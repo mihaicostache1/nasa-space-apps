@@ -1,0 +1,4 @@
+case_id,status,site_id,lat_deg,lon_east_deg,observer_altitude_km,time_utc,quickmap_url,layer_or_tool,reference_frame,terrain_model,body_disc_rule,quantity,reference_value,calculated_value,wrapped_difference_deg,tolerance,evidence_path,reviewer_notes
+case-01,pending,,,,,,,,,,,,,,,,,
+case-02,pending,,,,,,,,,,,,,,,,,
+case-03,pending,,,,,,,,,,,,,,,,,

@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+coverage
+.venv
+**/*.egg-info
+package-lock.json
+next-env.d.ts
+data/raw
+data/processed

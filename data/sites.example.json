@@ -1,0 +1,10 @@
+[
+  {
+    "id": "polar-example",
+    "name": "Illustrative polar point",
+    "lat": -89.0,
+    "lon": 0.0,
+    "altitudeKm": 0.0,
+    "coordinateSource": "Illustrative test input; not an official landing site. Replace using the Terrain/GIS lead's verified catalog."
+  }
+]

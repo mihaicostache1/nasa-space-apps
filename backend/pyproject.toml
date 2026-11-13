@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lunarwindow-ephemeris"
+version = "0.1.0"
+description = "Traceable Sun/Earth ephemerides for LunarWindow"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+lunarwindow-ephemeris = "lunarwindow.ephemeris.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
