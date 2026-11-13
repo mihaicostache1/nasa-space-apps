@@ -1,0 +1,87 @@
+{
+  "sourcePage": "https://pgda.gsfc.nasa.gov/products/78",
+  "sourceReadme": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/README",
+  "points": [
+    {
+      "siteId": "lola-site01-reference",
+      "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif",
+      "sourceSha256": "3ba7b97cb00a2bcf21189c3aeb535f65afc21207154ab9f0d43c5bdc1f7e747e",
+      "localFileMtimeUtc": "2026-11-13T11:12:17.001240+00:00",
+      "crsWkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "width": 3200,
+      "height": 3200,
+      "transform": [
+        5.0,
+        0.0,
+        -19000.0,
+        0.0,
+        -5.0,
+        -4000.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "row": 1600,
+      "col": 1600,
+      "pixelCenterXMetres": -10997.5,
+      "pixelCenterYMetres": -12002.5,
+      "surfaceElevationMetres": 1944.76708984375,
+      "mastHeightMetres": 0,
+      "referenceRadiusMetres": 1737400
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+      "sourceSha256": "38ff70dbdf2f066c2cfa94a646c3a59d653ce7f6b4528b15fc1b43ee397ce758",
+      "localFileMtimeUtc": "2026-11-13T11:10:45.520565+00:00",
+      "crsWkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "width": 3200,
+      "height": 3200,
+      "transform": [
+        5.0,
+        0.0,
+        -9000.0,
+        0.0,
+        -5.0,
+        1000.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "row": 1600,
+      "col": 1600,
+      "pixelCenterXMetres": -997.5,
+      "pixelCenterYMetres": -7002.5,
+      "surfaceElevationMetres": 767.9786376953125,
+      "mastHeightMetres": 0,
+      "referenceRadiusMetres": 1737400
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif",
+      "sourceSha256": "12d280a59cd7580415f6bada638d0abe025ce6727541fddf68d5dc371a6c94cf",
+      "localFileMtimeUtc": "2026-11-13T11:12:49.883215+00:00",
+      "crsWkt": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+      "width": 4200,
+      "height": 4200,
+      "transform": [
+        5.0,
+        0.0,
+        -11000.0,
+        0.0,
+        -5.0,
+        132000.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "row": 2100,
+      "col": 2100,
+      "pixelCenterXMetres": -497.5,
+      "pixelCenterYMetres": 121497.5,
+      "surfaceElevationMetres": 4783.62939453125,
+      "mastHeightMetres": 0,
+      "referenceRadiusMetres": 1737400
+    }
+  ]
+}

@@ -8,3 +8,6 @@ package-lock.json
 next-env.d.ts
 data/raw
 data/processed
+data/reference
+docs/validation/evidence
+docs/validation/quickmap-results.json

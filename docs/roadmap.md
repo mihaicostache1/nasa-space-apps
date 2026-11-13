@@ -4,14 +4,14 @@
 
 Local setup, two-scenario input shell, validation, team-aligned export types, frontend health route, code quality checks, CI, and architecture/source documentation. The Python ephemeris package and CLI are now installed locally.
 
-## 1. Ephemeris lead - implemented foundation, validation pending
+## 1. Ephemeris lead - reference milestone complete
 
-Implemented: Python Horizons retrieval, chunking, cache/provenance, JSON/CSV export, observer verification, real archived response fixtures, and offline ingestion/contract tests. A three-hour live smoke run succeeded at one illustrative point.
+Implemented: Python Horizons retrieval, chunking, cache/provenance, JSON/CSV export, observer verification, real archived response fixtures, and offline ingestion/contract tests. The hardened client also supplies angular radii, shared request/cache locks, version checks, Retry-After handling, and immutable validated run bundles. A 30-day dataset at three sourced NASA DEM grid cells, a month-long pointing plot, and three recorded QuickMap camera-observer checks are committed.
 
 Next:
 
 1. Agree verified GIS inputs, mast/altitude conventions, and the extended JSON contract.
-2. Export 2-3 real-site cases and complete the independent QuickMap validation worksheet.
+2. Review the completed reference-point/camera-observer evidence, then add surface/terrain cases after that integration is available.
 3. Run the agreed curated-site precompute after a `--dry-run` request estimate.
 4. Backend/data adds FastAPI routes, the terrain join, and derived metrics; frontend connects to that service.
 

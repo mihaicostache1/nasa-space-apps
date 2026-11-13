@@ -1,0 +1,103 @@
+Browser tab: 2, Title: "Lunar/LROC :: QuickMap", URL: "https://quickmap.lroc.im-ldi.com/settings?camera=128333.6644%2C-525.4923%2C-1832912.6969%2C-0.0698%2C0.0003%2C0.9976%2C0.9976%2C0%2C0.0698%2C60&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D".
+0 AXWebArea Lunar/LROC :: QuickMap, URL: quickmap.lroc.im-ldi.com/settings?camera=128333.6644%2C-525.4923%2C-1832912.6969%2C-0.0698%2C0.0003%2C0.9976%2C0.9976%2C0%2C0.0698%2C60&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D
+	1 container
+		2 container App
+			3 container QuickMap
+				4 content list
+					5 pop up button (collapsed) Description: Projection: Lunar Globe (3D), ID: radix-_r_1_, Secondary Actions: Expand
+					6 link Description: Layers, Value: quickmap.lroc.im-ldi.com/layers
+					7 link Description: My Features, Value: quickmap.lroc.im-ldi.com/query
+					8 link Description: Settings, Value: quickmap.lroc.im-ldi.com/
+					9 button Toggle fullscreen
+					10 pop up button (collapsed) Description: Share, Secondary Actions: Expand
+					11 link Description: Help, Value: quickmap.lroc.im-ldi.com/help
+				12 container
+					13 heading Settings, Value: 1
+						14 text Settings
+					15 heading Coordinates, Value: 3
+						16 text Coordinates
+					17 container
+						18 switch Description: Show Longitude as 0 to 360, Value: 1
+						19 text Show Longitude as 0 to 360
+					20 heading 3D Globe, Value: 3
+						21 text 3D Globe
+					22 container
+						23 switch Description: Enable Terrain (3D only), Value: 1
+						24 text Enable Terrain (3D only)
+					25 container
+						26 switch Description: Unlock Camera Z-Axis, Value: 0
+						27 text Unlock Camera Z-Axis
+					28 container
+						29 switch Description: Enable GeoTIFF in 3D, Value: 0
+						30 text Enable GeoTIFF in 3D
+					31 heading Export Image, Value: 3
+						32 text Export Image
+					33 button Download PNG
+					34 button Create Panorama
+						35 image
+						36 text Create Panorama
+					37 pop up button (collapsed) Visibility Analysis, Secondary Actions: Expand
+					38 button
+					39 heading Visibility Analysis, Value: 2, ID: radix-_r_54_
+						40 text Visibility Analysis
+				41 container
+					42 container
+						43 text N
+						44 image
+					45 checkbox Orbit, Value: 0
+						46 image Orbit
+					47 button
+					48 pop up button (collapsed) Description: 3D settings, ID: radix-_r_5r_, Secondary Actions: Expand
+					49 checkbox 0
+					50 image
+					51 button Navigation Instructions
+						52 image
+				53 container
+					54 link Description: Visit the ACT website, Value: actgate.com/
+					55 text Lunar/LROC
+					56 pop up button (collapsed) Description: Explore other QuickMaps, Secondary Actions: Expand
+				57 container
+					58 checkbox 0
+						59 image
+					60 checkbox 1
+						61 image
+					62 checkbox 0
+						63 image
+					64 checkbox 0
+					65 combo box (collapsed) Value: 1x, Secondary Actions: Expand
+						66 container
+							67 text 1 x
+					68 text 2026-11-14 00:00:00 UTC
+					69 container
+						70 text Nov 12 2026 00:00:00 UTC Nov 27 2026 00:00:00 UTC Dec 12 2026 00:00:00 UTC Dec 27 2026 00:00:00 UTC
+				71 heading Visibility Analysis, Value: 2, ID: radix-_r_h_
+					72 text Visibility Analysis
+				73 container
+					74 checkbox Description: Toggle time controls, Value: 1
+					75 text LAT -84.44693 LON 1.55155 HEIGHT -1.368 km RES 178.98 m/px DIST TO CURSOR 112.359 km
+					76 checkbox Description: Toggle camera info, Value: 0
+					77 checkbox Description: Toggle time and geometry info, Value: 1
+						78 image
+					79 pop up button (collapsed) Accuracy, Secondary Actions: Expand
+					80 text 10 km
+				81 container
+					82 image
+					83 combo box (expanded, settable) ID: radix-_r_t_, Secondary Actions: Collapse
+					85 list Description: Suggestions, ID: radix-_r_r_
+			89 container Notifications Alt+T
+		118 container radix-_r_67_
+			119 heading Time and Key Geometry Info, Value: 3
+				120 text Time and Key Geometry Info
+			121 button
+			122 container
+				123 text UTC 2026-11-14T00:00:00.000Z
+			124 container
+				125 heading SUN, Value: 3
+					126 text SUN
+				127 text LAT -1.55727 LON 126.61745 HEIGHT 147782368.939 km X -88116140.719 km Y 118573006.909 km Z -4016200.179 km ELEVATION -0.85 AZIMUTH (0°N) 126.87
+			128 container
+				129 heading EARTH, Value: 3
+					130 text EARTH
+				131 text LAT 4.40363 LON 358.77264 HEIGHT 403815.114 km X 404262.507 km Y -8661.225 km Z 31139.198 km ELEVATION -0.66 AZIMUTH (0°N) 359.01 EARTH TO SUN ANGLE 127.84
+
+The focused UI element is 85 list Description: Suggestions, ID: radix-_r_r_

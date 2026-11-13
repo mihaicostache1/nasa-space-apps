@@ -4,13 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lunarwindow-ephemeris"
-version = "0.1.0"
+version = "0.2.0"
 description = "Traceable Sun/Earth ephemerides for LunarWindow"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["jsonschema>=4.23,<5"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.14,<1"]
+analysis = ["matplotlib>=3.10,<4"]
+gis = ["rasterio>=1.4,<2"]
 
 [project.scripts]
 lunarwindow-ephemeris = "lunarwindow.ephemeris.cli:main"
+lunarwindow-report = "lunarwindow.ephemeris.report:main"
+lunarwindow-validate = "lunarwindow.ephemeris.contract:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"lunarwindow.ephemeris" = ["*.schema.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+# Keep generated evidence bytes unchanged so manifest hashes survive checkout.
+data/reference/** -text
+backend/tests/fixtures/** -text
+docs/validation/evidence/** -text
+docs/validation/quickmap-results.json -text
+docs/validation/quickmap-cases.csv -text

@@ -1,4 +1,4 @@
-/** P1 export contract; matches the Python CLI's lunarwindow.ephemeris.v1 JSON. */
+/** P1 export contract; checked by ephemeris.schema.json in the Python package. */
 export type EphemerisSample = {
   /** ISO 8601 UTC. Exports include start and exclude end. */
   t: string;
@@ -7,6 +7,8 @@ export type EphemerisSample = {
   sunEl: number;
   earthAz: number;
   earthEl: number;
+  sunAngularRadiusDeg: number;
+  earthAngularRadiusDeg: number;
 };
 
 export type EphemerisRequest = {
@@ -20,7 +22,7 @@ export type EphemerisRequest = {
 };
 
 export type EphemerisDataset = {
-  schemaVersion: 'lunarwindow.ephemeris.v1';
+  schemaVersion: 'lunarwindow.ephemeris.v2';
   siteId: string;
   site: string;
   lat: number;
@@ -40,6 +42,8 @@ export type EphemerisDataset = {
     stepMinutes: number;
     terrainModel: 'none';
     positionType: 'airless-apparent-body-center';
+    quantities: [4, 13];
+    angularSizeModel: 'equatorial-radius';
     requests: EphemerisRequest[];
   };
 };

@@ -16,6 +16,8 @@ The CSV's `earthAz` and `earthEl` are local pointing angles. They are not the Mo
 
 ## What to show
 
+The committed `data/reference/validation-30d/pointing-reference.png` and SVG now show a real 30-day example for three NASA LOLA reference grid cells. The matching JSON/CSV series, archived Horizons responses, and reproducible source manifests are shipped with it. Regenerate the figure with `lunarwindow-report data/reference/validation-30d --quickmap-results docs/validation/quickmap-results.json`. The figure's Earth azimuth is unwrapped across north for continuity; exported azimuths remain in [0, 360).
+
 For a verified polar point, plot Earth elevation over at least a lunar month and overlay that site's terrain horizon evaluated at Earth azimuth. A flat 0-degree line can explain the geometry first; label it as the local horizontal plane. Use real exports for the animation rather than an assumed wobble period/amplitude.
 
 Solar availability and direct-to-Earth communication require additional checks beyond pointing angles. Body-disc visibility, eclipses, terrain, antenna geometry, specific ground stations, and link budgets are separate integration decisions. Refine event timing around crossings rather than describing hourly samples as exact rise/set predictions.

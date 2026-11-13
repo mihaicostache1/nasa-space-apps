@@ -1,6 +1,6 @@
 # QuickMap validation protocol
 
-Status: **not performed**. No agreement values or pass claims have been invented. Archived Horizons tests verify ingestion and contracts, not an independent QuickMap comparison.
+Status: **three numerical camera-observer checks performed**, with 12 angle comparisons agreeing at the displayed 0.01-degree precision. See [the evidence and scope report](report.md). This protocol remains applicable to future surface/terrain validation.
 
 Reference application: [LROC QuickMap](https://quickmap.lroc.im-ldi.com/) (the older ASU URL redirects here). The precise tools/layers available must be checked in the live interface when performing validation.
 
@@ -21,6 +21,6 @@ Agree an acceptance tolerance before assessing results, based on the reference's
 
 ## Record results
 
-Use `quickmap-cases.csv` as the worksheet. Rows start as `pending` with blank measurements. Record expected/reference values, calculated values, differences, an agreed tolerance, evidence location, and reviewer notes. Use `pass`, `fail`, or `not-comparable` only after the evidence is recorded.
+`quickmap-cases.csv` now records the three completed camera-observer cases, with one row per angle. Start new cases as `pending` with blank measurements. Record expected/reference values, calculated values, differences, an agreed tolerance, evidence location, and reviewer notes. Use `pass`, `fail`, or `not-comparable` only after the evidence is recorded.
 
 Before claiming validation in the pitch, have at least one reproducible case with a concrete quantity, matched assumptions, evidence, measured difference, and agreed tolerance. Describe an illumination-map visual check as a sanity check rather than precise independent ephemeris validation.

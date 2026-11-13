@@ -1,13 +1,15 @@
 """Coordinate and time contracts shared by the CLI and a future FastAPI service."""
 
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
 import math
 import re
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 
 
 def parse_utc(value: str) -> datetime:
-    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?Z", value):
+    if not isinstance(value, str) or not re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?Z", value
+    ):
         raise ValueError("Times must be ISO 8601 UTC strings ending in Z.")
     try:
         result = datetime.fromisoformat(value[:-1] + "+00:00")
@@ -40,7 +42,9 @@ class Site:
     coordinate_source: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.site_id, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", self.site_id):
+        if not isinstance(self.site_id, str) or not re.fullmatch(
+            r"[a-z0-9]+(?:-[a-z0-9]+)*", self.site_id
+        ):
             raise ValueError("site_id must be a lowercase filename-safe slug.")
         if not isinstance(self.name, str) or not self.name.strip():
             raise ValueError("A site name is required.")
@@ -60,12 +64,18 @@ class TimeRange:
     step_minutes: int = 60
 
     def __post_init__(self) -> None:
-        if isinstance(self.step_minutes, bool) or not isinstance(self.step_minutes, int) or not 1 <= self.step_minutes <= 1440:
+        if (
+            isinstance(self.step_minutes, bool)
+            or not isinstance(self.step_minutes, int)
+            or not 1 <= self.step_minutes <= 1440
+        ):
             raise ValueError("step_minutes must be an integer in [1, 1440].")
         if self.end <= self.start:
             raise ValueError("End must follow start.")
         if self.sample_count > 200_000:
-            raise ValueError("At most 200,000 samples per export; shorten the interval or increase the step.")
+            raise ValueError(
+                "At most 200,000 samples per export; shorten the interval or increase the step."
+            )
 
     @property
     def start(self) -> datetime:
@@ -90,6 +100,6 @@ class TimeRange:
         intervals = max(1, span // self.step)
         current = self.start
         while current < self.end:
-            end = min(current + intervals * self.step, self.end)
+            end = current + min(intervals * self.step, self.end - current)
             yield current, end
             current = end

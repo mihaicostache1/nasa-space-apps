@@ -1,0 +1,115 @@
+{
+  "scope": "Sun/Earth center pointing at three elevated QuickMap camera observers, at one UTC timestamp; no terrain-visibility or mission-site certification",
+  "criterion": "within half the 0.01-degree UI display step plus 1e-6 degree coordinate-rounding allowance",
+  "status": "pass-display-precision",
+  "cases": [
+    {
+      "caseId": "quickmap-case-01",
+      "status": "pass-display-precision",
+      "observer": {
+        "lat": -89.76674147787118,
+        "lon": -171.89280891381682,
+        "altitudeKm": 144.36489015172265,
+        "cameraCartesianMetres": [
+          -7584.3237,
+          -1080.3803,
+          -1881749.2959
+        ]
+      },
+      "timeUtc": "2026-11-14T00:00:00Z",
+      "referenceUrl": "https://quickmap.lroc.im-ldi.com/settings?camera=-7584.3237%2C-1080.3803%2C-1881749.2959%2C0.004%2C0.0006%2C1%2C1%2C0%2C-0.004%2C60&queryOpts=N4IgLghgRiBcIEcCuBTATgTxAXyA&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D",
+      "reference": {
+        "sunAz": 298.5,
+        "sunEl": 1.67,
+        "earthAz": 170.66,
+        "earthEl": -4.9
+      },
+      "horizons": {
+        "sunAz": 298.504505486,
+        "sunEl": 1.667877299,
+        "earthAz": 170.662463807,
+        "earthEl": -4.89866575
+      },
+      "differencesDeg": {
+        "sunAz": 0.0045054860000277586,
+        "sunEl": -0.0021227010000000046,
+        "earthAz": 0.0024638069999980416,
+        "earthEl": 0.0013342500000002033
+      },
+      "toleranceDeg": 0.005001,
+      "evidence": "evidence/quickmap-case-01.png"
+    },
+    {
+      "caseId": "quickmap-case-02",
+      "status": "pass-display-precision",
+      "observer": {
+        "lat": -89.46315775814479,
+        "lon": -137.50198484460324,
+        "altitudeKm": 100.00000004914295,
+        "cameraCartesianMetres": [
+          -12693.0525,
+          -11630.2308,
+          -1837319.3474
+        ]
+      },
+      "timeUtc": "2026-11-14T00:00:00Z",
+      "referenceUrl": "https://quickmap.lroc.im-ldi.com/settings?camera=-12693.0525%2C-11630.2308%2C-1837319.3474%2C0.0069%2C0.0063%2C1%2C1%2C0%2C-0.0069%2C60&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D",
+      "reference": {
+        "sunAz": 264.11,
+        "sunEl": 1.5,
+        "earthAz": 136.24,
+        "earthEl": -5.05
+      },
+      "horizons": {
+        "sunAz": 264.105192218,
+        "sunEl": 1.501497599,
+        "earthAz": 136.244782483,
+        "earthEl": -5.050052787
+      },
+      "differencesDeg": {
+        "sunAz": -0.004807782000000316,
+        "sunEl": 0.001497598999999905,
+        "earthAz": 0.004782482999985405,
+        "earthEl": -5.2787000000442674e-05
+      },
+      "toleranceDeg": 0.005001,
+      "evidence": "evidence/quickmap-case-02.png"
+    },
+    {
+      "caseId": "quickmap-case-03",
+      "status": "pass-display-precision",
+      "observer": {
+        "lat": -85.99486736344207,
+        "lon": -0.23460970139217607,
+        "altitudeKm": 100.00000000482214,
+        "cameraCartesianMetres": [
+          128333.6644,
+          -525.4923,
+          -1832912.6969
+        ]
+      },
+      "timeUtc": "2026-11-14T00:00:00Z",
+      "referenceUrl": "https://quickmap.lroc.im-ldi.com/settings?camera=128333.6644%2C-525.4923%2C-1832912.6969%2C-0.0698%2C0.0003%2C0.9976%2C0.9976%2C0%2C0.0698%2C60&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D",
+      "reference": {
+        "sunAz": 126.87,
+        "sunEl": -0.85,
+        "earthAz": 359.01,
+        "earthEl": -0.66
+      },
+      "horizons": {
+        "sunAz": 126.871977006,
+        "sunEl": -0.846699543,
+        "earthAz": 359.01016224,
+        "earthEl": -0.658649779
+      },
+      "differencesDeg": {
+        "sunAz": 0.0019770060000041667,
+        "sunEl": 0.0033004569999999234,
+        "earthAz": 0.00016224000000875094,
+        "earthEl": 0.0013502210000000403
+      },
+      "toleranceDeg": 0.005001,
+      "evidence": "evidence/quickmap-case-03.png"
+    }
+  ]
+}

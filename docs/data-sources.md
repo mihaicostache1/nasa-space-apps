@@ -1,6 +1,6 @@
 # Data sources and conventions
 
-The Python module now queries Horizons and preserves real source responses. A short illustrative run is archived under `backend/tests/fixtures`; the React UI is not connected to those exports yet. Terrain datasets have not been downloaded.
+The Python module queries Horizons and preserves real source responses. The versioned sample fixture and a 30-day, three-point reference bundle are committed. Three NASA regional DEMs were downloaded into ignored storage to derive reference coordinates and surface heights; terrain horizon masks are not integrated. The React UI does not yet consume these exports.
 
 | Resource                                                                                                 | Intended role                                                                    |
 | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -25,11 +25,13 @@ The TypeScript UI scenario schema limits a comparison to 31 days and 10,000 samp
 
 ## Horizons integration
 
-Use lunar surface observer geometry (`CENTER='coord@301'`), with Sun target `10` and Earth target `399`. Quantity `4` requests azimuth/elevation. Read the manual before selecting geodetic or planetocentric coordinates and transforming elevations from another dataset. Record the actual frame, time scale, surface model, retrieval time, and source request with the result.
+Use lunar surface observer geometry (`CENTER='coord@301'`), with Sun target `10` and Earth target `399`. Quantity `4` requests azimuth/elevation; `13` requests angular diameter in arcseconds. Contract v2 exports the corresponding equatorial angular radius in degrees (diameter / 7200). Read the manual before selecting geodetic or planetocentric coordinates and transforming elevations from another dataset. Record the actual frame, time scale, surface model, retrieval time, and source request with the result.
 
 Use airless output for the Moon. Match and validate timestamps from both target queries. Detect provider errors and unavailable output explicitly. Do not assume the API returns valid samples just because the HTTP status is 200.
 
-These checks are implemented in `backend/src/lunarwindow/ephemeris/horizons.py`. Exports use the team's flat names (`t`, `sunAz`, `sunEl`, `earthAz`, `earthEl`) and include start / exclude end. Each query's actual observer frame and radii are preserved in its model header. The short archived 2026 responses report a spherical 1737.4 km center radius. GIS must confirm reference-frame/height compatibility before the terrain join.
+Horizons UT is interpreted as UTC for the modern dates used here. Future leap seconds are unknown; the provider uses its available time-scale conversion assumptions for future predictions. Preserve retrieval epochs/model headers and regenerate future data when those assumptions change. The application samples at whole-minute timestamps and does not represent a `23:59:60` leap-second label.
+
+These checks are implemented in `backend/src/lunarwindow/ephemeris/horizons.py`. Exports use the team's flat names (`t`, `sunAz`, `sunEl`, `earthAz`, `earthEl`) and include start / exclude end. Each row also carries `sunAngularRadiusDeg` and `earthAngularRadiusDeg`. Each query's actual observer frame and radii are preserved in its model header. The short archived 2026 responses report a spherical 1737.4 km center radius. GIS must confirm reference-frame/height compatibility before the terrain join.
 
 ## Terrain and accuracy
 

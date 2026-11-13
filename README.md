@@ -24,7 +24,7 @@ Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md
 
 ## Native setup: Ephemeris lead
 
-Python 3.11+; no runtime dependencies or NASA API key required.
+Python 3.11+; pip installs the declared contract-validation dependency. No NASA API key is required.
 
 ```sh
 python3 -m venv .venv
@@ -35,7 +35,7 @@ lunarwindow-ephemeris --sites data/sites.example.json \
 python -m unittest discover -s backend/tests -v
 ```
 
-Exports go to `data/processed/ephemeris/`, with raw response caches under `data/raw/horizons/`. The sample site is illustrative. See [Python setup](backend/README.md), [your work package](docs/ephemeris-lead.md), [libration notes](docs/libration.md), and [QuickMap validation protocol](docs/validation/quickmap.md).
+Each export creates `data/processed/ephemeris/<run-id>/` with JSON/CSV pairs and a checksum manifest. Raw response caches stay under `data/raw/horizons/`. The sample site is illustrative. See [Python setup](backend/README.md), [your work package](docs/ephemeris-lead.md), [libration notes](docs/libration.md), and [QuickMap validation protocol](docs/validation/quickmap.md).
 
 ## Native setup: React UI starter
 
@@ -56,12 +56,13 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - Responsive two-scenario workspace with editable coordinates, UTC dates, sample intervals, and validation.
 - Python Horizons client/CLI with sequential chunked requests, caching, JSON/CSV export, observer checks, and source provenance.
 - Flat Sun/Earth series matching the team's JSON field names, with corresponding TypeScript types.
-- Offline Python tests using a real, archived NASA response pair.
+- Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
+- A sourced 30-day, three-point NASA reference dataset, pointing plot, and reproducible QuickMap comparison evidence.
 - Health endpoint at `GET /api/health`.
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. FastAPI routes, the terrain join, charts, maps, visibility calculations, and verified site presets remain to be implemented. The default locations are illustrative coordinates, not named or NASA-selected landing sites. QuickMap comparisons are pending.
+The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. FastAPI routes, the terrain join, charts, maps, visibility calculations, and verified site presets remain to be implemented. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -115,4 +116,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-Obtain verified coordinates and observer altitude from GIS, validate short exports, and hand the dataset to Backend/data for its terrain join and FastAPI integration. See [the role-specific work package](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+Hand the versioned reference dataset and schema to Backend/data for integration. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See [the role-specific work package](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.

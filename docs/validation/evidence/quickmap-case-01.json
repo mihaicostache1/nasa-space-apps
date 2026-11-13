@@ -1,0 +1,10 @@
+{
+  "url": "https://quickmap.lroc.im-ldi.com/settings?camera=-7584.3237%2C-1080.3803%2C-1881749.2959%2C0.004%2C0.0006%2C1%2C1%2C0%2C-0.004%2C60&queryOpts=N4IgLghgRiBcIEcCuBTATgTxAXyA&earthShadowEnabled=true&proj=22&stack=3314&defs=N4IgzGCMAsIFygPYAcCGBjAlgFwJ70gF9Cg&features=-171.8928091%2C-89.7667415%40%40%7B%22id%22%3A%222oBLo%22%7D",
+  "timestampUtc": "2026-11-14T00:00:00Z",
+  "sunAz": 298.5,
+  "sunEl": 1.67,
+  "earthAz": 170.66,
+  "earthEl": -4.9,
+  "angularDisplayResolutionDeg": 0.01,
+  "observer": "camera"
+}

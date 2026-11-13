@@ -1,0 +1,59 @@
+{
+  "runId": "20261113T113208Z-a54cef6c81c6",
+  "contractValidation": "pass",
+  "quickmapValidation": "pass-display-precision",
+  "terrainModel": "none",
+  "sites": [
+    {
+      "siteId": "lola-site01-reference",
+      "samples": 720,
+      "earthElevationRangeDeg": [
+        -7.264254877,
+        5.879461648
+      ],
+      "sunElevationRangeDeg": [
+        1.004003889,
+        1.989060712
+      ],
+      "earthAzimuthRangeUnwrappedDeg": [
+        130.282762662,
+        144.388991906
+      ]
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "samples": 720,
+      "earthElevationRangeDeg": [
+        -7.075078193,
+        6.024539298
+      ],
+      "sunElevationRangeDeg": [
+        1.290729033,
+        1.674242287
+      ],
+      "earthAzimuthRangeUnwrappedDeg": [
+        164.652884854,
+        178.797676984
+      ]
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "samples": 720,
+      "earthElevationRangeDeg": [
+        -2.851888954,
+        10.254265518
+      ],
+      "sunElevationRangeDeg": [
+        -2.570192287,
+        5.526764805
+      ],
+      "earthAzimuthRangeUnwrappedDeg": [
+        352.942522612,
+        367.130070843
+      ]
+    }
+  ],
+  "quickmapScope": "Sun/Earth center pointing at three elevated QuickMap camera observers, at one UTC timestamp; no terrain-visibility or mission-site certification",
+  "quickmapEvidenceSha256": "4009382b0a4cb7d687c056ef2e4d2c837769e46c7992b47e10ec58491ced04e0",
+  "figureSha256": "6d01716761173de386157798bc0cdadd1f97b78d40c8c821b8db91cef0a58635"
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "lola-site01-reference",
+    "name": "Connecting ridge DEM reference point",
+    "lat": -89.46315775697248,
+    "lon": -137.50198490762307,
+    "altitudeKm": 1.94476708984375,
+    "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif; center pixel row=1600, col=1600; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target."
+  },
+  {
+    "id": "lola-site04-reference",
+    "name": "Shackleton rim DEM reference point",
+    "lat": -89.76674147712977,
+    "lon": -171.89280908299654,
+    "altitudeKm": 0.7679786376953125,
+    "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif; center pixel row=1600, col=1600; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target."
+  },
+  {
+    "id": "lola-site23-reference",
+    "name": "Malapert massif DEM reference point",
+    "lat": -85.99486736492491,
+    "lon": -0.23460969154338968,
+    "altitudeKm": 4.78362939453125,
+    "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif; center pixel row=2100, col=2100; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target."
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "lunarwindow.run.v1",
+  "runId": "20261113T113208Z-a54cef6c81c6",
+  "status": "complete",
+  "createdAtUtc": "2026-11-13T11:32:08Z",
+  "software": {
+    "packageVersion": "0.2.0",
+    "pythonVersion": "3.14.3"
+  },
+  "period": {
+    "startUtc": "2026-11-14T00:00:00Z",
+    "endUtc": "2026-12-14T00:00:00Z",
+    "stepMinutes": 60
+  },
+  "datasets": [
+    {
+      "siteId": "lola-site01-reference",
+      "samples": 720,
+      "json": "lola-site01-reference.json",
+      "csv": "lola-site01-reference.csv",
+      "jsonSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+      "csvSha256": "24fff9360a05d9b2c5cb3b838fcba44a5858730cc352a61c50fc2059690a1244"
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "samples": 720,
+      "json": "lola-site04-reference.json",
+      "csv": "lola-site04-reference.csv",
+      "jsonSha256": "f654c74182ef2f3b67d97cd6c642815affa84261340e2f591ee2cfc34839bbd6",
+      "csvSha256": "b6ac36b1559ab5f0fdf31a1884ea7b69e0468933353daa33cd2cb5a75d600876"
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "samples": 720,
+      "json": "lola-site23-reference.json",
+      "csv": "lola-site23-reference.csv",
+      "jsonSha256": "d6b6e13763f9ce645d87744f872ab754944c4fa87c2027c52b1bc0c2f28698aa",
+      "csvSha256": "46860ab8d879a7afa93e03349b31c506be89d751f809c119ab950d4557b9f8d4"
+    }
+  ]
+}

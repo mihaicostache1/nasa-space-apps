@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mihaicostache1/nasa-space-apps/blob/main/backend/src/lunarwindow/ephemeris/ephemeris.schema.json",
+  "title": "LunarWindow ephemeris v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "siteId",
+    "site",
+    "lat",
+    "lon",
+    "altitudeKm",
+    "coordinateSource",
+    "series",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "lunarwindow.ephemeris.v2"
+    },
+    "siteId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "site": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lat": {
+      "type": "number",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "lon": {
+      "type": "number",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "altitudeKm": {
+      "type": "number"
+    },
+    "coordinateSource": {
+      "type": "string",
+      "minLength": 1
+    },
+    "series": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "t",
+          "sunAz",
+          "sunEl",
+          "earthAz",
+          "earthEl",
+          "sunAngularRadiusDeg",
+          "earthAngularRadiusDeg"
+        ],
+        "properties": {
+          "t": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+          },
+          "sunAz": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMaximum": 360
+          },
+          "sunEl": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "earthAz": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMaximum": 360
+          },
+          "earthEl": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "sunAngularRadiusDeg": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 90
+          },
+          "earthAngularRadiusDeg": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 90
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "observerCenter",
+        "coordinateType",
+        "longitudeConvention",
+        "timeScale",
+        "startUtc",
+        "endUtc",
+        "endExclusive",
+        "stepMinutes",
+        "terrainModel",
+        "positionType",
+        "quantities",
+        "angularSizeModel",
+        "requests"
+      ],
+      "properties": {
+        "provider": {
+          "const": "NASA/JPL Horizons"
+        },
+        "observerCenter": {
+          "const": "coord@301"
+        },
+        "coordinateType": {
+          "const": "GEODETIC"
+        },
+        "longitudeConvention": {
+          "const": "east-positive"
+        },
+        "timeScale": {
+          "const": "UTC"
+        },
+        "startUtc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "endUtc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "endExclusive": {
+          "const": true
+        },
+        "stepMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        },
+        "terrainModel": {
+          "const": "none"
+        },
+        "positionType": {
+          "const": "airless-apparent-body-center"
+        },
+        "quantities": {
+          "const": [4, 13]
+        },
+        "angularSizeModel": {
+          "const": "equatorial-radius"
+        },
+        "requests": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "target",
+              "sourceUrl",
+              "retrievedAtUtc",
+              "responseSha256",
+              "apiVersion",
+              "modelHeader"
+            ],
+            "properties": {
+              "target": {
+                "enum": ["sun", "earth"]
+              },
+              "sourceUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "retrievedAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+              },
+              "responseSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "apiVersion": {
+                "enum": ["1.2", "1.3"]
+              },
+              "modelHeader": {
+                "type": "object",
+                "required": [
+                  "Center geodetic",
+                  "Center pole/equ",
+                  "Center radii"
+                ],
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

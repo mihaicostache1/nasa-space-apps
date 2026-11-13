@@ -20,8 +20,35 @@ services:
       target: ephemeris
     profiles: ['tools']
     user: '${LOCAL_UID:-1000}:${LOCAL_GID:-1000}'
+    environment:
+      LUNARWINDOW_LOCK_DIR: /app/data/raw/.locks
     volumes:
       - ./data:/app/data
+    init: true
+
+  validate:
+    image: lunarwindow-ephemeris:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: ephemeris
+    profiles: ['tools']
+    entrypoint: ['lunarwindow-validate']
+    volumes:
+      - ./data:/app/data:ro
+    init: true
+
+  report:
+    image: lunarwindow-report:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: analysis
+    profiles: ['tools']
+    user: '${LOCAL_UID:-1000}:${LOCAL_GID:-1000}'
+    volumes:
+      - ./data:/app/data
+      - ./docs/validation:/app/docs/validation:ro
     init: true
 
   ephemeris-test:

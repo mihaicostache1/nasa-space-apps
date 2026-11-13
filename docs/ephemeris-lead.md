@@ -4,14 +4,14 @@ This work package is based on the user-supplied LunarWindow team plan, particula
 
 ## Your deliverables
 
-| Deliverable                              | Location                                        | Status                                               |
-| ---------------------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
-| Horizons API scripts and reusable client | `backend/src/lunarwindow/ephemeris/`            | Working; one short live smoke run                    |
-| Sun/Earth azimuth/elevation series       | CLI JSON/CSV exports                            | Contract implemented; verified site catalog pending  |
-| Offline reference validation             | `backend/tests/`                                | Real NASA response fixtures and behavior tests       |
-| Libration explanation and model notes    | `docs/libration.md`                             | Written with NASA references                         |
-| QuickMap cross-checks                    | `docs/validation/quickmap.md` and CSV worksheet | Protocol ready; independent checks pending           |
-| All curated sites, hourly 2026-2030      | CLI supports bounded batches                    | Not executed; needs verified inputs and agreed scope |
+| Deliverable                              | Location                                        | Status                                                |
+| ---------------------------------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| Horizons API scripts and reusable client | `backend/src/lunarwindow/ephemeris/`            | Hardened client with shared locks and backoff         |
+| Sun/Earth azimuth/elevation series       | CLI JSON/CSV exports                            | Contract v2; 30 days at three NASA reference points   |
+| Offline reference validation             | `backend/tests/`                                | Real NASA response fixtures and behavior tests        |
+| Libration explanation and model notes    | `docs/libration.md`                             | Notes plus reproducible month-long pointing plot      |
+| QuickMap cross-checks                    | `docs/validation/quickmap.md` and CSV worksheet | Three camera-observer cases pass at display precision |
+| All curated sites, hourly 2026-2030      | CLI supports bounded batches                    | Not executed; needs verified inputs and agreed scope  |
 
 ## Handoff boundaries
 
@@ -27,13 +27,13 @@ To Frontend/viz: angles are apparent body-center angles in degrees. Azimuth incr
 2. Replace the illustrative site catalog with sourced coordinates from GIS.
 3. Export a short period for 2-3 contrasting locations; inspect the raw headers and CSV.
 4. Review the sampling interval near horizon crossings with backend. Hourly samples do not establish precise event times.
-5. Run and record the QuickMap checks with comparable inputs and models.
+5. Review the completed QuickMap camera-observer checks in `docs/validation/report.md`; add surface/terrain checks after GIS/backend integration.
 6. Preview the long batch with `--dry-run`; run the agreed sites/time span after the short cases pass.
 
 ## Points to clarify in the team plan
 
 - The JSON coordinates in the plan are placeholders. Geographic region names alone do not identify a valid point.
 - Verify the actual downloaded LOLA product's resolution and coverage from its metadata; do not assume every polar product is 20 m/px.
-- A solar-radius allowance and an Earth-radius allowance differ; if partial-disc visibility is modeled, use the appropriate body size/range and label the rule. This P1 module returns centers only.
+- A solar-radius allowance and an Earth-radius allowance differ; if partial-disc visibility is modeled, use the appropriate body size/range and label the rule. P1 exports center angles and separate equatorial angular radii; backend implements the visibility rule.
 - QuickMap time-specific geometry and long-term average illumination layers support different comparisons. Record which one is used.
 - The proposed multi-year range and the current UI's short comparison range are different workloads. The Python batch client handles chunking; the UI remains a separate starter until the team API is integrated.

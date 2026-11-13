@@ -4,7 +4,7 @@
 
 The team plan separates Python/FastAPI data services from a React frontend. The existing frontend starter uses Next.js App Router and strict TypeScript. The Ephemeris lead's working package is under `backend/src/lunarwindow/ephemeris`; the Backend/data lead can import it into FastAPI without invoking the CLI. FastAPI routes themselves are not implemented here. No database is required at this stage.
 
-Python uses the standard library at runtime, with `unittest` for offline tests. The frontend uses Zod for scenario validation, Vitest for tests, and ESLint/Prettier for code quality.
+Python uses the standard library for retrieval/storage and JSON Schema for the handoff boundary, with `unittest` for offline tests. Matplotlib and Rasterio are optional analysis/acquisition extras. The frontend uses Zod for scenario validation, Vitest for tests, and ESLint/Prettier for code quality.
 
 The package manifest overrides the TypeScript ESLint parser's `minimatch` dependency to patched version 11.0.8 or later in that major, addressing GHSA-g3hv-75wg-m249. Remove this override once upstream tooling depends on a patched release. ESLint stays on version 9 for compatibility with the React plugin's declared peer range.
 
@@ -24,7 +24,7 @@ The package manifest overrides the TypeScript ESLint parser's `minimatch` depend
 
 The page runs independently of NASA services. Scenario fields are kept in React state and validated against `scenarioSchema`. The results panels are empty states. Reloading resets the scenarios. `GET /api/health` describes this frontend process and identifies its ephemeris provider as `not-configured`; it does not check the separate Python CLI.
 
-The CLI can retrieve real Sun/Earth angles, cache exact provider responses, and export flat series plus provenance. The live smoke run covers one illustrative point over three hours. Curated site catalogs, terrain masks, visibility flags, metrics, and the full multi-year dataset remain pending.
+The CLI can retrieve real Sun/Earth angles, cache exact provider responses, and export flat series plus provenance. A committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. QuickMap camera-observer comparisons and a pointing plot are documented in `docs/validation/report.md`. Team-approved mission coordinates, terrain masks, visibility flags, metrics, and the full multi-year dataset remain pending.
 
 ## Planned data flow
 
@@ -62,7 +62,7 @@ The original scaffold suggested `POST /api/evaluations`; it is not implemented. 
 
 Map this UI request to Python `Site` and `TimeRange`, including a coordinate source. The P1 result is an `EphemerisDataset`; the backend adds `horizon`, visibility flags, and metrics after its terrain join. Preserve provenance in the combined result. Return structured input/provider errors and never substitute generated data for a failed request.
 
-The Python client already bounds/chunks requests, uses timeouts and limited retries, checks response structure/observer coordinates, and reuses disk archives keyed by request URL. Before exposing a service, backend still needs concurrency control, cache retention limits, HTTP input validation, and API-level request limits. Run blocking client calls in a worker and avoid concurrent writes to its current sequential cache.
+The Python client already bounds/chunks requests, uses timeouts and limited retries, checks response structure/observer coordinates, and reuses disk archives keyed by request URL. Cooperating workers now share OS request/cache locks, honor Retry-After, validate supported API signatures, and use atomic file writes. Export runs publish together with checksums only after all sites validate. Before exposing a service, backend still needs worker scheduling, cache retention limits, HTTP input validation, and API-level limits. All workers must share the configured lock directory; blocking client calls belong in a worker.
 
 ## Build and hosting
 

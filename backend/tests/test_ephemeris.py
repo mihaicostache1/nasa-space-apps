@@ -1,16 +1,22 @@
 """Offline tests against archived, real NASA responses; no API calls."""
 
-from datetime import timedelta
 import hashlib
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from datetime import timedelta
+from pathlib import Path
 from unittest.mock import patch
 
 from lunarwindow.ephemeris import HorizonsClient, HorizonsError, Site, TimeRange
 from lunarwindow.ephemeris.cli import load_sites
-from lunarwindow.ephemeris.horizons import merge_series, parse_response, query_parameters, query_url, validate_observer
+from lunarwindow.ephemeris.horizons import (
+    merge_series,
+    parse_response,
+    query_parameters,
+    query_url,
+    validate_observer,
+)
 from lunarwindow.ephemeris.models import parse_utc
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -29,7 +35,13 @@ class ModelTests(unittest.TestCase):
                 Site("test", "Test", lat, lon, altitude, "Test")
 
     def test_invalid_times(self):
-        for value in ["2026-11-14", "2026-11-14Z", "2026-11-14T00:00:00+02:00", "2026-02-30T00:00Z", "2026-11-14T00:00:01Z"]:
+        for value in [
+            "2026-11-14",
+            "2026-11-14Z",
+            "2026-11-14T00:00:00+02:00",
+            "2026-02-30T00:00Z",
+            "2026-11-14T00:00:01Z",
+        ]:
             with self.subTest(value=value), self.assertRaises(ValueError):
                 parse_utc(value)
         with self.assertRaises(ValueError):
@@ -51,7 +63,14 @@ class ModelTests(unittest.TestCase):
     def test_reject_duplicate_site_ids(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "sites.json"
-            site = {"id": "test", "name": "Test", "lat": 0, "lon": 0, "altitudeKm": 0, "coordinateSource": "Test"}
+            site = {
+                "id": "test",
+                "name": "Test",
+                "lat": 0,
+                "lon": 0,
+                "altitudeKm": 0,
+                "coordinateSource": "Test",
+            }
             path.write_text(json.dumps([site, site]))
             with self.assertRaises(ValueError):
                 load_sites(path)
@@ -68,7 +87,9 @@ class ProviderTests(unittest.TestCase):
     def test_real_fixtures_and_provenance_checksums(self):
         for target in ("sun", "earth"):
             data = archive(target)
-            self.assertEqual(hashlib.sha256(data["rawResponse"].encode()).hexdigest(), data["responseSha256"])
+            self.assertEqual(
+                hashlib.sha256(data["rawResponse"].encode()).hexdigest(), data["responseSha256"]
+            )
             samples, headers, version = parse_response(data["rawResponse"], target)
             self.assertEqual(len(samples), 4)
             self.assertTrue(version)
@@ -82,11 +103,24 @@ class ProviderTests(unittest.TestCase):
             result = client.evaluate(SITE, PERIOD)
         self.assertEqual(len(result["series"]), 3)
         self.assertEqual(result["series"][-1]["t"], "2026-11-14T02:00:00Z")
-        self.assertEqual(set(result["series"][0]), {"t", "sunAz", "sunEl", "earthAz", "earthEl"})
+        self.assertEqual(
+            set(result["series"][0]),
+            {
+                "t",
+                "sunAz",
+                "sunEl",
+                "earthAz",
+                "earthEl",
+                "sunAngularRadiusDeg",
+                "earthAngularRadiusDeg",
+            },
+        )
         self.assertEqual(result["provenance"]["terrainModel"], "none")
         self.assertNotIn("sunLit", result["series"][0])
         self.assertNotIn("horizon", result)
-        self.assertEqual(result["provenance"]["requests"][0]["retrievedAtUtc"], archive("sun")["retrievedAtUtc"])
+        self.assertEqual(
+            result["provenance"]["requests"][0]["retrievedAtUtc"], archive("sun")["retrievedAtUtc"]
+        )
 
     def test_known_archived_angles(self):
         sun, _, _ = parse_response(archive("sun")["rawResponse"], "sun")
@@ -104,7 +138,7 @@ class ProviderTests(unittest.TestCase):
             merge_series(sun, earth, PERIOD.start, PERIOD.end, PERIOD.step)
 
     def test_provider_errors_and_wrong_target_fail(self):
-        for raw in ['{"error":"test provider error"}', '{}', 'not json']:
+        for raw in ['{"error":"test provider error"}', "{}", "not json"]:
             with self.subTest(raw=raw), self.assertRaises(HorizonsError):
                 parse_response(raw, "sun")
         with self.assertRaises(HorizonsError):
@@ -133,7 +167,10 @@ class ProviderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / (hashlib.sha256(url.encode()).hexdigest() + ".json")
             path.write_text(json.dumps(data))
-            with patch("lunarwindow.ephemeris.horizons.urlopen", side_effect=AssertionError("Network forbidden")):
+            with patch(
+                "lunarwindow.ephemeris.horizons.urlopen",
+                side_effect=AssertionError("Network forbidden"),
+            ):
                 self.assertEqual(HorizonsClient(Path(directory)).fetch(params), data)
             data["responseSha256"] = "invalid"
             path.write_text(json.dumps(data))

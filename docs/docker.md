@@ -29,7 +29,7 @@ docker compose run --build --rm ephemeris \
   --end 2026-11-15T00:00:00Z
 ```
 
-JSON/CSV exports appear in your checkout under `data/processed/ephemeris/`; original NASA response caches appear under `data/raw/horizons/`. They persist when the command exits or containers are removed. The bind mount also makes your verified site catalog available inside the container. Live exports require internet access to NASA; no API key is needed.
+JSON/CSV exports and a completion/checksum manifest appear under a new `data/processed/ephemeris/<run-id>/` directory; original NASA response caches appear under `data/raw/horizons/`. They persist when the command exits or containers are removed. The bind mount also makes your verified site catalog available inside the container. Live exports require internet access to NASA; no API key is needed.
 
 Preview requests without using the network:
 
@@ -40,7 +40,7 @@ docker compose run --build --rm ephemeris \
   --end 2031-01-01T00:00:00Z --dry-run
 ```
 
-The default site is illustrative. Replace it with GIS-verified inputs before generating named-site results. Existing per-site exports in the chosen output directory are replaced on a successful run.
+The default site is illustrative. Replace it with GIS-verified inputs before generating named-site results. Existing runs are retained. No final run directory is published if a site fails; validated request caches are reused on a later invocation.
 
 The container uses UID/GID 1000 by default. Docker Desktop normally handles the host bind mount automatically. On Linux, if your checkout is owned by another UID/GID, put your numeric `LOCAL_UID` and `LOCAL_GID` in `.env` (obtain them with `id -u` and `id -g`), or override the user for one command:
 
@@ -54,7 +54,17 @@ docker compose run --build --rm --user "$(id -u):$(id -g)" ephemeris --help
 docker compose run --build --rm ephemeris-test
 ```
 
-Tests use the archived real NASA fixtures bundled into the separate test target. No network calls are made by the test process.
+Tests use the archived real NASA fixtures and 30-day reference bundle in the separate test target. No network calls are made by the test process.
+
+Validate the shipped handoff bundle and regenerate the pointing report:
+
+```sh
+docker compose run --build --rm validate data/reference/validation-30d
+docker compose run --build --rm report data/reference/validation-30d \
+  --quickmap-results docs/validation/quickmap-results.json
+```
+
+`validate` checks schema, grid, provenance models, manifest hashes, and CSV/JSON consistency. `report` uses an optional Matplotlib image. The report service mounts validation evidence read-only and writes its figures into the run directory. The ephemeris service uses a shared lock directory on the data mount to serialize cooperating request processes.
 
 ## Use images directly
 
@@ -76,4 +86,4 @@ After pulling code changes, rerun `docker compose up --build -d --wait`. This is
 
 Use commit subjects in the requested form: `feat:[description]`, `fix:[description]`, `docs:[description]`, `test:[description]`, or `chore:[description]`. Keep each commit focused on a reviewable change.
 
-The Docker CI job builds both runtime images, runs the Python test image and CLI dry run, and verifies the web health endpoint and page. It does not publish images or run a long NASA export.
+The Docker CI job builds the web, ephemeris, test, and analysis targets, runs offline regression/handoff checks, regenerates the reference plot, and verifies the web health endpoint and page. It does not publish images or run a long NASA export.
