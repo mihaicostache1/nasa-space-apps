@@ -50,6 +50,18 @@ python -m unittest discover -s backend/tests -v
 
 Each export creates `data/processed/ephemeris/<run-id>/` with JSON/CSV pairs and a checksum manifest. Raw response caches stay under `data/raw/horizons/`. The sample site is illustrative. See [Python setup](backend/README.md), [your work package](docs/ephemeris-lead.md), [libration notes](docs/libration.md), and [QuickMap validation protocol](docs/validation/quickmap.md).
 
+## Native setup: Terrain/GIS lead
+
+```sh
+python -m pip install -e './backend[gis,analysis]'
+lunarwindow-terrain download --all          # ~3.7 GB of NASA PGDA rasters into data/raw/lola/
+lunarwindow-terrain horizons --plots \
+  --sites data/sites.curated.json data/sites.shackleton-rim.json data/sites.artemis-regions.json
+python scripts/export_terrain_mask.py --site-id lola-site01-reference   # validated demo mask
+```
+
+Horizon profiles (360 whole-degree values plus 3,600 rays) are computed by exact spherical ray casting over the 20 m and 120 m LOLA south polar DEMs, out to 200 km, with ground + 2 m mast observers. The one validated demo mask is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json`: same coordinates and observer altitude as the archived Site01 ephemerides, 5 m/20 m/120 m DEM tiers, full DEM provenance. Horizons for the other 16 curated sites are preliminary. See [the terrain work package](docs/terrain-gis-lead.md) for sources, algorithm, validation, and handoff.
+
 ## Native setup: React UI starter
 
 Use Node.js 22.12+ on the 22.x line, or Node.js 24.x, with npm. An `.nvmrc` is included for Node 22.
@@ -73,11 +85,12 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - Flat Sun/Earth series matching the team's JSON field names, with corresponding TypeScript types.
 - Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
 - A sourced 30-day, three-point NASA reference dataset, pointing plot, and reproducible QuickMap comparison evidence.
+- A validated terrain horizon mask for the Site01 reference point (`lunarwindow.terrain-mask.v1`), plus tooling for a sourced 17-site catalog (9 Artemis III regions, Shackleton rim, landing sites, contrast cases) whose preliminary horizons match NASA PGDA 18.6-year sunlight averages within 4 percentage points at 12 of 14 polar sites.
 - Health endpoint at `GET /api/health`.
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. The real ephemeris/GIS integration, charts, maps, and verified site presets remain to be implemented. Visibility and metrics calculations are implemented and currently run on synthetic API inputs; they retain sampling and disc-model limitations. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
+The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. One validated terrain mask (Site01) and a sourced 17-site catalog are ready (see the [terrain work package](docs/terrain-gis-lead.md)); joining terrain into the API, charts, and maps remains to be implemented. Visibility and metrics calculations are implemented and currently run on synthetic API inputs; they retain sampling and disc-model limitations. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -88,6 +101,7 @@ backend/
   src/lunarwindow/api/        FastAPI app, HTTP contracts, synthetic provider
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
   src/lunarwindow/visibility/ Visibility engine, metrics, windows, and contracts
+  src/lunarwindow/terrain/    LOLA downloads, horizon ray casting, site catalog, service
   tests/                     Offline tests and archived NASA fixtures
 data/
   sites.example.json          Illustrative input catalog
@@ -99,7 +113,7 @@ docs/
   architecture.md             Module boundaries and API direction
   data-sources.md              NASA references and coordinate conventions
   roadmap.md                  Suggested implementation sequence
-scripts/                      Future data preparation tools
+scripts/                      Reference-point, QuickMap, rim-band, and terrain validation tools
 src/
   app/
     api/health/route.ts        Working health endpoint
@@ -109,6 +123,7 @@ src/
   domain/
     scenario.ts               Input schemas and shared types
     ephemeris.ts              Team-aligned Python export types
+    horizon.ts                Terrain horizon profile types
     evaluation.ts             FastAPI demo response types
   features/
     scenarios/components/     Editable comparison workspace
@@ -134,4 +149,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-Backend/data tasks 1 and 2 are complete; next integrate the versioned reference dataset and GIS masks, then add caching and curated-site precomputation. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+Backend/data tasks 1 and 2 are complete; next integrate the versioned reference dataset and GIS masks, then add caching and curated-site precomputation. The validated terrain mask is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json`; see the [terrain work package](docs/terrain-gis-lead.md). See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
