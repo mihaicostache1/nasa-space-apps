@@ -37,6 +37,7 @@ def evaluate_reference(
     *,
     cache: ReferenceEvaluationCache | None = None,
     expected_key: ReferenceEvaluationCacheKey | None = None,
+    precomputed_directory: Path | None = None,
 ) -> ReferenceEvaluationContract:
     verified = load_verified_reference_dataset(directory, request.siteId)
     archive = verified.dataset
@@ -67,7 +68,7 @@ def evaluate_reference(
         horizon = [HorizonPoint(az=az, el=0.0) for az in range(360)]
 
     # A cached success never bypasses source integrity, selection, or policy checks.
-    if cache is not None or expected_key is not None:
+    if cache is not None or expected_key is not None or precomputed_directory is not None:
         key = build_reference_evaluation_cache_key(
             request,
             ephemeris_sha256=verified.artifact_sha256,
@@ -80,6 +81,18 @@ def evaluate_reference(
             raise ValueError(
                 "Verified evaluation inputs differ from the planned precompute identity."
             )
+    if precomputed_directory is not None:
+        # Load lazily: the offline generator itself imports this provider.
+        from lunarwindow.precompute.loader import load_precomputed_evaluation
+
+        saved = load_precomputed_evaluation(
+            precomputed_directory,
+            key,
+            reference_directory=directory,
+            terrain_directory=terrain_directory,
+        )
+        if saved is not None:
+            return saved
     if cache is not None:
         snapshot = cache.get(key)
         if snapshot is not None:

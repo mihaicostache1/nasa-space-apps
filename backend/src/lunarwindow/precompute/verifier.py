@@ -7,7 +7,10 @@ from pathlib import Path
 from pydantic import TypeAdapter
 
 from lunarwindow.api.models import ReferenceAvailability
-from lunarwindow.api.reference_cache_key import build_reference_evaluation_cache_key
+from lunarwindow.api.reference_cache_key import (
+    ReferenceEvaluationCacheKey,
+    build_reference_evaluation_cache_key,
+)
 from lunarwindow.api.terrain_models import (
     ReferenceEvaluationContract,
     TerrainCompatibilityProvenance,
@@ -95,6 +98,47 @@ def _check_sources(
         raise ValueError("Output ephemeris samples differ from the verified source selection.")
 
 
+def _verify_bundle(
+    directory: Path,
+    *,
+    reference_directory: Path,
+    terrain_directory: Path | None = None,
+    lookup_key: ReferenceEvaluationCacheKey | None = None,
+) -> tuple[PrecomputeManifest, ReferenceEvaluationContract | None]:
+    """Shared verification pass retaining at most one freshly parsed response."""
+    directory, reference_directory = Path(directory), Path(reference_directory)
+    terrain_directory = (
+        reference_directory.parent / "terrain-masks"
+        if terrain_directory is None
+        else Path(terrain_directory)
+    )
+    try:
+        manifest = PrecomputeManifest.model_validate_json(
+            _read_artifact(directory, "manifest.json")
+        )
+        if manifest.status != "complete":
+            raise ValueError("Only complete precompute bundles can be verified for reuse.")
+        matched = None
+        for job in manifest.jobs:
+            if job.evaluation.calculationModelVersion != VISIBILITY_MODEL_VERSION:
+                raise ValueError("Unsupported calculation-model version in precompute job.")
+            content = _read_artifact(directory, job.output.filename)
+            if hashlib.sha256(content).hexdigest() != job.output.sha256:
+                raise ValueError(f"Output checksum mismatch: {job.output.filename}")
+            response = _RESPONSE.validate_json(content)
+            if response.schemaVersion != job.output.responseSchemaVersion:
+                raise ValueError("Output response schema differs from the manifest declaration.")
+            check_response_identity(response, job.evaluation)
+            _check_sources(job, response, reference_directory, terrain_directory)
+            if lookup_key is not None and job.evaluation == lookup_key:
+                matched = response
+        return manifest, matched
+    except (OSError, ValueError, LookupError) as exc:
+        raise PrecomputeVerificationError(
+            f"Cannot verify precompute bundle at {directory}: {exc}"
+        ) from exc
+
+
 def verify_bundle(
     directory: Path,
     *,
@@ -108,31 +152,7 @@ def verify_bundle(
     cache access, downloads, or writes. Returned metadata describes this verification
     snapshot, not file bytes a caller might reread later.
     """
-    directory, reference_directory = Path(directory), Path(reference_directory)
-    terrain_directory = (
-        reference_directory.parent / "terrain-masks"
-        if terrain_directory is None
-        else Path(terrain_directory)
+    manifest, _ = _verify_bundle(
+        directory, reference_directory=reference_directory, terrain_directory=terrain_directory
     )
-    try:
-        manifest = PrecomputeManifest.model_validate_json(
-            _read_artifact(directory, "manifest.json")
-        )
-        if manifest.status != "complete":
-            raise ValueError("Only complete precompute bundles can be verified for reuse.")
-        for job in manifest.jobs:
-            if job.evaluation.calculationModelVersion != VISIBILITY_MODEL_VERSION:
-                raise ValueError("Unsupported calculation-model version in precompute job.")
-            content = _read_artifact(directory, job.output.filename)
-            if hashlib.sha256(content).hexdigest() != job.output.sha256:
-                raise ValueError(f"Output checksum mismatch: {job.output.filename}")
-            response = _RESPONSE.validate_json(content)
-            if response.schemaVersion != job.output.responseSchemaVersion:
-                raise ValueError("Output response schema differs from the manifest declaration.")
-            check_response_identity(response, job.evaluation)
-            _check_sources(job, response, reference_directory, terrain_directory)
-        return manifest
-    except (OSError, ValueError, LookupError) as exc:
-        raise PrecomputeVerificationError(
-            f"Cannot verify precompute bundle at {directory}: {exc}"
-        ) from exc
+    return manifest

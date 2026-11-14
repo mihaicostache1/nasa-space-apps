@@ -56,6 +56,11 @@ def get_reference_cache(request: Request) -> ReferenceEvaluationCache:
     return request.app.state.reference_evaluation_cache
 
 
+def get_precomputed_directory() -> Path | None:
+    value = os.environ.get("LUNARWINDOW_PRECOMPUTED_DIR")
+    return Path(value) if value and value.strip() else None
+
+
 def query_period(
     startUtc: str = "2026-11-14T00:00:00Z",
     endUtc: str = "2026-12-14T00:00:00Z",
@@ -175,6 +180,8 @@ def create_app() -> FastAPI:
             "Returns visibility, metrics, windows, and setting brackets with original "
             "NASA evidence, archive coverage, and terrain/compatibility provenance when selected."
             " Successful results are cached after source, selection, and compatibility checks."
+            " An optional server-configured precomputed bundle supplies exact verified matches; "
+            "absent keys use live calculation or memory cache. Invalid bundles return HTTP 503."
         ),
     )
     def reference_evaluation(
@@ -182,9 +189,16 @@ def create_app() -> FastAPI:
         directory: Annotated[Path, Depends(get_reference_directory)],
         terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
         cache: Annotated[ReferenceEvaluationCache, Depends(get_reference_cache)],
+        precomputed_directory: Annotated[Path | None, Depends(get_precomputed_directory)],
     ) -> ReferenceEvaluationContract:
         try:
-            return evaluate_reference(scenario, directory, terrain_directory, cache=cache)
+            return evaluate_reference(
+                scenario,
+                directory,
+                terrain_directory,
+                cache=cache,
+                precomputed_directory=precomputed_directory,
+            )
         except (ReferenceSelectionError, TerrainCompatibilityError) as exc:
             raise RequestValidationError(
                 [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]

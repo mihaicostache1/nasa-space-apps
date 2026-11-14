@@ -1,6 +1,6 @@
 # Offline evaluation precompute manifest
 
-Offline precomputation defines, generates, and verifies bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py`, the read-only verifier is in `verifier.py`, and offline commands are in `cli.py`. Serving persisted results remains a later task; these helpers and commands do not change the HTTP API or its in-memory cache.
+Offline precomputation defines, generates, verifies, and loads bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py`, the read-only verifier is in `verifier.py`, key-based lookup is in `loader.py`, and offline commands are in `cli.py`. The reference evaluation API can opt into a complete bundle through the server-side `LUNARWINDOW_PRECOMPUTED_DIR` setting.
 
 ## Run contract
 
@@ -153,9 +153,34 @@ Verification checks:
 
 The generator and verifier share request/response identity rules in `validation.py`. The verifier independently loads artifacts and sources, performs no visibility calculations, and does not access caches, download data, or write files. A missing, corrupt, incomplete, unsupported, or inconsistent bundle raises `PrecomputeVerificationError` (a `ValueError`) with the original failure as its cause; no partial manifest is returned. Only manifest-listed output artifacts participate in verification.
 
-The returned manifest describes the byte snapshots checked during the call. It contains metadata rather than retained response bytes; any future serving path must verify the actual bytes it consumes instead of blindly rereading files after an earlier audit. Matching checksums, contracts, and source provenance does not independently validate the numerical metrics/windows or establish mission accuracy. Those calculations retain the existing regression evidence and documented model limits.
+The returned manifest describes the byte snapshots checked during the call. It contains metadata rather than retained response bytes. Use `load_precomputed_evaluation` below to obtain a response model directly from the verified snapshots; a later standalone file read requires its own verification. Matching checksums, contracts, and source provenance does not independently validate the numerical metrics/windows or establish mission accuracy. Those calculations retain the existing regression evidence and documented model limits.
 
 Focused verifier tests in `backend/tests/test_precompute_verifier.py` cover generated geometric/terrain bundles, incomplete states, corrupted and rehashed outputs, changed options and provenance, stale source/model identities, symlink artifacts, read-only operation, geometric independence, and same-read hashing/parsing.
+
+## Load one evaluation by its key
+
+`load_precomputed_evaluation(directory, key, *, reference_directory, terrain_directory=None)` accepts a `ReferenceEvaluationCacheKey` and returns a fresh geometric/terrain response model or `None` for an absent identity. For example, using the explicit `jobs` from the generation example:
+
+```python
+from lunarwindow.precompute import load_precomputed_evaluation
+
+evaluation = load_precomputed_evaluation(
+    Path("data/processed/site01-evaluation-example"),
+    jobs[0].evaluation,
+    reference_directory=Path("data/reference/validation-30d"),
+    terrain_directory=Path("data/reference/terrain-masks"),
+)
+if evaluation is None:
+    print("No saved evaluation for this key.")
+```
+
+The loader revalidates the lookup key and rejects unsupported lookup-model versions. It then runs the same complete bundle/source verification used by `verify_bundle`, retaining the matching response parsed from the exact bytes whose checksum was verified. It returns a match or miss only after **all** listed jobs pass. A corrupt sibling or invalid source cannot be hidden by an early match or absent-key shortcut. During verification, at most one matching model is retained alongside the current job; outputs are not reread afterward.
+
+Lookup uses the full canonical key, including source/mask checksums, model version, request options, and approximation acceptance. Equivalent normalized timestamps match; differing options or checksums identify different requests and can produce a miss. `None` means the key is absent from an otherwise valid complete bundle. Missing/incomplete/corrupt bundles, mismatched recorded sources, unsupported bundle models, and invalid masks raise `PrecomputeVerificationError` rather than becoming misses. Malformed lookup keys raise Pydantic validation errors before artifact reads.
+
+Every call verifies the current bundle and sources again and returns newly parsed model objects. Mutating returned samples or nested provenance cannot affect another call or the saved files. The loader performs no calculation, cache access, downloads, or writes. A mixed geometric/terrain bundle requires valid masks even for a geometric lookup because verification covers the whole bundle; a geometric-only bundle remains independent of terrain files.
+
+The loader itself returns a miss rather than calculating a fallback. The reference evaluation API now uses it after request/source/compatibility checks when `LUNARWINDOW_PRECOMPUTED_DIR` is configured: an exact saved match returns directly; a verified miss uses memory cache or normal calculation. An invalid configured bundle returns HTTP 503 even when memory contains a previous result. Unset or blank disables persisted lookup. The existing HTTP contracts and provenance remain unchanged, and the API performs no slicing of larger saved results. See [API configuration and error behavior](backend-data.md#serve-precomputed-reference-evaluations). Tests in `backend/tests/test_precompute_loader.py` cover hits, exact-key misses, returned-model isolation, same-read snapshots, corrupted siblings, invalid bundles/keys/models, source revalidation, terrain requirements, and read-only operation.
 
 ## Offline command-line interface
 
