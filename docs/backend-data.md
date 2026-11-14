@@ -189,6 +189,26 @@ Contract tests in `backend/tests/test_terrain_evaluation_contract.py` validate s
 
 Dedicated [terrain regression evidence](validation/terrain-regression.md) adds hand-computed blocking/boundary cases and independently derived, pinned Site01 API expectations for all six mode/rule combinations. These protect metrics, all operating-window boundaries, partial-disc behavior, negative horizons, and original source/compatibility provenance. The expectations verify the software model; validation against terrain observations remains separate.
 
+## Reference evaluation cache-key contract
+
+The first caching step defines identity only, in `backend/src/lunarwindow/api/reference_cache_key.py`. `build_reference_evaluation_cache_key` returns an immutable `ReferenceEvaluationCacheKey` with schema `lunarwindow.reference-cache-key.v1` and a deterministic SHA-256 `digest`. Storage, eviction, and cache lookup in the evaluation endpoint are subsequent tasks; requests currently continue through the existing provider.
+
+The key includes:
+
+- The site's full archived ephemeris JSON checksum, including its metadata, source provenance, and full archive coverage. Hashes of just the selected samples or raw Horizons responses are insufficient for caching complete API responses.
+- Site ID and geometric/terrain horizon mode.
+- Inclusive start, exclusive end, sampling interval, visibility rule, and effective countdown reference time.
+- Terrain mask ID, its complete artifact checksum, and the request's frame-approximation acceptance flag. The complete mask hash also covers observer height, coordinates, reference frame, DEM sources, and algorithm metadata. Geometric keys require null mask fields and false terrain acceptance.
+- `calculationModelVersion`, currently `lunarwindow.visibility.v1`, from `visibility/models.py`, and the cache-key schema namespace.
+
+Equivalent whole-minute UTC forms are normalized to seconds ending in `Z`. Omitted request options use their validated API defaults. A missing/null `asOfUtc` resolves to the range start, so it shares identity with an explicit start-time countdown reference. Different exclusive end times remain distinct, including ends between samples that change the final interval's weight. JSON mapping order and source directory paths do not affect identity.
+
+The digest encodes all key fields, including explicit nulls and defaults, using UTF-8 JSON with sorted keys, compact separators, ASCII escaping, and non-finite values forbidden. Tests pin this encoding. The builder revalidates mutable request models, validates checksum syntax, and rejects missing terrain checksums or terrain inputs on geometric keys. It performs no filesystem/network access, visibility calculation, or cache writes.
+
+Checksums supplied to the builder must come from verified artifacts. Syntactically valid hashes do not prove file integrity, archive availability, or mask compatibility. A future cache lookup must occur **after** full bundle verification, range selection, reviewed-mask verification, and compatibility checks. Recording a terrain request with acceptance false creates a distinct identity; it does not authorize the request or bypass the existing HTTP 422 policy. Invalid requests and source failures must never be served from a cached success or stored as successful evaluations.
+
+When implementing storage, cache complete response snapshots without exposing mutable cached objects. Bump `VISIBILITY_MODEL_VERSION` when calculation semantics change. Bump the cache-key namespace when identity, response construction/schema, or compatibility-policy semantics change, even if source files and numerical calculations stay the same. Focused tests in `backend/tests/test_reference_cache_key.py` cover canonical/default equivalence, every calculation option, both source hashes, mask identity, policy acceptance, version invalidation, strict inputs, and immutability.
+
 ## Synthetic scenario evaluation contract
 
 `POST /api/evaluations` accepts the fields already defined in `src/domain/scenario.ts`. Python validates latitude [-90, 90], east-positive longitude [-180, 180], finite altitude in kilometers above the reference surface, a nonblank name up to 80 characters, and integer steps from 1 to 1440 minutes. Times must be whole-minute ISO UTC strings ending in `Z`, from 1962 onward, consistent with the ephemeris package. End must follow start; requests are limited to 31 days and 10,000 samples. Extra JSON fields and numeric strings/booleans are rejected.

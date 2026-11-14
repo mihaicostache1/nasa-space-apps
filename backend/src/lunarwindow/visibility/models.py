@@ -4,6 +4,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+# Bump when calculation semantics change; cache identity must follow the model.
+VISIBILITY_MODEL_VERSION = "lunarwindow.visibility.v1"
+
 VisibilityRule = Literal["any-disc", "body-center", "full-disc"]
 DiscVisibility = Literal["hidden", "partial", "full"]
 

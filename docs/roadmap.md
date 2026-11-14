@@ -21,6 +21,8 @@ See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not ye
 
 The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. Caching, extended precomputation, and frontend integration remain pending.
 
+The reference evaluation cache-key contract is implemented and tested, including verified-source checksums, normalized request options, and calculation-model versioning. Next caching step: bounded storage and provider integration after existing integrity and compatibility checks.
+
 1. Connect the frontend to the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states. Synthetic custom-coordinate demos remain at `POST /api/evaluations`.
 2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.
 3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
