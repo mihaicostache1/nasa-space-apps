@@ -74,7 +74,7 @@ python scripts/make_crater_rim.py --name "Shackleton rim" --lat -89.67 --lon 129
 
 The USGS polygon zip (`A3_9regions-lonlat-simplified.zip`) must be downloaded manually from ScienceBase, which blocks scripted access, and unzipped into ignored `data/raw/artemis-regions/`.
 
-**Correction:** the `lola-site04-reference` point, previously called "Shackleton rim", lies on Shackleton's **inner wall**. It has a 32° slope, a horizon up to 31°, and PGDA long-term sunlight of about 11%. The curated catalog relabels it; use `shackleton-rim` for the rim.
+**Correction (applied):** the `lola-site04-reference` point, previously called "Shackleton rim", lies on Shackleton's **inner wall**. It has a 32° slope, a horizon up to 31°, and PGDA long-term sunlight of about 11%. The curated catalog relabels it; use `shackleton-rim` for the rim.
 
 ## Validated demo mask (Site01)
 
@@ -131,7 +131,7 @@ The remaining differences are expected. PGDA's maps come from 2016-era DEMs at 1
 
 ## Handoff
 
-**To Ephemeris (P1):** the Site01 mask uses your archived observer unchanged, so no new Horizons run is needed for it. Frames: the LOLA DEMs are DE421 `MOON_ME`, while the archived Horizons headers report `MEAN_ME (high precision)` from DE441. Both are Mean Earth/polar-axis frames on the same 1737.4 km sphere, but they are different realizations, and the mask applies no transformation; the backend compatibility check must decide whether to accept the pairing. The Site04 point's "Shackleton rim" label in `sites.nasa.json` and the validation report should be corrected to "inner wall".
+**To Ephemeris (P1):** the Site01 mask uses your archived observer unchanged, so no new Horizons run is needed for it. Frames: the LOLA DEMs are DE421 `MOON_ME`, while the archived Horizons headers report `MEAN_ME (high precision)` from DE441. Both are Mean Earth/polar-axis frames on the same 1737.4 km sphere, but they are different realizations, and the mask applies no transformation; the backend compatibility check must decide whether to accept the pairing. The Site04 point's label was corrected to "Shackleton inner wall" in `sites.nasa.json`, the 30-day bundle, and the validation report (PR #7).
 
 **To Backend/data (P3):**
 
