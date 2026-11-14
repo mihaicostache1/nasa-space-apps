@@ -7,6 +7,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 FROM dependencies AS build
+# The browser calls FastAPI directly; Next.js inlines this at build time.
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 COPY . .
 RUN npm run build && mkdir -p public
 

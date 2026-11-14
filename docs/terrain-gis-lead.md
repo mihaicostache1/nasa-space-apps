@@ -131,7 +131,7 @@ The remaining differences are expected. PGDA's maps come from 2016-era DEMs at 1
 
 ## Handoff
 
-**To Ephemeris (P1):** the Site01 mask uses your archived observer unchanged, so no new Horizons run is needed for it. Frames: the LOLA DEMs are DE421 `MOON_ME`, while the archived Horizons headers report `MEAN_ME (high precision)` from DE441. Both are Mean Earth/polar-axis frames on the same 1737.4 km sphere, but they are different realizations, and the mask applies no transformation; the backend compatibility check must decide whether to accept the pairing. The Site04 point's label was corrected to "Shackleton inner wall" in `sites.nasa.json`, the 30-day bundle, and the validation report (PR #7).
+**To Ephemeris (P1):** the Site01 mask uses your archived observer unchanged, so no new Horizons run is needed for it. Frames: the mask declares the DEMs' DE421 `MOON_ME`. The archived Horizons headers label the frame `MEAN_ME (high precision)` and list DE441 only as the body-position source, so they do not establish whether the two frames match or differ. The mask applies no transformation; the backend compatibility check must verify the relationship and explicitly accept or reject the pairing. For another mast height, regenerate the ephemerides and the mask together (two steps in the mask README). The Site04 point's label was corrected to "Shackleton inner wall" in `sites.nasa.json`, the 30-day bundle, and the validation report (PR #7).
 
 **To Backend/data (P3):**
 

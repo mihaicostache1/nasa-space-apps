@@ -192,7 +192,7 @@ Responses use `lunarwindow.evaluation.v2`, with matching TypeScript types in `sr
 
 Values repeat for identical requests, and overlapping date ranges share identical samples. Longitude and latitude vary the demo curves; altitude is echoed but has no effect. Angular radii are illustrative constants in the demo provider; the calculation engine accepts each sample's supplied radius. The engine computes metrics and partial-disc states, while the demo source remains synthetic. It does not read the real ephemeris cache or reference bundles, and it does not represent power availability or a validated radio link. Read [the visibility model](visibility.md) before interpreting sampling precision or partial visibility.
 
-The existing React workspace remains independent. A frontend integration can submit its scenario directly:
+The React workspace now uses the reference endpoints (`src/lib/api-client.ts`). A synthetic-scenario client would look like this:
 
 ```ts
 import type { EvaluationDataset, EvaluationRequest } from '@/domain/evaluation';

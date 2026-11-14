@@ -20,7 +20,7 @@ docker compose run --build --rm ephemeris \
   --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z
 ```
 
-Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric or reviewed-terrain evaluations of verified archived ephemerides. The React workspace is not connected to these results yet.
+Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric evaluations of verified archived ephemerides; the web app at port 3000 shows them, with no live NASA requests.
 
 ## Native setup: Backend/data
 
@@ -62,7 +62,7 @@ python scripts/export_terrain_mask.py --site-id lola-site01-reference   # valida
 
 Horizon profiles (360 whole-degree values plus 3,600 rays) are computed by exact spherical ray casting over the 20 m and 120 m LOLA south polar DEMs, out to 200 km, with ground + 2 m mast observers. The one validated demo mask is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json`: same coordinates and observer altitude as the archived Site01 ephemerides, 5 m/20 m/120 m DEM tiers, full DEM provenance. Horizons for the other 16 curated sites are preliminary. See [the terrain work package](docs/terrain-gis-lead.md) for sources, algorithm, validation, and handoff.
 
-## Native setup: React UI starter
+## Native setup: React UI
 
 Use Node.js 22.12+ on the 22.x line, or Node.js 24.x, with npm. An `.nvmrc` is included for Node 22.
 
@@ -73,7 +73,7 @@ npm ci
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or environment variables are required. `.env.example` is provided for future configuration; copying it is optional.
+Start the FastAPI service as well (see Backend/data above, or `docker compose up --build -d --wait api`), then open [localhost:3000](http://localhost:3000). The browser calls the API at `http://localhost:8000` by default; set `NEXT_PUBLIC_API_BASE_URL` at build time for another address (see `.env.example`). No API keys or database are required, and all data comes from the committed archive.
 
 ## What is ready
 
@@ -87,11 +87,13 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
 - A sourced 30-day, three-point NASA reference dataset, pointing plot, and reproducible QuickMap comparison evidence.
 - A validated terrain horizon mask for the Site01 reference point (`lunarwindow.terrain-mask.v1`), plus tooling for a sourced 17-site catalog (9 Artemis III regions, Shackleton rim, landing sites, contrast cases) whose preliminary horizons match NASA PGDA 18.6-year sunlight averages within 4 percentage points at 12 of 14 polar sites.
+- Web app on archived NASA data: two-scenario comparison of verified reference sites, a three-lane Sun/Earth/both timeline with a shared cursor, longest simultaneous operation and communication-outage indicators, a mission window finder, and a 2D azimuth/elevation sky explorer. Loading, error, and stale-result states; the geometric model and data source are stated on the page.
 - Health endpoint at `GET /api/health`.
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
 The UI workspace validates inputs locally. It does not persist them or consume backend results yet. Charts, maps, and a site picker remain pending. The API calculates visibility and metrics from synthetic demos or verified archived ephemerides, with an explicit geometric or reviewed-terrain horizon mode. Terrain mode currently supports the Site01 0 m mask and requires acceptance of its frame approximation; sampling, disc-model, and near-field limitations remain. A sourced 17-site GIS catalog is also available (see the [terrain work package](docs/terrain-gis-lead.md)); its other horizons are preliminary and are not registered for reference API evaluations. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
+The web app evaluates the verified reference sites through `POST /api/reference/evaluations`; it does not persist inputs, and maps and custom coordinates remain pending. The API calculates visibility and metrics from either synthetic demos or verified archived ephemerides; reference evaluations explicitly use a flat zero-degree horizon and retain sampling/disc-model limitations. One validated terrain mask (Site01, `lunarwindow.terrain-mask.v1`) and a sourced 17-site catalog are ready (see the [terrain work package](docs/terrain-gis-lead.md)), but the API does not apply terrain yet. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -119,7 +121,7 @@ src/
   app/
     api/health/route.ts        Working health endpoint
     layout.tsx                Application metadata and root layout
-    page.tsx                  Starter page
+    page.tsx                  Landing page, sources, and limits
     globals.css               Base styling
   domain/
     scenario.ts               Input schemas and shared types

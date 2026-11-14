@@ -16,7 +16,7 @@ docker compose logs -f web
 docker compose down
 ```
 
-The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. The API image also runs as a non-root user and checks `/api/health`. Both ports bind locally. The current UI remains the scenario starter; the separate FastAPI API serves explicitly synthetic data. See the [backend work package](backend-data.md). Real terrain models and UI/data integration remain pending.
+The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. The API image also runs as a non-root user and checks `/api/health`. Both ports bind locally. The browser loads the UI from port 3000 and calls the API on port 8000 directly; the API's CORS settings must include the web origin. Changing `API_PORT` rebuilds the web image with the matching `NEXT_PUBLIC_API_BASE_URL`. See the [backend work package](backend-data.md). Terrain models remain pending.
 
 Start the API alone with `docker compose up --build -d --wait api`; inspect it with `docker compose logs -f api`. No source-data mount or NASA access is needed for the demo API.
 

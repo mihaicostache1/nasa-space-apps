@@ -12,3 +12,4 @@ data/reference
 data/regions
 docs/validation/evidence
 docs/validation/quickmap-results.json
+tests/fixtures
