@@ -1,9 +1,9 @@
-import type {
-  ApiErrorResponse,
-  ReferenceEvaluationDataset,
-  ReferenceEvaluationRequest,
-} from '@/domain/evaluation';
+import type { ApiErrorResponse } from '@/domain/evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import type {
+  ReferenceEvaluationContract,
+  ReferenceEvaluationRequestContract,
+} from '@/domain/terrain-evaluation';
 
 /** Browser-visible FastAPI origin; inlined at build time. */
 export const API_BASE_URL = (
@@ -69,10 +69,10 @@ export function fetchReferenceSites(signal?: AbortSignal) {
 }
 
 export function evaluateReference(
-  body: ReferenceEvaluationRequest,
+  body: ReferenceEvaluationRequestContract,
   signal?: AbortSignal,
 ) {
-  return request<ReferenceEvaluationDataset>('/api/reference/evaluations', {
+  return request<ReferenceEvaluationContract>('/api/reference/evaluations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

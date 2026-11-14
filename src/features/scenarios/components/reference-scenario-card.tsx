@@ -3,9 +3,12 @@ import type { VisibilityRule } from '@/domain/evaluation';
 import {
   lastStartDate,
   stepOptions,
+  terrainMask,
   utcDate,
   VISIBILITY_RULES,
+  withHorizonMode,
   withSite,
+  type HorizonMode,
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
 
@@ -23,6 +26,7 @@ export function ReferenceScenarioCard({
   onChange,
 }: Props) {
   const site = sites.find((candidate) => candidate.id === form.siteId);
+  const mask = terrainMask(site);
   const id = `scenario-${form.slot}`;
   return (
     <fieldset className="panel" aria-describedby={`${id}-issues`}>
@@ -111,6 +115,48 @@ export function ReferenceScenarioCard({
           </select>
         </label>
       </div>
+      <label>
+        Horizon
+        <select
+          value={form.horizonMode}
+          onChange={(event) =>
+            onChange(
+              withHorizonMode(form, event.target.value as HorizonMode, site),
+            )
+          }
+        >
+          <option value="geometric">Flat 0° (geometric)</option>
+          <option value="terrain" disabled={!mask}>
+            {mask
+              ? 'LOLA terrain (reviewed mask)'
+              : 'LOLA terrain (not available for this site)'}
+          </option>
+        </select>
+      </label>
+      {form.horizonMode === 'terrain' && mask && (
+        <>
+          <p className="hint">
+            {mask.maskId} · observer {mask.observer.mastHeightM} m above ground
+            · LOLA DEMs at{' '}
+            {mask.demSources.map((source) => source.resolutionM).join(' / ')} m
+          </p>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={form.acceptFrameApproximation}
+              onChange={(event) =>
+                onChange({
+                  ...form,
+                  acceptFrameApproximation: event.target.checked,
+                })
+              }
+            />
+            <span>
+              <strong>Accept the frame approximation.</strong> {mask.limitation}
+            </span>
+          </label>
+        </>
+      )}
       <div id={`${id}-issues`} aria-live="polite">
         {issues.map((issue) => (
           <p className="issue" key={issue}>
