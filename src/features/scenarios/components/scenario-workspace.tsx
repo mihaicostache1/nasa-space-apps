@@ -1,202 +1,265 @@
 'use client';
 
-import { useState } from 'react';
-import { scenarioSchema, type Scenario } from '@/domain/scenario';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ReferenceEvaluationDataset } from '@/domain/evaluation';
+import type { ReferenceSiteCatalog } from '@/domain/reference';
+import {
+  ApiError,
+  evaluateReference,
+  fetchReferenceSites,
+} from '@/lib/api-client';
+import { ComparisonTimeline } from '@/features/analysis/components/comparison-timeline';
+import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
+import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
+import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
+import { domainHours, domainOf } from '@/features/analysis/lib/timeline';
+import type { ScenarioResult } from '@/features/analysis/types';
+import {
+  defaultForm,
+  toRequest,
+  validateForm,
+  type ReferenceScenarioForm,
+} from '../lib/reference-scenario';
+import { ReferenceScenarioCard } from './reference-scenario-card';
 
-const initialScenarios: Scenario[] = ['A', 'B'].map((slot, index) => ({
-  name: `Scenario ${slot}`,
-  location: {
-    latitudeDeg: -89 + index * 0.5,
-    longitudeDeg: index * 30,
-    altitudeKm: 0,
-  },
-  startUtc: '2026-11-14T00:00:00Z',
-  endUtc: '2026-11-15T00:00:00Z',
-  stepMinutes: 60,
-}));
+type CatalogState =
+  | { status: 'loading' }
+  | { status: 'ready'; data: ReferenceSiteCatalog }
+  | { status: 'error'; message: string };
+
+type SlotState = {
+  status: 'idle' | 'loading' | 'ready' | 'error';
+  data?: ReferenceEvaluationDataset;
+  /** The request that produced `data`, to detect stale results. */
+  requestKey?: string;
+  message?: string;
+};
+
+const requestKey = (form: ReferenceScenarioForm) =>
+  JSON.stringify(toRequest(form));
+
+function message(error: unknown) {
+  return error instanceof ApiError || error instanceof Error
+    ? error.message
+    : 'Unexpected error.';
+}
+
+/** Scenario A is the first site; B contrasts with another site over the same period. */
+function initialForms(catalog: ReferenceSiteCatalog): ReferenceScenarioForm[] {
+  const [first, second] = catalog.sites;
+  const contrast =
+    catalog.sites.find((site) => site.id === 'lola-site23-reference') ??
+    second ??
+    first;
+  return [defaultForm('A', first), defaultForm('B', contrast)];
+}
 
 export function ScenarioWorkspace() {
-  const [scenarios, setScenarios] = useState(initialScenarios);
-  const [status, setStatus] = useState(
-    'Edit two scenarios to prepare a comparison.',
+  const [catalog, setCatalog] = useState<CatalogState>({ status: 'loading' });
+  const [forms, setForms] = useState<ReferenceScenarioForm[]>([]);
+  const [slots, setSlots] = useState<SlotState[]>([
+    { status: 'idle' },
+    { status: 'idle' },
+  ]);
+  const [cursorHours, setCursorHours] = useState(0);
+  const [attempt, setAttempt] = useState(0);
+  const inFlight = useRef<AbortController | null>(null);
+
+  const evaluate = useCallback(
+    async (
+      current: ReferenceScenarioForm[],
+      sites: ReferenceSiteCatalog['sites'],
+    ) => {
+      inFlight.current?.abort();
+      const controller = new AbortController();
+      inFlight.current = controller;
+      const issues = current.map((form) =>
+        validateForm(
+          form,
+          sites.find((site) => site.id === form.siteId),
+        ),
+      );
+      setSlots((previous) =>
+        current.map((_, index) =>
+          issues[index].length
+            ? {
+                ...previous[index],
+                status: 'error',
+                message: issues[index].join(' '),
+              }
+            : { ...previous[index], status: 'loading', message: undefined },
+        ),
+      );
+      await Promise.all(
+        current.map(async (form, index) => {
+          if (issues[index].length) return;
+          try {
+            const data = await evaluateReference(
+              toRequest(form),
+              controller.signal,
+            );
+            setSlots((previous) =>
+              previous.map((slot, i) =>
+                i === index
+                  ? { status: 'ready', data, requestKey: requestKey(form) }
+                  : slot,
+              ),
+            );
+          } catch (error) {
+            if (controller.signal.aborted) return;
+            setSlots((previous) =>
+              previous.map((slot, i) =>
+                i === index
+                  ? { ...slot, status: 'error', message: message(error) }
+                  : slot,
+              ),
+            );
+          }
+        }),
+      );
+    },
+    [],
   );
 
-  function update(index: number, updater: (scenario: Scenario) => Scenario) {
-    setScenarios((current) =>
-      current.map((scenario, slot) =>
-        slot === index ? updater(scenario) : scenario,
-      ),
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchReferenceSites(controller.signal)
+      .then((data) => {
+        if (!data.sites.length)
+          throw new Error('The reference catalog is empty.');
+        const defaults = initialForms(data);
+        setCatalog({ status: 'ready', data });
+        setForms(defaults);
+        void evaluate(defaults, data.sites);
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          setCatalog({ status: 'error', message: message(error) });
+      });
+    return () => {
+      controller.abort();
+      inFlight.current?.abort();
+    };
+  }, [attempt, evaluate]);
+
+  if (catalog.status === 'loading') {
+    return (
+      <section className="workspace" aria-busy="true">
+        <p className="status-line">Loading verified reference sites…</p>
+      </section>
     );
-    setStatus('Inputs changed. Validate scenarios when ready.');
+  }
+  if (catalog.status === 'error') {
+    return (
+      <section className="workspace">
+        <div className="panel error-panel" role="alert">
+          <h2>Data unavailable</h2>
+          <p>{catalog.message}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setCatalog({ status: 'loading' });
+              setAttempt((n) => n + 1);
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
   }
 
-  function validate() {
-    const issues = scenarios.flatMap((scenario) => {
-      const result = scenarioSchema.safeParse(scenario);
-      return result.success
-        ? []
-        : result.error.issues.map(
-            (issue) =>
-              `${scenario.name}: ${issue.path.join('.')} — ${issue.message}`,
-          );
-    });
-    setStatus(
-      issues.length
-        ? issues.join(' ')
-        : 'Both scenarios are valid. Connect an ephemeris provider to calculate Sun and Earth positions.',
-    );
-  }
+  const sites = catalog.data.sites;
+  const results: ScenarioResult[] = slots.flatMap((slot, index) =>
+    slot.data && forms[index]
+      ? [
+          {
+            slot: forms[index].slot,
+            data: slot.data,
+            stale: slot.requestKey !== requestKey(forms[index]),
+          },
+        ]
+      : [],
+  );
+  const anyStale = results.some((result) => result.stale);
+  const loading = slots.some((slot) => slot.status === 'loading');
+  const maxHours = Math.max(
+    0,
+    ...results.map(({ data }) =>
+      domainHours(
+        domainOf(
+          data.provenance.ephemeris.startUtc,
+          data.provenance.ephemeris.endUtc,
+        ),
+      ),
+    ),
+  );
+  const cursor = Math.min(cursorHours, Math.max(0, maxHours - 1));
 
   return (
-    <section aria-labelledby="workspace-heading">
+    <section className="workspace" aria-labelledby="workspace-heading">
       <div className="section-heading">
-        <h2 id="workspace-heading">Comparison workspace</h2>
-        <span className="badge">SETUP MODE</span>
+        <h2 id="workspace-heading">Compare two scenarios</h2>
+        <span className="badge">ARCHIVED NASA DATA · GEOMETRIC</span>
       </div>
+      <DataSourceBanner catalog={catalog.data} results={results} />
       <div className="scenarios">
-        {scenarios.map((scenario, index) => (
-          <fieldset className="panel" key={index}>
-            <legend>{scenario.name}</legend>
-            <p className="hint">Custom location · illustrative coordinates</p>
-            <div className="fields">
-              <label>
-                Latitude (°)
-                <input
-                  type="number"
-                  min="-90"
-                  max="90"
-                  step="any"
-                  value={
-                    Number.isNaN(scenario.location.latitudeDeg)
-                      ? ''
-                      : scenario.location.latitudeDeg
-                  }
-                  onChange={(event) =>
-                    update(index, (s) => ({
-                      ...s,
-                      location: {
-                        ...s.location,
-                        latitudeDeg: event.target.valueAsNumber,
-                      },
-                    }))
-                  }
-                />
-              </label>
-              <label>
-                Longitude (° east)
-                <input
-                  type="number"
-                  min="-180"
-                  max="180"
-                  step="any"
-                  value={
-                    Number.isNaN(scenario.location.longitudeDeg)
-                      ? ''
-                      : scenario.location.longitudeDeg
-                  }
-                  onChange={(event) =>
-                    update(index, (s) => ({
-                      ...s,
-                      location: {
-                        ...s.location,
-                        longitudeDeg: event.target.valueAsNumber,
-                      },
-                    }))
-                  }
-                />
-              </label>
-            </div>
-            <label>
-              Altitude above reference surface (km)
-              <input
-                type="number"
-                step="any"
-                value={
-                  Number.isNaN(scenario.location.altitudeKm)
-                    ? ''
-                    : scenario.location.altitudeKm
-                }
-                onChange={(event) =>
-                  update(index, (s) => ({
-                    ...s,
-                    location: {
-                      ...s.location,
-                      altitudeKm: event.target.valueAsNumber,
-                    },
-                  }))
-                }
-              />
-            </label>
-            <div className="fields">
-              <label>
-                Start date (UTC)
-                <input
-                  type="date"
-                  value={scenario.startUtc.slice(0, 10)}
-                  onChange={(event) =>
-                    update(index, (s) => ({
-                      ...s,
-                      startUtc: event.target.value
-                        ? `${event.target.value}T00:00:00Z`
-                        : '',
-                    }))
-                  }
-                />
-              </label>
-              <label>
-                End date (UTC)
-                <input
-                  type="date"
-                  value={scenario.endUtc.slice(0, 10)}
-                  onChange={(event) =>
-                    update(index, (s) => ({
-                      ...s,
-                      endUtc: event.target.value
-                        ? `${event.target.value}T00:00:00Z`
-                        : '',
-                    }))
-                  }
-                />
-              </label>
-            </div>
-            <label>
-              Sample interval
-              <select
-                value={scenario.stepMinutes}
-                onChange={(event) =>
-                  update(index, (s) => ({
-                    ...s,
-                    stepMinutes: Number(event.target.value),
-                  }))
-                }
-              >
-                <option value={15}>15 minutes</option>
-                <option value={60}>1 hour</option>
-                <option value={360}>6 hours</option>
-              </select>
-            </label>
-          </fieldset>
+        {forms.map((form, index) => (
+          <ReferenceScenarioCard
+            key={form.slot}
+            form={form}
+            sites={sites}
+            issues={
+              slots[index]?.status === 'error' && slots[index].message
+                ? [slots[index].message]
+                : []
+            }
+            onChange={(next) =>
+              setForms((current) =>
+                current.map((f, i) => (i === index ? next : f)),
+              )
+            }
+          />
         ))}
       </div>
       <div className="actions">
-        <button type="button" onClick={validate}>
-          Validate scenarios <span aria-hidden="true">→</span>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => void evaluate(forms, sites)}
+        >
+          {loading ? 'Calculating…' : 'Update comparison'}{' '}
+          <span aria-hidden="true">→</span>
         </button>
-        <p role="status">{status}</p>
+        <p role="status">
+          {loading
+            ? 'Evaluating archived ephemerides…'
+            : anyStale
+              ? 'Inputs changed: results below are out of date until you update.'
+              : results.length
+                ? 'Results match the inputs above.'
+                : ''}
+        </p>
       </div>
-      <div className="result-grid">
-        {[
-          'Sun & Earth horizon',
-          'Sunlight timeline',
-          'Communication windows',
-        ].map((title, index) => (
-          <section className="panel placeholder" key={title}>
-            <p className="eyebrow">0{index + 1} / ANALYSIS</p>
-            <h3>{title}</h3>
-            <p>Awaiting ephemeris data</p>
-          </section>
-        ))}
-      </div>
+      {results.length > 0 && (
+        <>
+          <ComparisonTimeline
+            results={results}
+            cursorHours={cursor}
+            onCursorChange={setCursorHours}
+          />
+          <MissionWindowFinder
+            results={results}
+            onJump={(hours) => {
+              setCursorHours(hours);
+              document
+                .getElementById('timeline-heading')
+                ?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+          <SkyExplorer results={results} cursorHours={cursor} />
+        </>
+      )}
     </section>
   );
 }
