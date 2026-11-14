@@ -1,6 +1,6 @@
 # Offline evaluation precompute manifest
 
-Offline precomputation defines, generates, and verifies bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py` and the read-only verifier is in `verifier.py`. A command-line interface and serving persisted results remain later tasks; these helpers do not change the HTTP API or its in-memory cache.
+Offline precomputation defines, generates, and verifies bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py`, the read-only verifier is in `verifier.py`, and offline commands are in `cli.py`. Serving persisted results remains a later task; these helpers and commands do not change the HTTP API or its in-memory cache.
 
 ## Run contract
 
@@ -156,6 +156,64 @@ The generator and verifier share request/response identity rules in `validation.
 The returned manifest describes the byte snapshots checked during the call. It contains metadata rather than retained response bytes; any future serving path must verify the actual bytes it consumes instead of blindly rereading files after an earlier audit. Matching checksums, contracts, and source provenance does not independently validate the numerical metrics/windows or establish mission accuracy. Those calculations retain the existing regression evidence and documented model limits.
 
 Focused verifier tests in `backend/tests/test_precompute_verifier.py` cover generated geometric/terrain bundles, incomplete states, corrupted and rehashed outputs, changed options and provenance, stale source/model identities, symlink artifacts, read-only operation, geometric independence, and same-read hashing/parsing.
+
+## Offline command-line interface
+
+Install or refresh the backend package to register `lunarwindow-precompute`:
+
+```sh
+python -m pip install -e ./backend
+lunarwindow-precompute --help
+```
+
+The same commands are available through `python -m lunarwindow.precompute`. Both entry points support `generate` and `verify`; all sources are local and the commands perform no NASA requests, DEM downloads, or automatic job expansion.
+
+Generation takes an explicit pending manifest plan. To save the verified `jobs` list constructed in the Python example above:
+
+```python
+from datetime import datetime, timezone
+
+from lunarwindow.precompute import PrecomputeManifest
+
+plan = PrecomputeManifest(
+    runId="site01-reference-demo",
+    createdAtUtc=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    status="incomplete",
+    jobs=jobs,
+)
+plan_path = Path("data/processed/site01-plan.json")
+plan_path.parent.mkdir(parents=True, exist_ok=True)
+with plan_path.open("x", encoding="utf-8", newline="") as stream:
+    stream.write(plan.model_dump_json(indent=2) + "\n")
+```
+
+All plan jobs must be pending, without outputs or errors. Complete runs and failed/partially completed manifests are rejected as plans. The CLI preserves `runId` and job identities; the generator records fresh run creation/completion timestamps. Source checksums and approximation acceptance must be explicit in the plan. Reusing a plan after a source/model change fails through the existing identity checks.
+
+Generate into a fresh directory and then independently verify it:
+
+```sh
+lunarwindow-precompute generate data/processed/site01-plan.json \
+  --reference-dir data/reference/validation-30d \
+  --terrain-dir data/reference/terrain-masks \
+  --output data/processed/site01-cli-example
+
+lunarwindow-precompute verify data/processed/site01-cli-example \
+  --reference-dir data/reference/validation-30d \
+  --terrain-dir data/reference/terrain-masks
+```
+
+`--reference-dir` is required on both commands and points directly to the archive directory containing its source `manifest.json`. `--terrain-dir` is optional and defaults to its sibling `terrain-masks`. `--output` is required for generation; existing paths are never overwritten. The plan is not modified. Verification remains read-only.
+
+On success, stdout contains one JSON summary with `command`, `status`, `runId`, `jobCount`, and the `manifest` path. Generation success reports completed generation; the separate verification command checks the saved bundle against its sources. Errors go to stderr with no success summary or traceback for expected operational failures. Generation errors identify the retained incomplete manifest and include the underlying cause.
+
+| Exit code | Meaning                                                                         |
+| --------- | ------------------------------------------------------------------------------- |
+| `0`       | Successful command or help                                                      |
+| `1`       | Invalid plan, failed generation/verification, or filesystem error               |
+| `2`       | Argument/usage error from argparse                                              |
+| `130`     | Interrupted by the user; inspect the last generation checkpoint before retrying |
+
+`backend/tests/test_precompute_cli.py` covers both commands on real archived inputs, argument validation, stdout/stderr separation, custom directories, paths with spaces, generation and verification failures, interruption, and module-entry-point exit codes.
 
 Focused tests are in `backend/tests/test_precompute_contract.py`:
 
