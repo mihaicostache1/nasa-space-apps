@@ -34,6 +34,7 @@ from .models import (
     ReferenceSiteCatalog,
     SiteCatalog,
 )
+from .reference_cache import ReferenceEvaluationCache
 from .reference_catalog import build_reference_catalog
 from .reference_provider import evaluate_reference
 from .terrain_models import ReferenceEvaluationContract, ReferenceEvaluationRequestContract
@@ -49,6 +50,10 @@ def get_reference_directory() -> Path:
 
 def get_terrain_directory() -> Path:
     return Path(os.environ.get("LUNARWINDOW_REFERENCE_DIR", "data/reference")) / "terrain-masks"
+
+
+def get_reference_cache(request: Request) -> ReferenceEvaluationCache:
+    return request.app.state.reference_evaluation_cache
 
 
 def query_period(
@@ -85,6 +90,7 @@ def create_app() -> FastAPI:
         ),
         responses={422: {"model": ErrorResponse}},
     )
+    app.state.reference_evaluation_cache = ReferenceEvaluationCache()
     origins = os.environ.get(
         "LUNARWINDOW_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
     )
@@ -168,15 +174,17 @@ def create_app() -> FastAPI:
             "explicit acceptance of the documented Mean Earth reference approximation. "
             "Returns visibility, metrics, windows, and setting brackets with original "
             "NASA evidence, archive coverage, and terrain/compatibility provenance when selected."
+            " Successful results are cached after source, selection, and compatibility checks."
         ),
     )
     def reference_evaluation(
         scenario: ReferenceEvaluationRequestContract,
         directory: Annotated[Path, Depends(get_reference_directory)],
         terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
+        cache: Annotated[ReferenceEvaluationCache, Depends(get_reference_cache)],
     ) -> ReferenceEvaluationContract:
         try:
-            return evaluate_reference(scenario, directory, terrain_directory)
+            return evaluate_reference(scenario, directory, terrain_directory, cache=cache)
         except (ReferenceSelectionError, TerrainCompatibilityError) as exc:
             raise RequestValidationError(
                 [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]

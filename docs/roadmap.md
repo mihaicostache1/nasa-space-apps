@@ -19,9 +19,9 @@ See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not ye
 
 ## 2. Usable comparison
 
-The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. Caching, extended precomputation, and frontend integration remain pending.
+The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. Extended precomputation and frontend terrain integration remain pending.
 
-The reference evaluation cache-key contract and bounded in-memory LRU storage are implemented and tested, including verified-source checksums, normalized request options, calculation-model versioning, immutable snapshots, entry/byte limits, and concurrent access. Next caching step: provider integration after existing integrity and compatibility checks.
+Reference evaluations now use the versioned cache-key contract and bounded in-memory LRU storage after source integrity, date selection, and terrain compatibility checks. Repeated requests reuse validated response snapshots and skip visibility calculation while preserving source checks, provenance, and HTTP errors. Tests cover source/mask/model invalidation, isolation, bounds, and warmed-cache failure cases. Extended curated-site precomputation remains separate.
 
 1. Connect the frontend to the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states. Synthetic custom-coordinate demos remain at `POST /api/evaluations`.
 2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.

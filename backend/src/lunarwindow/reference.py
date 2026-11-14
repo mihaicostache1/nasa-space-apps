@@ -3,6 +3,7 @@
 import hashlib
 import json
 from copy import deepcopy
+from dataclasses import dataclass
 from pathlib import Path
 
 from lunarwindow.ephemeris.contract import validate_dataset, verify_run
@@ -13,12 +14,25 @@ class ReferenceSelectionError(ValueError):
     """A requested range or sampling interval is unsupported by the archive."""
 
 
-def _read_verified_dataset(directory: Path, item: dict) -> dict:
+@dataclass(frozen=True)
+class VerifiedReferenceDataset:
+    """Parsed dataset and checksum from the same verified byte snapshot."""
+
+    dataset: dict
+    artifact_sha256: str
+
+
+def _read_verified_artifact(directory: Path, item: dict) -> VerifiedReferenceDataset:
     content = (directory / item["json"]).read_bytes()
+    checksum = hashlib.sha256(content).hexdigest()
     # Check the exact bytes returned, even if a file changed after verify_run.
-    if hashlib.sha256(content).hexdigest() != item["jsonSha256"]:
+    if checksum != item["jsonSha256"]:
         raise ValueError(f"Checksum mismatch: {item['json']}")
-    return validate_dataset(json.loads(content))
+    return VerifiedReferenceDataset(validate_dataset(json.loads(content)), checksum)
+
+
+def _read_verified_dataset(directory: Path, item: dict) -> dict:
+    return _read_verified_artifact(directory, item).dataset
 
 
 def load_reference_dataset(directory: str | Path, site_id: str) -> dict:
@@ -28,13 +42,24 @@ def load_reference_dataset(directory: str | Path, site_id: str) -> dict:
     for an unknown site, or ValueError for an unreadable or invalid bundle. The
     caller supplies the directory explicitly; no working-directory guess is used.
     """
+    return load_verified_reference_dataset(directory, site_id).dataset
+
+
+def load_verified_reference_dataset(
+    directory: str | Path, site_id: str
+) -> VerifiedReferenceDataset:
+    """Verify the whole run and return one dataset with its exact artifact checksum.
+
+    Preserve the existing loader's lookup/error behavior. Never hash a second file
+    read to identify data parsed from an earlier snapshot.
+    """
     directory = Path(directory)
     try:
         manifest = verify_run(directory)
         item = next((item for item in manifest["datasets"] if item["siteId"] == site_id), None)
         if item is None:
             raise LookupError(f"Unknown reference site {site_id!r} in {directory}.")
-        return _read_verified_dataset(directory, item)
+        return _read_verified_artifact(directory, item)
     except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
         raise ValueError(f"Cannot load reference bundle at {directory}: {exc}") from exc
 
