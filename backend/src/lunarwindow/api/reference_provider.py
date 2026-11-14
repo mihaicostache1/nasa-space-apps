@@ -12,7 +12,7 @@ from lunarwindow.visibility.models import VISIBILITY_MODEL_VERSION, HorizonPoint
 
 from .models import ReferenceAvailability
 from .reference_cache import ReferenceEvaluationCache
-from .reference_cache_key import build_reference_evaluation_cache_key
+from .reference_cache_key import ReferenceEvaluationCacheKey, build_reference_evaluation_cache_key
 from .reference_models import (
     ReferenceEvaluation,
     ReferenceEvaluationProvenance,
@@ -36,6 +36,7 @@ def evaluate_reference(
     terrain_directory: Path | None = None,
     *,
     cache: ReferenceEvaluationCache | None = None,
+    expected_key: ReferenceEvaluationCacheKey | None = None,
 ) -> ReferenceEvaluationContract:
     verified = load_verified_reference_dataset(directory, request.siteId)
     archive = verified.dataset
@@ -66,13 +67,20 @@ def evaluate_reference(
         horizon = [HorizonPoint(az=az, el=0.0) for az in range(360)]
 
     # A cached success never bypasses source integrity, selection, or policy checks.
-    if cache is not None:
+    if cache is not None or expected_key is not None:
         key = build_reference_evaluation_cache_key(
             request,
             ephemeris_sha256=verified.artifact_sha256,
             terrain_mask_sha256=terrain.artifactSha256 if terrain is not None else None,
             calculation_model_version=VISIBILITY_MODEL_VERSION,
         )
+        if expected_key is not None and key != ReferenceEvaluationCacheKey.model_validate(
+            expected_key
+        ):
+            raise ValueError(
+                "Verified evaluation inputs differ from the planned precompute identity."
+            )
+    if cache is not None:
         snapshot = cache.get(key)
         if snapshot is not None:
             try:

@@ -233,7 +233,7 @@ Cache hits still perform source I/O and contract validation; the optimization av
 
 ## Offline precompute manifest contract
 
-The [offline evaluation precompute contract](precompute.md) defines `lunarwindow.precompute-manifest.v1` for planned and completed reference evaluation jobs. It reuses cache-key identities to record source/mask checksums, request options, model version, and approximation acceptance. Each completed job records its output filename, SHA-256, and response schema version. Run/job validation rejects duplicates, inconsistent completion claims, unsafe filenames, and output/mode disagreement. Models and the packaged JSON Schema are in `backend/src/lunarwindow/precompute`; the generator and bundle verifier remain separate future steps.
+The [offline evaluation precompute contract and generator](precompute.md) define and produce `lunarwindow.precompute-manifest.v1` bundles for explicit reference evaluation jobs. They reuse cache-key identities to record source/mask checksums, request options, model version, and approximation acceptance. Each completed job records its output filename, SHA-256, and response schema version. Run/job validation rejects duplicates, inconsistent completion claims, unsafe filenames, and output/mode disagreement. The generator verifies inputs against planned identities, validates results, and checkpoints atomic writes in a fresh directory, retaining an incomplete manifest on failure. Models, the generator, and the packaged JSON Schema are in `backend/src/lunarwindow/precompute`; a standalone bundle verifier, CLI, and persisted-result API integration remain separate future steps.
 
 ## Synthetic scenario evaluation contract
 

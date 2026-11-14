@@ -1,6 +1,6 @@
 # Offline evaluation precompute manifest
 
-This first precomputation step defines bookkeeping for bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. Result generation, bundle file verification, and serving persisted results are later tasks; this step does not change the API or its in-memory cache.
+Offline precomputation defines and generates bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py`. A standalone bundle verifier, command-line interface, and serving persisted results remain later tasks; the generator does not change the HTTP API or its in-memory cache.
 
 ## Run contract
 
@@ -62,7 +62,69 @@ The packaged JSON Schema describes field shapes, literals, checksums, and nested
 
 Contract validation performs no artifact reads, writes, downloads, calculations, or API calls. It reuses strict models with forbidden extra fields and revalidates nested model instances. Valid metadata, a completion claim, or a checksum with correct syntax does not prove that files exist, hashes match, scientific sources are verified, or calculations are correct.
 
-The next generator task must verify the existing archive and reviewed masks, select valid samples, check compatibility, calculate and validate responses, write/hash the same serialized bytes, and publish a complete manifest only after all outputs succeed. A future bundle loader must independently verify those files and match their validated response metadata to the recorded jobs before reuse. Existing API source/compatibility checks and the documented reference-demo limitations continue to apply. Preliminary GIS horizons and unreviewed sites are not authorized by a manifest entry.
+The generator verifies the existing archive and reviewed masks, selects valid samples, checks compatibility, calculates and validates responses, writes/hashes the same serialized bytes, and publishes a complete manifest only after all outputs succeed. A future bundle loader must independently verify those files and match their validated response metadata to the recorded jobs before reuse. Existing API source/compatibility checks and the documented reference-demo limitations continue to apply. Preliminary GIS horizons and unreviewed sites are not authorized by a manifest entry.
+
+## Generate an explicit job list
+
+`generate_bundle(jobs, *, run_id, reference_directory, output_directory, terrain_directory=None)` accepts a nonempty, unique sequence of pending `PrecomputeJob` objects and returns the completed `PrecomputeManifest`. The generator revalidates the whole plan before creating files and rejects non-pending jobs. It requires a fresh output directory, refusing to overwrite an existing file or directory. There is no automatic site/date expansion, network retrieval, resume mode, or result-cache use.
+
+This example generates one geometric evaluation and one reviewed Site01 terrain evaluation from the committed archive:
+
+```python
+from pathlib import Path
+
+from pydantic import TypeAdapter
+
+from lunarwindow.api.reference_cache_key import build_reference_evaluation_cache_key
+from lunarwindow.api.terrain_models import ReferenceEvaluationRequestContract
+from lunarwindow.precompute import PrecomputeJob, generate_bundle
+from lunarwindow.reference import load_verified_reference_dataset
+from lunarwindow.terrain.registry import load_reviewed_mask
+
+root = Path("data/reference")
+site_id = "lola-site01-reference"
+archive = load_verified_reference_dataset(root / "validation-30d", site_id)
+reviewed = load_reviewed_mask(root / "terrain-masks", "lola-site01-reference-mast-0m")
+jobs = []
+for terrain in (False, True):
+    options = {
+        "siteId": site_id,
+        "horizonMode": "terrain" if terrain else "geometric",
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-11-15T00:00:00Z",
+    }
+    if terrain:
+        options.update(maskId=reviewed.mask.maskId, allowMeanEarthApproximation=True)
+    request = TypeAdapter(ReferenceEvaluationRequestContract).validate_python(options)
+    key = build_reference_evaluation_cache_key(
+        request,
+        ephemeris_sha256=archive.artifact_sha256,
+        terrain_mask_sha256=reviewed.artifact_sha256 if terrain else None,
+    )
+    jobs.append(PrecomputeJob(evaluation=key, status="pending"))
+
+manifest = generate_bundle(
+    jobs,
+    run_id="site01-reference-demo",
+    reference_directory=root / "validation-30d",
+    terrain_directory=root / "terrain-masks",
+    output_directory=Path("data/processed/site01-evaluation-example"),
+)
+```
+
+The initial reads create explicit planned identities. The provider verifies the sources again for each actual calculation. Its internal `expected_key` guard compares the verified byte-snapshot identity, requested options, and current model version with the planned key **before** calculation. A changed source, reviewed mask, or model version fails the job instead of silently generating under stale metadata. Range and terrain compatibility checks also run normally; a manifest cannot authorize a mismatched observer or unreviewed mask.
+
+Each response is serialized to UTF-8 JSON with a final LF newline, revalidated against the existing response contract, and checked against the planned job identity. Output writes use the existing atomic-write helper without platform newline translation. The generator reads the saved file back, requires it to equal the validated serialized bytes, and hashes those saved bytes for `output.sha256`. It checks every completed output's existence and checksum again before publishing the complete manifest. Input artifacts are not modified.
+
+## Checkpoints and failures
+
+Before any calculations, the new directory contains an atomically written incomplete `manifest.json` with all jobs pending. Each successful job is checkpointed; the final checkpoint becomes complete only after every output succeeds and the final checksum checks pass. No complete manifest is published while jobs remain pending or failed.
+
+A job failure stops execution, records a failed job with its diagnostic error, preserves other successful outputs, leaves later jobs pending, and raises `PrecomputeGenerationError` with the original exception as its cause. Failed jobs claim no published output. A failure can leave an unclaimed output file in the incomplete directory, for example if response writing succeeded but final manifest publication failed. Such a directory must not be consumed as a complete bundle.
+
+Manifest I/O errors can propagate as `OSError` if even the failure checkpoint cannot be saved; the last successful atomic checkpoint remains authoritative. `KeyboardInterrupt` and process termination can leave a job pending in that checkpoint. Retry in a fresh directory; this generator does not resume or overwrite runs. The completion marker is producer bookkeeping rather than independent scientific validation, and a future reader must still verify persisted artifacts before use.
+
+`backend/tests/test_precompute_generator.py` exercises real geometric/terrain generation, exact saved checksums, checkpoint ordering, source/model identity rejection, compatibility, invalid results, non-overwrite behavior, write failures, interruptions, and damaged outputs before completion.
 
 Focused tests are in `backend/tests/test_precompute_contract.py`:
 
