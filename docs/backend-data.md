@@ -231,6 +231,10 @@ The HTTP response schemas and error envelopes are unchanged. Source checksum/met
 
 Cache hits still perform source I/O and contract validation; the optimization avoids repeated visibility calculation. Simultaneous identical misses may calculate independently, while storage operations remain thread-safe and bounded. This process-local cache does not precompute additional sites or dates. `backend/tests/test_reference_cache_api.py` verifies hits/misses, canonical request equivalence, source/mask/model revisions, validation before lookup, mutable-result isolation, disabled/oversized storage, eviction, application isolation, and recovery from invalid responses/snapshots.
 
+## Offline precompute manifest contract
+
+The [offline evaluation precompute contract](precompute.md) defines `lunarwindow.precompute-manifest.v1` for planned and completed reference evaluation jobs. It reuses cache-key identities to record source/mask checksums, request options, model version, and approximation acceptance. Each completed job records its output filename, SHA-256, and response schema version. Run/job validation rejects duplicates, inconsistent completion claims, unsafe filenames, and output/mode disagreement. Models and the packaged JSON Schema are in `backend/src/lunarwindow/precompute`; the generator and bundle verifier remain separate future steps.
+
 ## Synthetic scenario evaluation contract
 
 `POST /api/evaluations` accepts the fields already defined in `src/domain/scenario.ts`. Python validates latitude [-90, 90], east-positive longitude [-180, 180], finite altitude in kilometers above the reference surface, a nonblank name up to 80 characters, and integer steps from 1 to 1440 minutes. Times must be whole-minute ISO UTC strings ending in `Z`, from 1962 onward, consistent with the ephemeris package. End must follow start; requests are limited to 31 days and 10,000 samples. Extra JSON fields and numeric strings/booleans are rejected.

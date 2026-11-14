@@ -32,6 +32,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "lunarwindow.ephemeris" = ["*.schema.json"]
 "lunarwindow.terrain" = ["*.schema.json"]
+"lunarwindow.precompute" = ["*.schema.json"]
 
 [tool.ruff]
 line-length = 100

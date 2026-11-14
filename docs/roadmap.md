@@ -23,6 +23,8 @@ The backend serves synthetic scenarios and verified reference-data geometric or 
 
 Reference evaluations now use the versioned cache-key contract and bounded in-memory LRU storage after source integrity, date selection, and terrain compatibility checks. Repeated requests reuse validated response snapshots and skip visibility calculation while preserving source checks, provenance, and HTTP errors. Tests cover source/mask/model invalidation, isolation, bounds, and warmed-cache failure cases. Extended curated-site precomputation remains separate.
 
+The [offline evaluation precompute manifest contract](precompute.md) is implemented with job identities, source/output checksums, model versions, and complete/incomplete run semantics. Next small task: generate evaluation bundles from existing verified archives and reviewed masks using that contract.
+
 1. Connect the frontend to the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states. Synthetic custom-coordinate demos remain at `POST /api/evaluations`.
 2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.
 3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
