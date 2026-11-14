@@ -1,6 +1,6 @@
 # Offline evaluation precompute manifest
 
-Offline precomputation defines and generates bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py`. A standalone bundle verifier, command-line interface, and serving persisted results remain later tasks; the generator does not change the HTTP API or its in-memory cache.
+Offline precomputation defines, generates, and verifies bundles of reference evaluations. Models are in `backend/src/lunarwindow/precompute/models.py`, exported as `PrecomputeManifest`, `PrecomputeJob`, and `PrecomputeOutput`. The packaged JSON Schema is `lunarwindow/precompute/precompute-manifest.schema.json`. The generator is in `generator.py` and the read-only verifier is in `verifier.py`. A command-line interface and serving persisted results remain later tasks; these helpers do not change the HTTP API or its in-memory cache.
 
 ## Run contract
 
@@ -62,7 +62,7 @@ The packaged JSON Schema describes field shapes, literals, checksums, and nested
 
 Contract validation performs no artifact reads, writes, downloads, calculations, or API calls. It reuses strict models with forbidden extra fields and revalidates nested model instances. Valid metadata, a completion claim, or a checksum with correct syntax does not prove that files exist, hashes match, scientific sources are verified, or calculations are correct.
 
-The generator verifies the existing archive and reviewed masks, selects valid samples, checks compatibility, calculates and validates responses, writes/hashes the same serialized bytes, and publishes a complete manifest only after all outputs succeed. A future bundle loader must independently verify those files and match their validated response metadata to the recorded jobs before reuse. Existing API source/compatibility checks and the documented reference-demo limitations continue to apply. Preliminary GIS horizons and unreviewed sites are not authorized by a manifest entry.
+The generator verifies the existing archive and reviewed masks, selects valid samples, checks compatibility, calculates and validates responses, writes/hashes the same serialized bytes, and publishes a complete manifest only after all outputs succeed. The standalone verifier independently reads the saved files and matches validated response metadata and provenance to both the recorded jobs and verified sources. Existing API source/compatibility checks and the documented reference-demo limitations continue to apply. Preliminary GIS horizons and unreviewed sites are not authorized by a manifest entry.
 
 ## Generate an explicit job list
 
@@ -122,9 +122,40 @@ Before any calculations, the new directory contains an atomically written incomp
 
 A job failure stops execution, records a failed job with its diagnostic error, preserves other successful outputs, leaves later jobs pending, and raises `PrecomputeGenerationError` with the original exception as its cause. Failed jobs claim no published output. A failure can leave an unclaimed output file in the incomplete directory, for example if response writing succeeded but final manifest publication failed. Such a directory must not be consumed as a complete bundle.
 
-Manifest I/O errors can propagate as `OSError` if even the failure checkpoint cannot be saved; the last successful atomic checkpoint remains authoritative. `KeyboardInterrupt` and process termination can leave a job pending in that checkpoint. Retry in a fresh directory; this generator does not resume or overwrite runs. The completion marker is producer bookkeeping rather than independent scientific validation, and a future reader must still verify persisted artifacts before use.
+Manifest I/O errors can propagate as `OSError` if even the failure checkpoint cannot be saved; the last successful atomic checkpoint remains authoritative. `KeyboardInterrupt` and process termination can leave a job pending in that checkpoint. Retry in a fresh directory; this generator does not resume or overwrite runs. The completion marker is producer bookkeeping rather than independent scientific validation; use the verifier to audit persisted artifacts.
 
 `backend/tests/test_precompute_generator.py` exercises real geometric/terrain generation, exact saved checksums, checkpoint ordering, source/model identity rejection, compatibility, invalid results, non-overwrite behavior, write failures, interruptions, and damaged outputs before completion.
+
+## Verify a saved bundle
+
+```python
+from pathlib import Path
+
+from lunarwindow.precompute import verify_bundle
+
+verified_manifest = verify_bundle(
+    Path("data/processed/site01-evaluation-example"),
+    reference_directory=Path("data/reference/validation-30d"),
+    terrain_directory=Path("data/reference/terrain-masks"),
+)
+```
+
+`verify_bundle(directory, *, reference_directory, terrain_directory=None)` returns the validated `PrecomputeManifest` only after every listed job passes. `reference_directory` is required because evaluation responses do not duplicate the full archived JSON checksum. The source loader establishes that checksum from the exact source bytes it parses. The terrain directory defaults to `reference_directory.parent / "terrain-masks"`; geometric-only bundles remain independent of terrain files.
+
+Verification checks:
+
+1. The manifest contract and complete run/job states, including unique identities, safe filenames, timestamps, and output/mode schema declarations.
+2. The current supported `VISIBILITY_MODEL_VERSION`. Future or historical model versions are rejected; the recorded version cannot authorize different calculation semantics.
+3. Every listed output's existence, regular-file type, and exact-byte SHA-256. Symlinked manifests/outputs and special files are rejected. Each output is hashed and parsed from the same read.
+4. The existing geometric v1 or terrain v2 response contract and its agreement with the output schema declaration and recorded job options: site, horizon mode, dates, interval, visibility rule, countdown reference, and terrain mask identity/acceptance.
+5. The complete reference bundle, exact archived JSON checksum, and requested sample selection. Output site metadata, original NASA request evidence, native archive coverage, and all raw ephemeris values must match the verified source selection exactly.
+6. For terrain results, the registered mask's pinned checksum and complete mask metadata, plus current observer/frame compatibility and its recorded assessment. A self-declared artifact checksum in an output is insufficient.
+
+The generator and verifier share request/response identity rules in `validation.py`. The verifier independently loads artifacts and sources, performs no visibility calculations, and does not access caches, download data, or write files. A missing, corrupt, incomplete, unsupported, or inconsistent bundle raises `PrecomputeVerificationError` (a `ValueError`) with the original failure as its cause; no partial manifest is returned. Only manifest-listed output artifacts participate in verification.
+
+The returned manifest describes the byte snapshots checked during the call. It contains metadata rather than retained response bytes; any future serving path must verify the actual bytes it consumes instead of blindly rereading files after an earlier audit. Matching checksums, contracts, and source provenance does not independently validate the numerical metrics/windows or establish mission accuracy. Those calculations retain the existing regression evidence and documented model limits.
+
+Focused verifier tests in `backend/tests/test_precompute_verifier.py` cover generated geometric/terrain bundles, incomplete states, corrupted and rehashed outputs, changed options and provenance, stale source/model identities, symlink artifacts, read-only operation, geometric independence, and same-read hashing/parsing.
 
 Focused tests are in `backend/tests/test_precompute_contract.py`:
 

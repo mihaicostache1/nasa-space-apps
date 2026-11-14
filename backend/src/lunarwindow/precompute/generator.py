@@ -7,22 +7,13 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from lunarwindow.api.reference_cache_key import (
-    ReferenceEvaluationCacheKey,
-    build_reference_evaluation_cache_key,
-)
-from lunarwindow.api.reference_models import ReferenceSiteEvaluationRequest
 from lunarwindow.api.reference_provider import evaluate_reference
-from lunarwindow.api.terrain_models import (
-    ReferenceEvaluationContract,
-    ReferenceEvaluationRequestContract,
-    TerrainReferenceEvaluation,
-)
+from lunarwindow.api.terrain_models import ReferenceEvaluationContract
 from lunarwindow.ephemeris.storage import atomic_write
 
 from .models import PrecomputeJob, PrecomputeManifest, PrecomputeOutput
+from .validation import check_response_identity, request_for_key
 
-_REQUEST = TypeAdapter(ReferenceEvaluationRequestContract)
 _RESPONSE = TypeAdapter(ReferenceEvaluationContract)
 
 
@@ -43,44 +34,6 @@ def _manifest(run_id: str, created_at: str, jobs: list[PrecomputeJob]) -> Precom
         status="complete" if complete else "incomplete",
         jobs=jobs,
     )
-
-
-def _request_for(key: ReferenceEvaluationCacheKey) -> ReferenceEvaluationRequestContract:
-    fields = set(ReferenceSiteEvaluationRequest.model_fields) | {"horizonMode"}
-    if key.horizonMode == "terrain":
-        fields |= {"maskId", "allowMeanEarthApproximation"}
-    return _REQUEST.validate_python(key.model_dump(include=fields))
-
-
-def _check_response_identity(
-    response: ReferenceEvaluationContract, planned: ReferenceEvaluationCacheKey
-) -> None:
-    source = response.provenance.ephemeris
-    request = {
-        "siteId": response.siteId,
-        "horizonMode": response.horizonMode,
-        "startUtc": source["startUtc"],
-        "endUtc": source["endUtc"],
-        "stepMinutes": source["stepMinutes"],
-        "visibilityRule": response.calculation.visibilityRule,
-        "asOfUtc": response.metrics.asOfUtc,
-    }
-    mask_checksum = None
-    if isinstance(response, TerrainReferenceEvaluation):
-        request.update(
-            maskId=response.maskId, allowMeanEarthApproximation=response.allowMeanEarthApproximation
-        )
-        mask_checksum = response.provenance.terrain.artifactSha256
-    actual = build_reference_evaluation_cache_key(
-        _REQUEST.validate_python(request),
-        # The provider's expected_key guard verified this against the exact parsed
-        # archive bytes, before calculation. The response does not duplicate it.
-        ephemeris_sha256=planned.ephemerisSha256,
-        terrain_mask_sha256=mask_checksum,
-        calculation_model_version=planned.calculationModelVersion,
-    )
-    if actual != planned:
-        raise ValueError("Calculated response does not match the planned evaluation identity.")
 
 
 def generate_bundle(
@@ -112,14 +65,14 @@ def generate_bundle(
         failure_index = index
         try:
             response = evaluate_reference(
-                _request_for(job.evaluation),
+                request_for_key(job.evaluation),
                 reference_directory,
                 terrain_directory,
                 expected_key=job.evaluation,
             )
             serialized = response.model_dump_json(indent=2) + "\n"
             validated = _RESPONSE.validate_json(serialized)
-            _check_response_identity(validated, job.evaluation)
+            check_response_identity(validated, job.evaluation)
             filename = f"{job.evaluation.digest}.json"
             path = output_directory / filename
             atomic_write(path, serialized)
