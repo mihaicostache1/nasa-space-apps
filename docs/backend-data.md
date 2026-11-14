@@ -78,6 +78,29 @@ Unknown sites return a structured HTTP 404. Missing or invalid bundle data retur
 
 Native startup from the repository root reads `data/reference/validation-30d`. Set the process environment variable `LUNARWINDOW_REFERENCE_DIR` to another reference-root directory containing `validation-30d` if needed. The Docker API image includes the committed bundle at `/app/data/reference/validation-30d`; no downloads or bind mounts are required.
 
+## Reference-evaluation contract (integration step 3)
+
+The request/response models are defined in `backend/src/lunarwindow/api/reference_models.py`, with matching TypeScript types in `src/domain/evaluation.ts`. This step defines and tests the contract only. A reference-evaluation HTTP endpoint and its calculation-engine adapter will be implemented in step 4; the existing API routes still have their current behavior.
+
+`ReferenceEvaluationRequest` selects a catalog entry by `siteId` and requires an explicit `horizonMode: "geometric"`, plus `startUtc` and `endUtc`. Optional fields are `stepMinutes` (default 60), `visibilityRule` (default `any-disc`), and `asOfUtc` (default to the selected start during calculation). It inherits the existing UTC, range-length, sample-count, and countdown-reference validation. Custom coordinates and unsupported horizon modes are rejected. Site existence and archive-grid availability belong to the loader/selection integration in step 4.
+
+```json
+{
+  "siteId": "lola-site01-reference",
+  "horizonMode": "geometric",
+  "startUtc": "2026-11-15T00:00:00Z",
+  "endUtc": "2026-11-16T00:00:00Z",
+  "stepMinutes": 60,
+  "visibilityRule": "any-disc"
+}
+```
+
+The `ReferenceEvaluation` response declares `schemaVersion: "lunarwindow.reference-evaluation.v1"`, `dataMode: "reference"`, and `horizonMode: "geometric"`. It includes the source site's identity/coordinates, a 360-point zero-degree horizon, augmented Sun/Earth samples, metrics, windows, and calculation details using the existing visibility models. A geometric horizon must have ordered azimuths 0..359 and zero elevation in both the mask and the sample horizon fields.
+
+`provenance.ephemeris` retains the selected dataset's complete P1 provenance, including the original NASA request URLs, response hashes, retrieval times, model headers, and coordinate/time conventions. Its period and step describe the selected samples. `provenance.archive` records the original archive's start/end, end-exclusive convention, native step, and sample count. The response also supplies a model-limitation message explaining the flat horizon and the absence of terrain, eclipse, electrical-power, and radio-link models.
+
+Contract validation reuses the P1 provenance schema and dataset checks, including observer-coordinate consistency and the selected sampling grid. It also checks archive coverage/counts, archive/selection grid alignment, calculation step, countdown reference, and evaluated duration. These checks validate contract coherence; verifying source-file checksums remains the offline loader's responsibility. The contract models perform no retrieval or calculations. JSON Schemas can be obtained with `ReferenceEvaluationRequest.model_json_schema()` and `ReferenceEvaluation.model_json_schema()`.
+
 ## Frontend evaluation contract
 
 `POST /api/evaluations` accepts the fields already defined in `src/domain/scenario.ts`. Python validates latitude [-90, 90], east-positive longitude [-180, 180], finite altitude in kilometers above the reference surface, a nonblank name up to 80 characters, and integer steps from 1 to 1440 minutes. Times must be whole-minute ISO UTC strings ending in `Z`, from 1962 onward, consistent with the ephemeris package. End must follow start; requests are limited to 31 days and 10,000 samples. Extra JSON fields and numeric strings/booleans are rejected.

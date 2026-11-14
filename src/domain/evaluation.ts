@@ -1,4 +1,4 @@
-import type { EphemerisSample } from './ephemeris';
+import type { EphemerisDataset, EphemerisSample } from './ephemeris';
 import type { Scenario } from './scenario';
 
 export type VisibilityRule = 'any-disc' | 'body-center' | 'full-disc';
@@ -112,6 +112,42 @@ export type EvaluationDataset = {
     terrainModel: 'synthetic';
     warning: string;
   };
+};
+
+/** Contract for the next reference-evaluation endpoint; not yet served by the API. */
+export type ReferenceEvaluationRequest = {
+  siteId: string;
+  horizonMode: 'geometric';
+  startUtc: string;
+  endUtc: string;
+  stepMinutes?: number;
+  visibilityRule?: VisibilityRule;
+  asOfUtc?: string | null;
+};
+
+export type ReferenceArchiveCoverage = {
+  startUtc: string;
+  endUtc: string;
+  endExclusive: true;
+  stepMinutes: number;
+  sampleCount: number;
+};
+
+export type ReferenceEvaluationProvenance = {
+  /** Period/step describe selected samples; original NASA request evidence is retained. */
+  ephemeris: EphemerisDataset['provenance'];
+  archive: ReferenceArchiveCoverage;
+  warning: string;
+};
+
+export type ReferenceEvaluationDataset = Omit<
+  EvaluationDataset,
+  'schemaVersion' | 'dataMode' | 'provenance'
+> & {
+  schemaVersion: 'lunarwindow.reference-evaluation.v1';
+  dataMode: 'reference';
+  horizonMode: 'geometric';
+  provenance: ReferenceEvaluationProvenance;
 };
 
 export type ApiErrorResponse = {
