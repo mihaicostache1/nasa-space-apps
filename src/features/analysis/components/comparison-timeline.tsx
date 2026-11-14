@@ -9,6 +9,7 @@ import {
   domainOf,
   formatHours,
   formatPercent,
+  formatSetting,
   formatUtc,
   longestOf,
   sampleAt,
@@ -112,6 +113,14 @@ function ScenarioTimeline({
     data.windows.darkness,
     data.metrics.longestDarkHrs,
   );
+  const sunset = formatSetting(
+    data.metrics.nextSunsetBracket,
+    data.metrics.asOfUtc,
+  );
+  const earthset = formatSetting(
+    data.metrics.nextEarthsetBracket,
+    data.metrics.asOfUtc,
+  );
 
   function moveTo(event: PointerEvent<HTMLDivElement>) {
     const box = tracks.current?.getBoundingClientRect();
@@ -155,6 +164,8 @@ function ScenarioTimeline({
           label="Longest darkness"
           value={formatHours(longestDark.hours, longestDark.atLeast)}
         />
+        <Stat label="Next sunset" {...sunset} />
+        <Stat label="Next Earthset" {...earthset} />
       </dl>
       <div className="lanes">
         <div className="lane-labels" aria-hidden="true">
@@ -275,16 +286,22 @@ function CursorReadout({
 function Stat({
   label,
   value,
+  detail,
   accent,
 }: {
   label: string;
   value: string;
+  /** Smaller second line, e.g. the UTC bracket behind a countdown. */
+  detail?: string;
   accent?: boolean;
 }) {
   return (
     <div className={accent ? 'accent' : undefined}>
       <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dd>
+        {value}
+        {detail && <small>{detail}</small>}
+      </dd>
     </div>
   );
 }

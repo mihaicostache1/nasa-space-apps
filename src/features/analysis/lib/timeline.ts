@@ -1,4 +1,8 @@
-import type { VisibilitySample, VisibilityWindow } from '@/domain/evaluation';
+import type {
+  EventBracket,
+  VisibilitySample,
+  VisibilityWindow,
+} from '@/domain/evaluation';
 
 export const HOUR_MS = 3_600_000;
 
@@ -113,4 +117,29 @@ export function dayTicks(
       // Every other tick is hidden on narrow screens.
       minor: index % 2 === 1,
     }));
+}
+
+/**
+ * The next setting after `asOfUtc`, known only to lie between two observations:
+ * the body was still up at `afterUtc` and had set by `byUtc`. Hours count from
+ * `asOfUtc`, in the same T+ notation as the timeline cursor.
+ */
+export function formatSetting(
+  bracket: EventBracket | null,
+  asOfUtc: string,
+): { value: string; detail: string } {
+  if (!bracket) {
+    return { value: 'None observed', detail: 'No setting in this period' };
+  }
+  const hoursFrom = (iso: string) =>
+    Number(((Date.parse(iso) - Date.parse(asOfUtc)) / HOUR_MS).toFixed(1));
+  const after = formatUtc(bracket.afterUtc);
+  const by = formatUtc(bracket.byUtc);
+  const sameDay = after.slice(0, 10) === by.slice(0, 10);
+  return {
+    value: `T+${hoursFrom(bracket.afterUtc)}–${hoursFrom(bracket.byUtc)} h`,
+    detail: sameDay
+      ? `${after.slice(0, 16)}–${by.slice(11)}`
+      : `${after.slice(0, 16)} – ${by}`,
+  };
 }

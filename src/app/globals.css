@@ -253,12 +253,18 @@ button:disabled {
 }
 .stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin: 0 0 20px;
 }
 .stats dd {
   font-size: 16px;
+}
+.stats dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
 }
 .stats .accent dd {
   color: var(--accent);
