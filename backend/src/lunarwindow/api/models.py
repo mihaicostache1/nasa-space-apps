@@ -193,6 +193,19 @@ class Health(ApiModel):
     dataMode: Literal["synthetic"] = "synthetic"
 
 
+class Readiness(ApiModel):
+    schemaVersion: Literal["lunarwindow.readiness.v1"] = "lunarwindow.readiness.v1"
+    status: Literal["ready"] = "ready"
+    service: Literal["lunarwindow-backend"] = "lunarwindow-backend"
+    dataMode: Literal["reference"] = "reference"
+    referenceSiteCount: int = Field(ge=1)
+    terrainMaskCount: int = Field(ge=0)
+    precomputed: Literal["disabled", "verified"]
+    precomputedJobCount: int = Field(ge=0)
+    cacheMaxEntries: int = Field(ge=0)
+    cacheMaxBytes: int = Field(ge=0)
+
+
 class ErrorDetail(ApiModel):
     location: list[str | int]
     message: str

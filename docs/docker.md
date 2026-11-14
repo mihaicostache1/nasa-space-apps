@@ -16,7 +16,9 @@ docker compose logs -f web
 docker compose down
 ```
 
-The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. The API image also runs as a non-root user and checks `/api/health`. Both ports bind locally. The browser loads the UI from port 3000 and calls the API on port 8000 directly; the API's CORS settings must include the web origin. Changing `API_PORT` rebuilds the web image with the matching `NEXT_PUBLIC_API_BASE_URL`. See the [backend work package](backend-data.md).
+The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. The API image also runs as a non-root user and checks `/api/ready`, which verifies its configured reference data and saved bundle. Compose waits for API readiness before starting the web service. Both ports bind locally. The browser loads the UI from port 3000 and calls the API on port 8000 directly; the API's CORS settings must include the web origin. Changing `API_PORT` rebuilds the web image with the matching `NEXT_PUBLIC_API_BASE_URL`. See the [backend work package](backend-data.md).
+
+The API container defaults to 1 GiB memory, two CPUs, Uvicorn concurrency 16, and a five-second keep-alive timeout. The reference response cache defaults to 32 entries and 16 MiB of serialized payloads per process. See [deployment readiness](deployment-readiness.md) and `.env.example` for overrides, failure diagnostics, and the browser rehearsal.
 
 The API image includes and verifies the read-only `lunarwindow-demo-v1` data release: default full-month geometric results for all three reference sites and the reviewed Site01 0 m terrain case. Docker enables persisted lookup at `/app/data/releases/lunarwindow-demo-v1/bundle`; an explicit blank `LUNARWINDOW_PRECOMPUTED_DIR` disables it. Exact matches preserve full source/model provenance, and valid misses calculate normally. See [release replay, deployment overrides, and CI checks](data-releases.md).
 
@@ -100,4 +102,4 @@ After pulling code changes, rerun `docker compose up --build -d --wait`. This is
 
 Use commit subjects in the requested form: `feat:[description]`, `fix:[description]`, `docs:[description]`, `test:[description]`, or `chore:[description]`. Keep each commit focused on a reviewable change.
 
-The Docker CI job builds the web, API, ephemeris, test, and analysis targets, runs offline HTTP/regression/handoff checks, verifies the packaged release through a real isolated API server, regenerates the reference plot, and verifies both service health endpoints and the web page. The native Python matrix also rebuilds and compares the pinned release. CI does not publish images or run a long NASA export.
+The Docker CI job builds the web, API, ephemeris, test, and analysis targets, runs offline HTTP/regression/handoff checks, verifies the packaged release through a real isolated API server, regenerates the reference plot, and verifies service health, data readiness, and the web page. A Chromium rehearsal checks browser API calls, CORS, comparison updates, and invalid-date errors against the running images. The native Python matrix also rebuilds and compares the pinned release. CI does not publish images or run a long NASA export.

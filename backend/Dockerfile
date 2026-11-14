@@ -68,12 +68,14 @@ USER root
 RUN chmod -R a=rX /app/data/releases/lunarwindow-demo-v1
 USER lunarwindow
 ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference \
-    LUNARWINDOW_PRECOMPUTED_DIR=/app/data/releases/lunarwindow-demo-v1/bundle
+    LUNARWINDOW_PRECOMPUTED_DIR=/app/data/releases/lunarwindow-demo-v1/bundle \
+    UVICORN_LIMIT_CONCURRENCY=16 \
+    UVICORN_TIMEOUT_KEEP_ALIVE=5
 RUN lunarwindow-data-release verify /app/data/releases/lunarwindow-demo-v1 \
     --reference-dir /app/data/reference/validation-30d
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)"]
 ENTRYPOINT ["python", "-m", "uvicorn", "lunarwindow.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 CMD []
 

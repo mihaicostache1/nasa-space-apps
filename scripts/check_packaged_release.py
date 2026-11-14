@@ -68,6 +68,14 @@ def main() -> None:
         while not server.started and thread.is_alive() and time.monotonic() < deadline:
             time.sleep(0.02)
         assert server.started, "Packaged API failed to start."
+        with urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/api/ready", timeout=30
+        ) as response:
+            readiness = json.load(response)
+            assert readiness["status"] == "ready"
+            assert readiness["referenceSiteCount"] == 3
+            assert readiness["terrainMaskCount"] == 1
+            assert readiness["precomputedJobCount"] == len(manifest.jobs)
         with patch(
             "lunarwindow.api.reference_provider.calculate_visibility",
             side_effect=AssertionError(

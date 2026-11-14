@@ -32,7 +32,7 @@ The [offline evaluation precompute contract, generator, verifier, loader, and CL
 5. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
 6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, mission window finder, and a 2D azimuth/elevation sky explorer.
 7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
-8. Next: load the validated Site01 terrain mask, demo rehearsal in a clean browser, and deployment.
+8. Done: backend data readiness, configurable resource limits, private validation-failure diagnostics, and a Chromium rehearsal against the production web/API images. See [deployment readiness](deployment-readiness.md). Frontend terrain controls and external deployment remain pending.
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 

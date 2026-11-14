@@ -88,7 +88,7 @@ Start the FastAPI service as well (see Backend/data above, or `docker compose up
 - A sourced 30-day, three-point NASA reference dataset, pointing plot, and reproducible QuickMap comparison evidence.
 - A validated terrain horizon mask for the Site01 reference point (`lunarwindow.terrain-mask.v1`), plus tooling for a sourced 17-site catalog (9 Artemis III regions, Shackleton rim, landing sites, contrast cases) whose preliminary horizons match NASA PGDA 18.6-year sunlight averages within 4 percentage points at 12 of 14 polar sites.
 - Web app on archived NASA data: two-scenario comparison of verified reference sites, a three-lane Sun/Earth/both timeline with a shared cursor, longest simultaneous operation and communication-outage indicators, a mission window finder, and a 2D azimuth/elevation sky explorer. Loading, error, and stale-result states; the geometric model and data source are stated on the page.
-- Health endpoint at `GET /api/health`.
+- Process health at `GET /api/health` and verified backend data readiness at `GET /api/ready`, with [resource limits and deployed-browser checks](docs/deployment-readiness.md).
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 

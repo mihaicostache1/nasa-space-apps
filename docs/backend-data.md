@@ -28,12 +28,15 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 | Method | Route                                      | Response                                                        |
 | ------ | ------------------------------------------ | --------------------------------------------------------------- |
 | GET    | `/api/health`                              | Backend process health and `dataMode: "synthetic"`              |
+| GET    | `/api/ready`                               | Verified data readiness, saved-job counts, and cache caps       |
 | GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels  |
 | GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                        |
 | POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request     |
 | POST   | `/api/reference/evaluations`               | Geometric or reviewed-terrain metrics and windows from archives |
 | GET    | `/api/reference/sites`                     | Verified reference coordinates and archive availability         |
 | GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance     |
+
+See [deployment readiness](deployment-readiness.md) for readiness failures, environment-configured resource limits, server diagnostics, and the deployed browser rehearsal.
 
 The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
 
@@ -221,7 +224,7 @@ Storage performs no source loading, downloads, filesystem writes, JSON/response 
 
 ## Cached reference evaluations
 
-`POST /api/reference/evaluations` uses one `ReferenceEvaluationCache` owned by each FastAPI application instance. `get_reference_cache` exposes it as a dependency; independently created applications and worker processes do not share entries. The default limits are 32 responses and 16 MiB of serialized payloads. The application-owned instance is `app.state.reference_evaluation_cache`; deployments or tests can replace it with an instance using different limits, including `max_entries=0` to disable storage. This cache is process-local. Optional persisted lookup is configured separately below; neither choice is a client request option.
+`POST /api/reference/evaluations` uses one `ReferenceEvaluationCache` owned by each FastAPI application instance. `get_reference_cache` exposes it as a dependency; independently created applications and worker processes do not share entries. The default limits are 32 responses and 16 MiB of serialized payloads, configurable at startup through `LUNARWINDOW_CACHE_MAX_ENTRIES` and `LUNARWINDOW_CACHE_MAX_BYTES`. Either limit being zero disables caching; invalid values fail startup. The application-owned instance is `app.state.reference_evaluation_cache`; tests can also replace it directly. This cache is process-local. Optional persisted lookup is configured separately below; neither choice is a client request option.
 
 For both geometric and terrain requests, the provider first verifies the entire source bundle and selects the requested range/grid. `load_verified_reference_dataset` returns the dataset and SHA-256 of the exact JSON bytes parsed and validated in the same read; it never rereads a potentially changed file to identify an earlier snapshot. The original `load_reference_dataset` interface still returns the dataset unchanged. Terrain mode also reloads the registered mask, checks its pinned checksum, and checks observer/frame compatibility and explicit approximation acceptance. All these checks run on every request, including cache hits.
 
