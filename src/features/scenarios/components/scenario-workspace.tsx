@@ -10,6 +10,7 @@ import {
 } from '@/lib/api-client';
 import { ComparisonTimeline } from '@/features/analysis/components/comparison-timeline';
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
+import { LanderView } from '@/features/analysis/components/lander-view';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
 import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
 import { modelBadge } from '@/features/analysis/lib/model';
@@ -252,6 +253,11 @@ export function ScenarioWorkspace() {
       </div>
       {results.length > 0 && (
         <>
+          <LanderView
+            results={results}
+            cursorHours={cursor}
+            onCursorChange={setCursorHours}
+          />
           <ComparisonTimeline
             results={results}
             cursorHours={cursor}
