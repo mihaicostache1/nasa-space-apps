@@ -44,8 +44,8 @@ a {
   text-decoration: none;
 }
 .intro {
-  max-width: 760px;
-  padding: 64px 0 48px;
+  padding: 44px 0 32px;
+  background: radial-gradient(ellipse at 90% 0%, #20384a55, transparent 60%);
 }
 .eyebrow {
   color: var(--accent);
@@ -566,6 +566,215 @@ footer {
   color: var(--muted);
   font-size: 12px;
 }
+.mission-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 26px;
+}
+.mission-nav a {
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  text-decoration: none;
+  font: 11px monospace;
+  color: var(--muted);
+}
+.mission-nav a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.mission-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0;
+}
+.mission-tools > span {
+  margin-right: auto;
+}
+.operations-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 20px;
+}
+.polar-panel {
+  background: linear-gradient(145deg, #152331, #0d141d);
+}
+.polar-panel .section-heading {
+  flex-wrap: wrap;
+}
+.polar-panel .hint {
+  margin-bottom: 12px;
+}
+.polar-map {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.polar-grid {
+  fill: none;
+  stroke: #7193ae;
+  stroke-opacity: 0.22;
+  stroke-dasharray: 3 5;
+}
+.polar-map text {
+  fill: var(--muted);
+  font: 11px monospace;
+  pointer-events: none;
+}
+.polar-map .pole-label {
+  font-size: 9px;
+}
+.map-site {
+  cursor: pointer;
+}
+.site-hit {
+  fill: transparent;
+}
+.site-dot {
+  fill: var(--earth);
+  stroke: #0b1017;
+  stroke-width: 3;
+}
+.map-site.selected .site-dot {
+  fill: var(--accent);
+}
+.map-site:hover .site-dot,
+.map-site:focus .site-dot {
+  stroke: white;
+}
+.map-site.selected text {
+  fill: var(--accent);
+  font-weight: bold;
+}
+.map-key {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.map-key button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  background: transparent;
+  color: var(--muted);
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  font-size: 12px;
+}
+.map-key button:hover {
+  color: var(--accent);
+}
+.map-key button span {
+  margin: 0 12px 0 0;
+  color: var(--earth);
+  font: 11px monospace;
+}
+.operation-cards {
+  display: grid;
+  gap: 16px;
+}
+.operation-card .section-heading {
+  margin-bottom: 8px;
+}
+.operation-model {
+  color: var(--muted);
+  font: 10px monospace;
+  text-transform: uppercase;
+}
+.body-indicators {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.body-indicator {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  column-gap: 9px;
+  padding: 12px;
+  background: #0b121c;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+}
+.body-indicator small {
+  grid-column: 2;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.signal {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #54616d;
+  margin-top: 5px;
+}
+.sun .signal.on {
+  background: var(--sun);
+  box-shadow: 0 0 12px #f5c45166;
+}
+.earth .signal.on {
+  background: var(--earth);
+  box-shadow: 0 0 12px #6cb4ff66;
+}
+.operation-metric {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin: 16px 0 10px;
+}
+.operation-metric span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.operation-metric strong {
+  font: 20px monospace;
+  color: var(--accent);
+}
+.availability-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--track);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.availability-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.operation-card .hint {
+  margin-bottom: 12px;
+}
+.comparison-verdict {
+  padding: 16px 20px;
+  border-left: 2px solid var(--accent);
+  background: #d0f28c08;
+}
+.comparison-verdict p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+.comparison-verdict small {
+  color: var(--muted);
+  font-size: 11px;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
 @media (max-width: 700px) {
   main {
     padding: 0 20px;
@@ -577,6 +786,19 @@ footer {
   .finder-grid,
   .source-banner dl {
     grid-template-columns: 1fr;
+  }
+  .operations-grid {
+    grid-template-columns: 1fr;
+  }
+  .mission-control > .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .mission-tools > span {
+    width: 100%;
+  }
+  .operation-card .section-heading {
+    flex-wrap: wrap;
   }
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));

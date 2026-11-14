@@ -12,6 +12,7 @@ import { ComparisonTimeline } from '@/features/analysis/components/comparison-ti
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
 import { LanderView } from '@/features/analysis/components/lander-view';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
+import { MissionControl } from '@/features/analysis/components/mission-control';
 import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
 import { modelBadge } from '@/features/analysis/lib/model';
 import { domainHours, domainOf } from '@/features/analysis/lib/timeline';
@@ -20,6 +21,7 @@ import {
   defaultForm,
   toRequest,
   validateForm,
+  withSite,
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
 import { ReferenceScenarioCard } from './reference-scenario-card';
@@ -198,6 +200,34 @@ export function ScenarioWorkspace() {
   );
   const cursor = Math.min(cursorHours, Math.max(0, maxHours - 1));
 
+  function jumpToWindow(hours: number) {
+    setCursorHours(hours);
+    document
+      .getElementById('timeline-heading')
+      ?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function loadScheduleDemo() {
+    const site =
+      sites.find((candidate) => candidate.id === 'lola-site01-reference') ??
+      sites[0];
+    const next = [
+      {
+        ...defaultForm('A', site),
+        startDate: '2026-11-17',
+        endDate: '2026-11-24',
+      },
+      {
+        ...defaultForm('B', site),
+        startDate: '2026-12-01',
+        endDate: '2026-12-08',
+      },
+    ];
+    setForms(next);
+    setCursorHours(0);
+    void evaluate(next, sites);
+  }
+
   return (
     <section className="workspace" aria-labelledby="workspace-heading">
       <div className="section-heading">
@@ -213,6 +243,51 @@ export function ScenarioWorkspace() {
         </span>
       </div>
       <DataSourceBanner catalog={catalog.data} results={results} />
+      <div className="mission-tools" aria-label="Comparison shortcuts">
+        <span className="eyebrow">PLAN YOUR COMPARISON</span>
+        <button
+          type="button"
+          className="link-button"
+          disabled={loading}
+          onClick={loadScheduleDemo}
+        >
+          Try a two-week schedule slip
+        </button>
+        <button
+          type="button"
+          className="link-button"
+          disabled={loading}
+          onClick={() =>
+            setForms((current) =>
+              current.map((form) =>
+                form.slot === 'B'
+                  ? {
+                      ...form,
+                      startDate: current[0].startDate,
+                      endDate: current[0].endDate,
+                      stepMinutes: current[0].stepMinutes,
+                    }
+                  : form,
+              ),
+            )
+          }
+        >
+          Use A’s dates for B
+        </button>
+        <button
+          type="button"
+          className="link-button"
+          disabled={loading}
+          onClick={() => {
+            const next = initialForms(catalog.data);
+            setForms(next);
+            setCursorHours(0);
+            void evaluate(next, sites);
+          }}
+        >
+          Reset to full archive
+        </button>
+      </div>
       <div className="scenarios">
         {forms.map((form, index) => (
           <ReferenceScenarioCard
@@ -253,26 +328,35 @@ export function ScenarioWorkspace() {
       </div>
       {results.length > 0 && (
         <>
-          <LanderView
+          <MissionControl
+            sites={sites}
+            selections={forms.map((form) => ({
+              slot: form.slot,
+              siteId: form.siteId,
+            }))}
             results={results}
             cursorHours={cursor}
-            onCursorChange={setCursorHours}
+            onSelectSite={(slot, site) =>
+              setForms((current) =>
+                current.map((form) =>
+                  form.slot === slot ? withSite(form, site) : form,
+                ),
+              )
+            }
+            onJump={jumpToWindow}
           />
           <ComparisonTimeline
             results={results}
             cursorHours={cursor}
             onCursorChange={setCursorHours}
           />
-          <MissionWindowFinder
-            results={results}
-            onJump={(hours) => {
-              setCursorHours(hours);
-              document
-                .getElementById('timeline-heading')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          />
+          <MissionWindowFinder results={results} onJump={jumpToWindow} />
           <SkyExplorer results={results} cursorHours={cursor} />
+          <LanderView
+            results={results}
+            cursorHours={cursor}
+            onCursorChange={setCursorHours}
+          />
         </>
       )}
     </section>

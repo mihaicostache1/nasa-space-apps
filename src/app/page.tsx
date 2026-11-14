@@ -17,17 +17,22 @@ export default function Home() {
         </a>
       </header>
       <section className="intro">
-        <p className="eyebrow">NASA SPACE APPS 2026 · LUNAR SOUTH POLE</p>
+        <p className="eyebrow">LUNAR SOUTH POLE / OPERATIONS PLANNING</p>
         <h1>
           Find a window
           <br />
           to the Sun and Earth.
         </h1>
         <p>
-          Compare lunar south-pole reference sites and dates: when is the Sun up
-          for power, when is Earth up for a direct link, and when are both up at
-          once?
+          Two locations. One mission decision. Compare sunlight, Earth
+          visibility, and the windows that keep your mission connected.
         </p>
+        <nav className="mission-nav" aria-label="Dashboard sections">
+          <a href="#workspace-heading">01 / Plan</a>
+          <a href="#operations-heading">02 / Operations</a>
+          <a href="#timeline-heading">03 / Timeline</a>
+          <a href="#finder-heading">04 / Windows</a>
+        </nav>
       </section>
       <ScenarioWorkspace />
       <footer>
