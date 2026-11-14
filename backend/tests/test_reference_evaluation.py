@@ -197,12 +197,17 @@ class ReferenceEvaluationTests(unittest.TestCase):
     def test_openapi_publishes_the_reference_request_response_and_errors(self):
         schema = self.client.get("/openapi.json").json()
         operation = schema["paths"][ENDPOINT]["post"]
+        request_body = operation["requestBody"]["content"]["application/json"]["schema"]
+        response_body = operation["responses"]["200"]["content"]["application/json"]["schema"]
+        for body in (request_body, response_body):
+            self.assertEqual(body["discriminator"]["propertyName"], "horizonMode")
+            self.assertEqual(set(body["discriminator"]["mapping"]), {"geometric", "terrain"})
         self.assertEqual(
-            operation["requestBody"]["content"]["application/json"]["schema"]["$ref"],
+            request_body["discriminator"]["mapping"]["geometric"],
             "#/components/schemas/ReferenceEvaluationRequest",
         )
         self.assertEqual(
-            operation["responses"]["200"]["content"]["application/json"]["schema"]["$ref"],
+            response_body["discriminator"]["mapping"]["geometric"],
             "#/components/schemas/ReferenceEvaluation",
         )
         self.assertTrue({"404", "422", "503"}.issubset(operation["responses"]))

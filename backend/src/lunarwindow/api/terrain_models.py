@@ -1,4 +1,4 @@
-"""Terrain-aware reference API contracts; runtime routing is connected separately."""
+"""Terrain-aware reference API contracts and complete source/compatibility provenance."""
 
 import math
 from typing import Annotated, Literal, Self

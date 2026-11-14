@@ -1,6 +1,6 @@
 # Visibility, metrics, and operating windows
 
-The reusable calculation engine in `backend/src/lunarwindow/visibility` accepts ephemeris samples and an ordered 360-point horizon, then returns visibility states, metrics, windows, and setting-event brackets. FastAPI uses it for synthetic scenarios and for `POST /api/reference/evaluations`, which runs verified archived NASA samples against an explicitly selected flat zero-degree horizon. Terrain-mask integration remains a later task.
+The reusable calculation engine in `backend/src/lunarwindow/visibility` accepts ephemeris samples and an ordered 360-point horizon, then returns visibility states, metrics, windows, and setting-event brackets. FastAPI uses it for synthetic scenarios and for `POST /api/reference/evaluations`, which runs verified archived NASA samples against an explicitly selected flat zero-degree horizon or the reviewed Site01 terrain mask. Terrain mode verifies the mask checksum and observer compatibility, and requires explicit acceptance of the frame approximation before calculation.
 
 ## Inputs and horizon interpolation
 
@@ -28,7 +28,7 @@ Let `c = body elevation - interpolated horizon elevation` and `r = supplied angu
 
 The angular radii come from the supplied series, rather than a fixed Sun-size assumption in the engine. P1 derives them from Horizons' equatorial angular diameter quantity 13; see the [JPL Horizons manual](https://ssd.jpl.nasa.gov/horizons/manual.html).
 
-This local horizontal-disc approximation does not trace the terrain across the disc's width, compute a visible-area fraction, or model eclipses. Time counted as partially sunlit is not a prediction of full solar power. Earth-disc visibility is a geometric proxy, not a link budget or proof that a particular ground station is accessible. Demo evaluations use illustrative radii and a synthetic mask with `dataMode: "synthetic"`. Reference evaluations use archived per-sample radii and a zero-degree horizon with `dataMode: "reference"` and `horizonMode: "geometric"`.
+This local horizontal-disc approximation does not trace the terrain across the disc's width, compute a visible-area fraction, or model eclipses. Time counted as partially sunlit is not a prediction of full solar power. Earth-disc visibility is a geometric proxy, not a link budget or proof that a particular ground station is accessible. Demo evaluations use illustrative radii and a synthetic mask with `dataMode: "synthetic"`. Reference evaluations use archived per-sample radii with `dataMode: "reference"`: geometric v1 uses a zero-degree horizon; terrain v2 uses the reviewed mask and includes its complete provenance and approximate frame assessment. The Site01 mask is for a 0 m mast and excludes terrain within 60 m; changing observer height requires new matching source artifacts.
 
 ## Time model and percentages
 

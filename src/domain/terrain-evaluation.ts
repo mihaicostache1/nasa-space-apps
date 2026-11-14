@@ -5,7 +5,7 @@ import type {
 } from './evaluation';
 import type { TerrainMask } from './terrain-mask';
 
-/** Contract prepared for runtime integration; the current HTTP route is geometric only. */
+/** POST /api/reference/evaluations with a server-reviewed terrain horizon. */
 export type TerrainReferenceEvaluationRequest = Omit<
   ReferenceEvaluationRequest,
   'horizonMode'

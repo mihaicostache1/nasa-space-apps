@@ -2,7 +2,7 @@
 
 `lunarwindow.terrain-mask.v1` defines the GIS-to-backend handoff for a static lunar terrain horizon. The Python contract is `TerrainMask` in `backend/src/lunarwindow/terrain/models.py`. It records one observer, one reference frame, a complete azimuth/elevation profile, and the evidence needed to trace its DEM sources and generation method.
 
-The contract, offline loader, observer/frame compatibility checks, and [terrain-aware evaluation contract](backend-data.md#terrain-aware-evaluation-contract-runtime-integration-pending) are implemented. The first reviewed artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it). Connecting the prepared contract to the HTTP route and visibility engine is the next step. Live reference evaluations currently support only `horizonMode: "geometric"`.
+The contract, offline loader, observer/frame compatibility checks, and [terrain-aware evaluation endpoint](backend-data.md#terrain-aware-evaluation-contract) are implemented. The reviewed artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it). Live reference evaluations support `horizonMode: "geometric"` or `"terrain"`; terrain mode requires the registered mask ID and explicit acceptance of the frame approximation.
 
 ## Required fields
 
@@ -159,7 +159,7 @@ print(asdict(assessment))
 
 Successful checks return a frozen `TerrainCompatibility` record. It carries the mask/site IDs, both original frame declarations, the dynamical source, reference radius, `frame_policy: "mean-earth-reference-v1"`, `frame_status: "approximate"`, `transformation_applied: False`, a limitation, and the documentation URLs. Preserve this assessment alongside the original mask and ephemeris provenance when integrating evaluations. Neither artifact is modified or relabeled.
 
-Rejected pairings raise `TerrainCompatibilityError`, a `ValueError` subclass, with the reason. Omitting the approximation opt-in rejects the current real pair. The prepared terrain API response requires this assessment in its provenance and rejects inconsistent declarations. The HTTP route does not use the helper yet; its active geometric response contract is unchanged.
+Rejected pairings raise `TerrainCompatibilityError`, a `ValueError` subclass, with the reason. Omitting the approximation opt-in rejects the current real pair. The HTTP provider runs the helper before visibility calculation, returning HTTP 422 for a rejected pairing. Successful terrain responses retain the assessment in their provenance and reject inconsistent declarations. The geometric v1 response contract is unchanged.
 
 Run the focused offline tests with:
 

@@ -245,19 +245,19 @@ class TerrainEvaluationContractTests(unittest.TestCase):
             with self.subTest(damage=damage), self.assertRaises(ValidationError):
                 TerrainReferenceEvaluation.model_validate(payload)
 
-    def test_runtime_remains_geometric_until_the_provider_is_connected(self):
+    def test_runtime_publishes_and_returns_both_versioned_contracts(self):
         app = create_app()
         app.dependency_overrides[get_reference_directory] = lambda: REFERENCE / "validation-30d"
         with TestClient(app) as client:
-            with patch(
-                "lunarwindow.api.app.evaluate_reference", side_effect=AssertionError("No provider")
-            ):
-                response = client.post(
-                    "/api/reference/evaluations",
-                    json=self.request | {"allowMeanEarthApproximation": True},
-                )
-            self.assertEqual(response.status_code, 422)
-            self.assertEqual(response.json()["error"]["code"], "validation_error")
+            response = client.post(
+                "/api/reference/evaluations",
+                json=self.request | {"allowMeanEarthApproximation": True},
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIsInstance(
+                TypeAdapter(ReferenceEvaluationContract).validate_python(response.json()),
+                TerrainReferenceEvaluation,
+            )
             geometric = {key: value for key, value in self.request.items() if key != "maskId"}
             geometric["horizonMode"] = "geometric"
             response = client.post("/api/reference/evaluations", json=geometric)
@@ -269,4 +269,5 @@ class TerrainEvaluationContractTests(unittest.TestCase):
             )
             self.assertNotIn("terrain", data["provenance"])
             schemas = client.get("/openapi.json").json()["components"]["schemas"]
-            self.assertNotIn("TerrainReferenceEvaluationRequest", schemas)
+            self.assertIn("TerrainReferenceEvaluationRequest", schemas)
+            self.assertIn("TerrainReferenceEvaluation", schemas)

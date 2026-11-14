@@ -2,7 +2,7 @@
 
 ## Stack
 
-The team plan separates Python/FastAPI data services from a React frontend. The existing frontend starter uses Next.js App Router and strict TypeScript. The Ephemeris lead's package is under `backend/src/lunarwindow/ephemeris`; it is importable without invoking the CLI. FastAPI lives under `backend/src/lunarwindow/api`, with a reusable engine under `backend/src/lunarwindow/visibility`. The API supports synthetic demos and geometric evaluations of verified archived ephemerides. No database is required at this stage.
+The team plan separates Python/FastAPI data services from a React frontend. The existing frontend starter uses Next.js App Router and strict TypeScript. The Ephemeris lead's package is under `backend/src/lunarwindow/ephemeris`; it is importable without invoking the CLI. FastAPI lives under `backend/src/lunarwindow/api`, with a reusable engine under `backend/src/lunarwindow/visibility`. The API supports synthetic demos and geometric or reviewed-terrain evaluations of verified archived ephemerides. No database is required at this stage.
 
 Python uses FastAPI/Pydantic for HTTP contracts, Uvicorn for serving, the standard library for retrieval/storage, and JSON Schema for the ephemeris handoff boundary. Offline tests use `unittest` and FastAPI's HTTP test client. Matplotlib and Rasterio are optional analysis/acquisition extras. The frontend uses Zod for scenario validation, Vitest for tests, and ESLint/Prettier for code quality.
 
@@ -28,9 +28,9 @@ The package manifest overrides the TypeScript ESLint parser's `minimatch` depend
 
 The page runs independently of NASA services. Scenario fields are kept in React state and validated against `scenarioSchema`. The results panels are empty states. Reloading resets the scenarios. `GET /api/health` describes this frontend process and identifies its ephemeris provider as `not-configured`; it does not check the separate Python CLI.
 
-FastAPI runs separately on port 8000. `POST /api/evaluations` supplies synthetic scenarios (`lunarwindow.evaluation.v2`). The reference catalog and ephemeris endpoints expose the verified archive, and `POST /api/reference/evaluations` calculates geometric visibility from selected real samples (`lunarwindow.reference-evaluation.v1`). Responses include source labels, a horizon, pointing series, metrics, windows, and setting brackets. Reference evaluations require `horizonMode: "geometric"` and retain original NASA evidence plus full archive coverage. The React workspace is not connected yet. See [the backend contract](backend-data.md) and [calculation model](visibility.md).
+FastAPI runs separately on port 8000. `POST /api/evaluations` supplies synthetic scenarios (`lunarwindow.evaluation.v2`). The reference catalog and ephemeris endpoints expose the verified archive. `POST /api/reference/evaluations` calculates geometric v1 or reviewed-terrain v2 visibility from selected real samples. Responses include source labels, a horizon, pointing series, metrics, windows, and setting brackets. Terrain mode requires a registered mask ID and explicit frame-approximation acceptance, retaining mask/checksum/compatibility provenance alongside the original NASA evidence and archive coverage. The React workspace is not connected yet. See [the backend contract](backend-data.md) and [calculation model](visibility.md).
 
-The CLI retrieves real Sun/Earth angles, caches provider responses, and exports flat series plus provenance. The committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. The reference adapter validates that bundle, selects its requested grid, and supplies a zero-degree horizon to the engine. QuickMap camera-observer comparisons are documented in `docs/validation/report.md`; they validate displayed angles for observers about 100–144 km up, not ground-level terrain shadows. One validated terrain mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, contract `lunarwindow.terrain-mask.v1`) matches the archived Site01 ephemeris observer; the API does not load it yet. Horizons for the other curated sites are preliminary (see `docs/terrain-gis-lead.md`). Team-approved mission coordinates and the full multi-year dataset remain pending.
+The CLI retrieves real Sun/Earth angles, caches provider responses, and exports flat series plus provenance. The committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. The reference adapter validates that bundle and selects its requested grid. It then supplies either a zero-degree horizon or the checksummed Site01 mask to the engine after compatibility checks. QuickMap camera-observer comparisons are documented in `docs/validation/report.md`; they validate displayed angles for observers about 100–144 km up, not ground-level terrain shadows. The Site01 mask is registered in `terrain/registry.py`, with a fixed filename, expected site identity, and pinned checksum. Its 0 m observer and explicit frame-approximation requirement are preserved. Other curated horizons remain preliminary and are not registered for reference evaluations (see `docs/terrain-gis-lead.md`). Team-approved mission coordinates and the full multi-year dataset remain pending.
 
 ## Current data flow
 
@@ -38,7 +38,7 @@ The CLI retrieves real Sun/Earth angles, caches provider responses, and exports 
 flowchart LR
   UI[React scenario workspace] -. integration pending .-> API[FastAPI service]
   API --> Demo[Synthetic provider]
-  API --> Reference[Geometric reference adapter]
+  API --> Reference[Reference evaluation adapter]
   Archive[Verified reference bundle] --> Reference
   Reference --> Domain
   Demo --> Domain[Visibility and metrics engine]
@@ -47,11 +47,11 @@ flowchart LR
   Provider --> Horizons[JPL Horizons]
   Provider --> Data[Normalized samples and provenance]
   Data --> Archive
-  Mask[Validated Site01 terrain mask] -. integration pending .-> Domain
+  Mask[Reviewed Site01 terrain mask] --> Reference
   Domain -. pending .-> Views[Horizon, timeline, comparison]
 ```
 
-The workspace, FastAPI service, visibility engine, Python ephemeris module, and export CLI exist today. The ephemeris type is `EphemerisDataset` in `src/domain/ephemeris.ts`; evaluation responses use `EvaluationDataset` or `ReferenceEvaluationDataset` in `src/domain/evaluation.ts`. Dashed arrows describe work still pending.
+The workspace, FastAPI service, visibility engine, Python ephemeris module, and export CLI exist today. The ephemeris type is `EphemerisDataset` in `src/domain/ephemeris.ts`; existing evaluation types are in `src/domain/evaluation.ts`, with terrain variants and the discriminated union in `src/domain/terrain-evaluation.ts`. Dashed arrows describe work still pending.
 
 ## HTTP contract
 
@@ -71,7 +71,7 @@ FastAPI implements `POST /api/evaluations` using the existing UI `Scenario` requ
 }
 ```
 
-The synthetic provider generates demo angles and masks. The reference endpoint instead accepts a catalog `siteId`, UTC range/step, and explicit geometric mode. Both use the shared engine and optional `visibilityRule`/`asOfUtc` controls. The reference path preserves P1 source evidence, validates archive-grid availability, and returns structured 404/422/503 errors without a synthetic fallback. GIS integration will supply verified masks and their provenance later.
+The synthetic provider generates demo angles and masks. The reference endpoint accepts a catalog `siteId`, UTC range/step, and explicit geometric or terrain mode. Terrain requests add a reviewed `maskId` and `allowMeanEarthApproximation: true` for the current pairing. Both modes use the shared engine and optional `visibilityRule`/`asOfUtc` controls. The reference path preserves P1 source evidence, validates archive-grid availability, and returns structured 404/422/503 errors without a fallback. Geometric requests remain independent of terrain artifacts.
 
 The Python client bounds/chunks requests, uses timeouts and limited retries, validates observer coordinates, and reuses disk archives keyed by URL. Cooperating export workers share OS locks, honor Retry-After, and publish complete checksummed bundles. Evaluation requests are bounded to 31 days / 10,000 samples. The synchronous reference route runs disk reads and calculations in FastAPI's worker thread and makes no NASA requests. Live on-demand retrieval will need worker scheduling and cache-retention controls; cooperating retrieval workers must share the configured lock directory.
 
