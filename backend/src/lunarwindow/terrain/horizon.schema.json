@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lunarwindow.horizon.v1",
+  "$defs": {
+    "HorizonParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "mastHeightM": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Mastheightm",
+          "type": "number"
+        },
+        "maxRangeKm": {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "title": "Maxrangekm",
+          "type": "number"
+        },
+        "nearFieldKm": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Nearfieldkm",
+          "type": "number"
+        },
+        "minDistanceM": {
+          "exclusiveMinimum": 0,
+          "title": "Mindistancem",
+          "type": "number"
+        },
+        "raysPerDegree": {
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Raysperdegree",
+          "type": "integer"
+        },
+        "stepGrowth": {
+          "maximum": 0.05,
+          "minimum": 0,
+          "title": "Stepgrowth",
+          "type": "number"
+        },
+        "binning": {
+          "const": "max-per-degree",
+          "default": "max-per-degree",
+          "title": "Binning",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mastHeightM",
+        "maxRangeKm",
+        "nearFieldKm",
+        "minDistanceM",
+        "raysPerDegree",
+        "stepGrowth"
+      ],
+      "title": "HorizonParameters",
+      "type": "object"
+    },
+    "HorizonPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "az": {
+          "exclusiveMaximum": 360,
+          "minimum": 0,
+          "title": "Az",
+          "type": "integer"
+        },
+        "el": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "El",
+          "type": "number"
+        }
+      },
+      "required": [
+        "az",
+        "el"
+      ],
+      "title": "HorizonPoint",
+      "type": "object"
+    },
+    "HorizonQuality": {
+      "additionalProperties": false,
+      "properties": {
+        "truncatedAzimuths": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Truncatedazimuths",
+          "type": "array"
+        },
+        "minReachKm": {
+          "minimum": 0,
+          "title": "Minreachkm",
+          "type": "number"
+        },
+        "missingSampleFraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missingsamplefraction",
+          "type": "number"
+        },
+        "nearFieldAvailable": {
+          "title": "Nearfieldavailable",
+          "type": "boolean"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "truncatedAzimuths",
+        "minReachKm",
+        "missingSampleFraction",
+        "nearFieldAvailable",
+        "warnings"
+      ],
+      "title": "HorizonQuality",
+      "type": "object"
+    },
+    "HorizonSource": {
+      "additionalProperties": false,
+      "properties": {
+        "productId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Productid"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Role"
+        },
+        "sourceUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sourceurl"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sha256"
+        },
+        "resolutionM": {
+          "exclusiveMinimum": 0,
+          "title": "Resolutionm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "productId",
+        "role",
+        "sourceUrl",
+        "sha256",
+        "resolutionM"
+      ],
+      "title": "HorizonSource",
+      "type": "object"
+    },
+    "RayProfile": {
+      "additionalProperties": false,
+      "description": "Full-resolution rays for drawing; azimuth of ray i is i \u00d7 stepDeg.",
+      "properties": {
+        "stepDeg": {
+          "exclusiveMinimum": 0,
+          "title": "Stepdeg",
+          "type": "number"
+        },
+        "el": {
+          "items": {
+            "type": "number"
+          },
+          "title": "El",
+          "type": "array"
+        },
+        "horizonDistanceKm": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Horizondistancekm",
+          "type": "array"
+        },
+        "reachKm": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Reachkm",
+          "type": "array"
+        }
+      },
+      "required": [
+        "stepDeg",
+        "el",
+        "horizonDistanceKm",
+        "reachKm"
+      ],
+      "title": "RayProfile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "lunarwindow.horizon.v1",
+      "default": "lunarwindow.horizon.v1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "siteId": {
+      "title": "Siteid",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "lat": {
+      "maximum": 90,
+      "minimum": -90,
+      "title": "Lat",
+      "type": "number"
+    },
+    "lon": {
+      "maximum": 180,
+      "minimum": -180,
+      "title": "Lon",
+      "type": "number"
+    },
+    "coordinateSource": {
+      "title": "Coordinatesource",
+      "type": "string"
+    },
+    "terrainModel": {
+      "enum": [
+        "lola-dem",
+        "none"
+      ],
+      "title": "Terrainmodel",
+      "type": "string"
+    },
+    "surfaceElevationM": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Surfaceelevationm"
+    },
+    "mastHeightM": {
+      "minimum": 0,
+      "title": "Mastheightm",
+      "type": "number"
+    },
+    "observerAltitudeKm": {
+      "title": "Observeraltitudekm",
+      "type": "number"
+    },
+    "referenceRadiusM": {
+      "exclusiveMinimum": 0,
+      "title": "Referenceradiusm",
+      "type": "number"
+    },
+    "horizon": {
+      "items": {
+        "$ref": "#/$defs/HorizonPoint"
+      },
+      "title": "Horizon",
+      "type": "array"
+    },
+    "rays": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RayProfile"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "quality": {
+      "$ref": "#/$defs/HorizonQuality"
+    },
+    "parameters": {
+      "$ref": "#/$defs/HorizonParameters"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/HorizonSource"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "algorithmVersion": {
+      "title": "Algorithmversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "siteId",
+    "name",
+    "lat",
+    "lon",
+    "coordinateSource",
+    "terrainModel",
+    "surfaceElevationM",
+    "mastHeightM",
+    "observerAltitudeKm",
+    "referenceRadiusM",
+    "horizon",
+    "rays",
+    "quality",
+    "parameters",
+    "sources",
+    "algorithmVersion"
+  ],
+  "title": "HorizonProfile",
+  "type": "object"
+}
