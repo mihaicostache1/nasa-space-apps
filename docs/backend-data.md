@@ -52,7 +52,7 @@ The response declares `schemaVersion: "lunarwindow.reference-catalog.v1"`, provi
 
 The catalog is derived from the complete verified bundle. Currently it lists three LOLA DEM reference points, each with 720 hourly samples covering 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z (end excluded). Their source descriptions identify them as reference points rather than selected landing targets. Missing, corrupted, or invalid source data returns a structured HTTP 503; no partial catalog is published. The endpoint performs no downloads or writes.
 
-Use an entry's `id` with the reference ephemeris endpoint below. Availability describes the existing archive; date-range selection remains a separate implementation step. The OpenAPI documentation includes the catalog's typed response schema.
+Use an entry's `id` with the reference ephemeris endpoint below. Availability describes the full archive and its native sampling interval; optional selections do not change the catalog. The OpenAPI documentation includes the catalog's typed response schema.
 
 ## Read one verified reference dataset
 
@@ -60,7 +60,19 @@ Use an entry's `id` with the reference ephemeris endpoint below. Availability de
 curl http://localhost:8000/api/reference/sites/lola-site01-reference/ephemeris
 ```
 
-This endpoint uses the offline loader to validate the complete reference bundle and return the selected site's original `lunarwindow.ephemeris.v2` dataset. The response matches `EphemerisDataset` in `src/domain/ephemeris.ts`, including all 720 hourly samples from 2026-11-14 through 2026-12-14 UTC (end excluded), angular radii, coordinates, and NASA/JPL provenance. It returns the complete archive with no date filtering, terrain, visibility flags, or metrics.
+Without query parameters, this endpoint returns the selected site's original `lunarwindow.ephemeris.v2` dataset unchanged: all 720 hourly samples from 2026-11-14 through 2026-12-14 UTC (end excluded), angular radii, coordinates, and NASA/JPL provenance. It validates the complete reference bundle first. The response matches `EphemerisDataset` in `src/domain/ephemeris.ts` and contains no terrain, visibility flags, or metrics.
+
+Optional query parameters select a contained range and sampling interval:
+
+```sh
+curl 'http://localhost:8000/api/reference/sites/lola-site01-reference/ephemeris?startUtc=2026-11-15T00:00:00Z&endUtc=2026-11-16T00:00:00Z&stepMinutes=120'
+```
+
+This returns 12 existing samples, starting at 00:00 and ending at 22:00 on November 15. `startUtc` is inclusive and must lie on the archive's sampling grid. `endUtc` is exclusive and may fall between samples; the returned timestamps still stay strictly before it. Both bounds must be whole-minute UTC strings ending in `Z` and remain within archive coverage. Omitted bounds default independently to the archive's start/end.
+
+`stepMinutes` defaults to the archive interval (currently 60 minutes). Supported values are positive whole-number multiples of that interval, up to 1440 minutes. A larger step selects every corresponding archived sample, anchored at the requested start; it does not interpolate. Requests for unavailable dates, off-grid starts, invalid UTC times, empty/reversed ranges, or unsupported intervals return structured HTTP 422 errors. No bounds are silently clipped and no missing samples are filled.
+
+Filtered responses retain the `lunarwindow.ephemeris.v2` contract. Their `provenance.startUtc`, `endUtc`, and `stepMinutes` describe the returned grid. All original NASA request URLs, response hashes, retrieval times, model headers, coordinates, and angular values are preserved. The source archive is unchanged; use the catalog or unfiltered endpoint for its full coverage. The reusable `select_reference_dataset` helper also validates its selected output against the existing ephemeris contract.
 
 Unknown sites return a structured HTTP 404. Missing or invalid bundle data returns a structured HTTP 503 with no synthetic fallback or filesystem paths in the response. Availability is checked when the reference endpoint is called; the existing demo routes remain independent.
 

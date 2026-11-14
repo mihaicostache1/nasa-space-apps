@@ -12,7 +12,12 @@ from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
 from lunarwindow.ephemeris.contract import dataset_schema
-from lunarwindow.reference import load_reference_catalog, load_reference_dataset
+from lunarwindow.reference import (
+    ReferenceSelectionError,
+    load_reference_catalog,
+    load_reference_dataset,
+    select_reference_dataset,
+)
 from lunarwindow.visibility.models import VisibilityRule
 
 from .demo import DemoProvider
@@ -143,7 +148,7 @@ def create_app() -> FastAPI:
         response_model=None,
         responses={
             200: {
-                "description": "Verified ephemeris dataset with unchanged source provenance",
+                "description": "Verified full or selected ephemeris with original source evidence",
                 "content": {"application/json": {"schema": dataset_schema()}},
             },
             404: {"model": ErrorResponse},
@@ -151,14 +156,38 @@ def create_app() -> FastAPI:
         },
         tags=["reference"],
         summary="Read one verified site's archived Sun/Earth ephemeris",
-        description="Returns the complete archived period without terrain or visibility calculations.",
+        description=(
+            "Optional UTC bounds and a sampling step select existing archive samples. "
+            "Start must align with the archive grid; step must be a whole-number multiple "
+            "of the archive interval. Omitted values use archive defaults. "
+            "Range metadata describes the selection; original request evidence is retained."
+        ),
     )
     def reference_ephemeris(
         site_id: str,
         directory: Annotated[Path, Depends(get_reference_directory)],
+        startUtc: Annotated[
+            str | None, Query(description="Inclusive UTC start; on archive grid")
+        ] = None,
+        endUtc: Annotated[
+            str | None, Query(description="Exclusive UTC end; within archive")
+        ] = None,
+        stepMinutes: Annotated[
+            int | None,
+            Query(ge=1, le=1440, description="Whole-number multiple of archive interval"),
+        ] = None,
     ) -> dict:
         try:
-            return load_reference_dataset(directory, site_id)
+            dataset = load_reference_dataset(directory, site_id)
+            if startUtc is None and endUtc is None and stepMinutes is None:
+                return dataset
+            return select_reference_dataset(
+                dataset, start_utc=startUtc, end_utc=endUtc, step_minutes=stepMinutes
+            )
+        except ReferenceSelectionError as exc:
+            raise RequestValidationError(
+                [{"loc": ("query",), "msg": str(exc), "type": "value_error"}]
+            ) from exc
         except LookupError as exc:
             raise HTTPException(
                 status_code=404, detail=f"Unknown reference site: {site_id}"

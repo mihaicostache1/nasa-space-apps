@@ -58,6 +58,65 @@ class ReferenceApiTests(unittest.TestCase):
         self.assertEqual(error["code"], "not_found")
         self.assertIn("Unknown reference site", error["message"])
 
+    def test_reference_query_returns_exact_samples_with_consistent_selected_range(self):
+        expected = json.loads((REFERENCE / f"{SITE_ID}.json").read_text(encoding="utf-8"))
+        options = {
+            "startUtc": "2026-11-15T00:00:00Z",
+            "endUtc": "2026-11-16T00:00:00Z",
+            "stepMinutes": 120,
+        }
+        response = self.client.get(ENDPOINT, params=options)
+        self.assertEqual(response.status_code, 200)
+        expected["series"] = expected["series"][24:48:2]
+        expected["provenance"].update(options)
+        self.assertEqual(response.json(), expected)
+        self.assertEqual(len(response.json()["series"]), 12)
+        operation = self.client.get("/openapi.json").json()["paths"][
+            "/api/reference/sites/{site_id}/ephemeris"
+        ]["get"]
+        query = {item["name"]: item for item in operation["parameters"] if item["in"] == "query"}
+        self.assertEqual(set(query), {"startUtc", "endUtc", "stepMinutes"})
+        self.assertTrue(all(not item["required"] for item in query.values()))
+
+    def test_reference_query_defaults_unspecified_values_to_archive_coverage(self):
+        for options, expected_count in (
+            ({"endUtc": "2026-11-14T02:30:00Z"}, 3),
+            ({"startUtc": "2026-12-13T23:00:00Z"}, 1),
+            ({"stepMinutes": 120}, 360),
+        ):
+            with self.subTest(options=options):
+                response = self.client.get(ENDPOINT, params=options)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()["series"]), expected_count)
+
+    def test_invalid_or_unavailable_reference_selection_returns_structured_422(self):
+        cases = [
+            {"startUtc": "2026-11-13T23:00:00Z"},
+            {"endUtc": "2026-12-14T00:01:00Z"},
+            {"startUtc": "2026-12-14T00:00:00Z"},
+            {"startUtc": "2026-11-15T00:00:00Z", "endUtc": "2026-11-15T00:00:00Z"},
+            {"startUtc": "2026-11-16T00:00:00Z", "endUtc": "2026-11-15T00:00:00Z"},
+            {"startUtc": "2026-11-14T00:30:00Z"},
+            {"startUtc": "2026-11-14T00:00:01Z"},
+            {"startUtc": "2026-11-14T00:00:00+02:00"},
+            {"endUtc": "2026-11-31T00:00:00Z"},
+            {"startUtc": "not-a-date"},
+            {"stepMinutes": 30},
+            {"stepMinutes": 90},
+            {"stepMinutes": 0},
+            {"stepMinutes": 1441},
+            {"stepMinutes": "invalid"},
+            {"stepMinutes": "true"},
+        ]
+        for options in cases:
+            with self.subTest(options=options):
+                response = self.client.get(ENDPOINT, params=options)
+                self.assertEqual(response.status_code, 422)
+                error = response.json()["error"]
+                self.assertEqual(error["code"], "validation_error")
+                self.assertTrue(error["details"])
+                self.assertEqual(error["details"][0]["location"][0], "query")
+
     def test_catalog_lists_verified_coordinates_sources_and_archive_coverage(self):
         with patch(
             "lunarwindow.ephemeris.horizons.urlopen", side_effect=AssertionError("No network")
@@ -127,7 +186,7 @@ class ReferenceApiTests(unittest.TestCase):
                     shutil.copytree(REFERENCE, directory)
                     (directory / f"{SITE_ID}.json").write_text("{}", encoding="utf-8")
                 self.app.dependency_overrides[get_reference_directory] = lambda: directory
-                for endpoint in (ENDPOINT, CATALOG_ENDPOINT):
+                for endpoint in (ENDPOINT, CATALOG_ENDPOINT, ENDPOINT + "?stepMinutes=120"):
                     with patch(
                         "lunarwindow.api.demo.DemoProvider.evaluate",
                         side_effect=AssertionError("No synthetic fallback"),

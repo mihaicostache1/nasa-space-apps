@@ -2,9 +2,15 @@
 
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 
 from lunarwindow.ephemeris.contract import validate_dataset, verify_run
+from lunarwindow.ephemeris.models import TimeRange, iso_utc
+
+
+class ReferenceSelectionError(ValueError):
+    """A requested range or sampling interval is unsupported by the archive."""
 
 
 def _read_verified_dataset(directory: Path, item: dict) -> dict:
@@ -66,3 +72,57 @@ def load_reference_catalog(directory: str | Path) -> list[dict]:
         return sites
     except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
         raise ValueError(f"Cannot load reference bundle at {directory}: {exc}") from exc
+
+
+def select_reference_dataset(
+    dataset: dict,
+    *,
+    start_utc: str | None = None,
+    end_utc: str | None = None,
+    step_minutes: int | None = None,
+) -> dict:
+    """Select existing samples on a contained grid, preserving source evidence.
+
+    Omitted bounds/step use the archive's values. The start must be on its grid;
+    the end may fall between samples. No interpolation or extrapolation is used.
+    Source validation errors remain distinct from unsupported request errors.
+    """
+    validate_dataset(dataset)
+    source = dataset["provenance"]
+    archive = TimeRange(source["startUtc"], source["endUtc"], source["stepMinutes"])
+    try:
+        period = TimeRange(
+            source["startUtc"] if start_utc is None else start_utc,
+            source["endUtc"] if end_utc is None else end_utc,
+            source["stepMinutes"] if step_minutes is None else step_minutes,
+        )
+    except ValueError as exc:
+        raise ReferenceSelectionError(str(exc)) from exc
+    if period.start < archive.start or period.end > archive.end:
+        raise ReferenceSelectionError(
+            f"Requested range must be within [{source['startUtc']}, {source['endUtc']})."
+        )
+    if (period.start - archive.start) % archive.step:
+        raise ReferenceSelectionError(
+            f"startUtc must align with the archive's {archive.step_minutes}-minute grid "
+            f"anchored at {source['startUtc']}."
+        )
+    if period.step_minutes % archive.step_minutes:
+        raise ReferenceSelectionError(
+            f"stepMinutes must be a multiple of the archive's {archive.step_minutes}-minute interval."
+        )
+    first = (period.start - archive.start) // archive.step
+    stride = period.step_minutes // archive.step_minutes
+    selected = {
+        **dataset,
+        "series": deepcopy(
+            dataset["series"][first : first + period.sample_count * stride : stride]
+        ),
+        "provenance": deepcopy(source),
+    }
+    selected["provenance"].update(
+        startUtc=iso_utc(period.start),
+        endUtc=iso_utc(period.end),
+        stepMinutes=period.step_minutes,
+    )
+    return validate_dataset(selected)
