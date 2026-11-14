@@ -2,7 +2,7 @@
 
 from .export import load_horizons, verify_horizon_run
 from .horizon import OutsideCoverage, SiteSpec, compute_horizon, default_parameters, flat_horizon
-from .models import HorizonProfile
+from .models import HorizonProfile, TerrainMask
 from .service import HorizonService
 
 __all__ = [
@@ -10,6 +10,7 @@ __all__ = [
     "HorizonService",
     "OutsideCoverage",
     "SiteSpec",
+    "TerrainMask",
     "compute_horizon",
     "default_parameters",
     "flat_horizon",
