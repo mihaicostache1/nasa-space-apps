@@ -14,6 +14,8 @@ import {
   segments,
 } from '@/features/analysis/lib/timeline';
 import { findMissionWindows } from '@/features/analysis/lib/window-finder';
+import { describeModel, modelBadge } from '@/features/analysis/lib/model';
+import type { TerrainReferenceEvaluationDataset } from '@/domain/terrain-evaluation';
 import {
   elevationBounds,
   trackSegments,
@@ -195,5 +197,42 @@ describe('sky explorer geometry', () => {
     expect(low).toBeLessThan(Math.min(...els));
     expect(high).toBeGreaterThan(Math.max(...els));
     expect(low).toBeLessThanOrEqual(0);
+  });
+});
+
+describe('horizon model labels', () => {
+  it('names one mode when the scenarios agree', () => {
+    expect(modelBadge([])).toBe('GEOMETRIC');
+    expect(
+      modelBadge([
+        { slot: 'A', horizonMode: 'terrain' },
+        { slot: 'B', horizonMode: 'terrain' },
+      ]),
+    ).toBe('TERRAIN');
+  });
+
+  it('names the mode per scenario when they differ', () => {
+    expect(
+      modelBadge([
+        { slot: 'A', horizonMode: 'terrain' },
+        { slot: 'B', horizonMode: 'geometric' },
+      ]),
+    ).toBe('A TERRAIN · B GEOMETRIC');
+  });
+
+  it('describes the geometric and terrain models', () => {
+    expect(describeModel(site01)).toEqual({
+      label: 'Geometric',
+      detail: 'flat 0° horizon, terrain not applied',
+    });
+    const terrain = {
+      horizonMode: 'terrain',
+      provenance: { terrain: { mask: { observer: { mastHeightM: 0 } } } },
+    } as unknown as TerrainReferenceEvaluationDataset;
+    expect(describeModel(terrain)).toEqual({
+      label: 'Terrain',
+      detail:
+        'reviewed LOLA DEM horizon, 0 m mast, frame approximation accepted',
+    });
   });
 });
