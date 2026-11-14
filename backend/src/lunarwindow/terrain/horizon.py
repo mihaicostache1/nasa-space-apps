@@ -33,11 +33,15 @@ from .models import (
 from .products import REFERENCE_RADIUS_M
 
 ALGORITHM_VERSION = "lunarwindow.horizon-raycast.1"
-RAY_CHUNK = 120
+SAMPLES_PER_CHUNK = 2_000_000  # Rays per chunk adapt to the step count (~200 MB peak).
 
 
 class OutsideCoverage(ValueError):
     """The site has no valid DEM height, so a terrain horizon cannot be computed."""
+
+
+class IncompleteTerrain(ValueError):
+    """Some required ray samples had no DEM data (raised only when completeness is required)."""
 
 
 @dataclass(frozen=True)
@@ -85,9 +89,9 @@ def _sources(*grids: Grid | None) -> list[HorizonSource]:
     return sources
 
 
-def surface_height(lat: float, lon: float, near: Grid | None, far: Grid | None):
+def surface_height(lat: float, lon: float, *grids: Grid | None):
     x, y = latlon_to_stereographic(lat, lon)
-    for grid in (near, far):
+    for grid in grids:
         if grid is not None:
             value = float(grid.sample(x, y))
             if math.isfinite(value):
@@ -101,15 +105,24 @@ def compute_horizon(
     far: Grid | None,
     parameters: HorizonParameters | None = None,
     radius: float = REFERENCE_RADIUS_M,
+    *,
+    fine: Grid | None = None,
+    fine_field_m: float = 0.0,
+    require_complete: bool = False,
 ) -> HorizonProfile:
+    """Ray-cast a horizon. Grids are tried finest first at each sample: `fine` within
+    `fine_field_m` (e.g. a 5 m site tile), `near` within nearFieldKm, then `far`. With
+    `require_complete`, any sample without data from any grid raises IncompleteTerrain."""
     params = parameters or default_parameters()
-    surface, surface_grid = surface_height(site.lat, site.lon, near, far)
+    surface, surface_grid = surface_height(site.lat, site.lon, fine, near, far)
     observer = surface + params.mastHeightM
-    base_step = min(grid.resolution_m for grid in (near, far) if grid is not None)
+    base_step = min(grid.resolution_m for grid in (fine, near, far) if grid is not None)
     distances = sample_distances(
         params.minDistanceM, params.maxRangeKm * 1000, base_step, params.stepGrowth
     )
+    use_fine = distances <= fine_field_m
     use_near = distances <= params.nearFieldKm * 1000
+    ray_chunk = max(1, SAMPLES_PER_CHUNK // len(distances))
     count = 360 * params.raysPerDegree
     azimuths = np.arange(count) / params.raysPerDegree
     ray_el = np.empty(count)
@@ -117,14 +130,17 @@ def compute_horizon(
     ray_reach = np.zeros(count)
     missing = 0
 
-    for start in range(0, count, RAY_CHUNK):
-        chunk = azimuths[start : start + RAY_CHUNK]
+    for start in range(0, count, ray_chunk):
+        chunk = azimuths[start : start + ray_chunk]
         x, y = stereographic_from_vectors(
             ray_unit_vectors(site.lat, site.lon, chunk, distances, radius), radius
         )
         heights = np.full(x.shape, np.nan)
+        if fine is not None and use_fine.any():
+            heights[:, use_fine] = fine.sample(x[:, use_fine], y[:, use_fine])
         if near is not None:
-            heights[:, use_near] = near.sample(x[:, use_near], y[:, use_near])
+            gaps = np.isnan(heights) & use_near
+            heights[gaps] = near.sample(x[gaps], y[gaps])
         if far is not None:
             gaps = np.isnan(heights)
             heights[gaps] = far.sample(x[gaps], y[gaps])
@@ -142,6 +158,10 @@ def compute_horizon(
         last_valid = np.where(valid.any(axis=1), valid.shape[1] - 1 - valid[:, ::-1].argmax(1), -1)
         ray_reach[start:stop] = np.where(last_valid >= 0, distances[last_valid.clip(0)], 0.0)
 
+    if require_complete and missing:
+        raise IncompleteTerrain(
+            f"{site.site_id}: {missing} of {count * len(distances)} ray samples have no DEM data."
+        )
     # Rays with no terrain at all fall back to the bare-sphere horizon and are flagged. Valid
     # rays keep values below that dip: an observer on a peak sees terrain falling away.
     dip = smooth_sphere_horizon_deg(params.mastHeightM, radius)
@@ -156,7 +176,7 @@ def compute_horizon(
             f"{int(truncated_bins.sum())} azimuth bins reach the DEM edge before "
             f"{params.maxRangeKm:g} km; distant terrain there is not modelled."
         )
-    if near is None or surface_grid is not near:
+    if surface_grid is far:
         warnings.append("No near-field DEM at the site; local terrain uses the coarse grid.")
     total = count * len(distances)
     return HorizonProfile(
@@ -183,11 +203,11 @@ def compute_horizon(
             truncatedAzimuths=[int(az) for az in np.flatnonzero(truncated_bins)],
             minReachKm=round(float(ray_reach.min()) / 1000, 3),
             missingSampleFraction=round(missing / total, 6),
-            nearFieldAvailable=near is not None and surface_grid is near,
+            nearFieldAvailable=surface_grid is not far,
             warnings=warnings,
         ),
         parameters=params,
-        sources=_sources(near, far),
+        sources=_sources(fine, near, far),
         algorithmVersion=ALGORITHM_VERSION,
     )
 

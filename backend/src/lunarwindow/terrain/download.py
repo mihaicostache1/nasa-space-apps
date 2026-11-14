@@ -53,6 +53,16 @@ def read_provenance(path: Path) -> dict:
     return record
 
 
+def _remote_revision(url: str) -> dict:
+    """HTTP revision headers identifying the published file version (best effort)."""
+    try:
+        request = Request(url, method="HEAD", headers={"User-Agent": USER_AGENT})
+        with urlopen(request, timeout=60) as response:
+            return {key: response.headers.get(key) for key in ("Last-Modified", "ETag")}
+    except OSError:
+        return {}
+
+
 def _fetch_segment(url: str, part: Path, start: int, end: int, counter, attempts: int = 6):
     """Download bytes [start, end] into `part`, resuming from its current length."""
     expected = end - start + 1
@@ -116,6 +126,7 @@ def download(product: Product, directory: Path, progress=None, connections: int 
             ]
             for future in futures:
                 future.result()
+        revision = _remote_revision(product.url)
         with partial.open("wb") as output:
             for part in parts:
                 with part.open("rb") as stream:
@@ -140,6 +151,8 @@ def download(product: Product, directory: Path, progress=None, connections: int 
             "sizeBytes": stat.st_size,
             "sha256": digest,
             "retrievedAtUtc": iso_utc(datetime.now(timezone.utc)),
+            "lastModified": revision.get("Last-Modified"),
+            "etag": revision.get("ETag"),
             "mtimeNs": stat.st_mtime_ns,
         }
         atomic_write(sidecar_path(path), json.dumps(record, indent=2) + "\n")
