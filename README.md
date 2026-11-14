@@ -20,7 +20,7 @@ docker compose run --build --rm ephemeris \
   --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z
 ```
 
-Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. The FastAPI skeleton serves explicit synthetic data; the React workspace and real ephemeris pipeline are not connected to it yet.
+Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric evaluations of verified archived ephemerides. The React workspace is not connected to these results yet.
 
 ## Native setup: Backend/data
 
@@ -33,7 +33,7 @@ python -m pip install -e './backend[dev]'
 python -m uvicorn lunarwindow.api.app:app --reload --port 8000
 ```
 
-Open [localhost:8000/docs](http://localhost:8000/docs). Routes: `GET /api/health`, `GET /api/sites`, `GET /api/sites/{site_id}`, and `POST /api/evaluations`. Responses include a synthetic horizon, Sun/Earth series, calculated disc visibility, duration-weighted metrics, operating windows, and bracketed setting times. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for examples, precision limits, and the v2 response migration.
+Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
 
 ## Native setup: Ephemeris lead
 
@@ -80,6 +80,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - Next.js App Router, React, and strict TypeScript.
 - Responsive two-scenario workspace with editable coordinates, UTC dates, sample intervals, and validation.
 - FastAPI skeleton with deterministic synthetic site/scenario data, HTTP validation, CORS, OpenAPI, and Docker startup.
+- Verified reference-data loader, site catalog, date-range selection, and geometric evaluations with original NASA evidence and archive coverage.
 - Reusable visibility engine with partial-disc rules, circular horizon interpolation, metrics, merged windows, clipped-range flags, and countdown brackets.
 - Python Horizons client/CLI with sequential chunked requests, caching, JSON/CSV export, observer checks, and source provenance.
 - Flat Sun/Earth series matching the team's JSON field names, with corresponding TypeScript types.
@@ -90,7 +91,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. One validated terrain mask (Site01) and a sourced 17-site catalog are ready (see the [terrain work package](docs/terrain-gis-lead.md)); joining terrain into the API, charts, and maps remains to be implemented. Visibility and metrics calculations are implemented and currently run on synthetic API inputs; they retain sampling and disc-model limitations. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
+The UI workspace validates inputs locally. It does not persist them or consume backend results yet. Charts, maps, and a site picker remain pending. The API calculates visibility and metrics from either synthetic demos or verified archived ephemerides; reference evaluations explicitly use a flat zero-degree horizon and retain sampling/disc-model limitations. One validated terrain mask (Site01, `lunarwindow.terrain-mask.v1`) and a sourced 17-site catalog are ready (see the [terrain work package](docs/terrain-gis-lead.md)), but the API does not apply terrain yet. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -98,7 +99,7 @@ The UI workspace validates inputs locally. It does not persist them or consume t
 .github/workflows/ci.yml       Automated checks
 backend/
   pyproject.toml              Installable Python package and CLI
-  src/lunarwindow/api/        FastAPI app, HTTP contracts, synthetic provider
+  src/lunarwindow/api/        FastAPI app, contracts, demo and reference providers
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
   src/lunarwindow/visibility/ Visibility engine, metrics, windows, and contracts
   src/lunarwindow/terrain/    LOLA downloads, horizon ray casting, site catalog, service
@@ -149,4 +150,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-Backend/data tasks 1 and 2 are complete; next integrate the versioned reference dataset and GIS masks, then add caching and curated-site precomputation. The validated terrain mask is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json`; see the [terrain work package](docs/terrain-gis-lead.md). See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+Archived reference-data integration is complete for geometric evaluations. Next load the validated Site01 terrain mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, see the [terrain work package](docs/terrain-gis-lead.md)) through `TerrainMask`, add caching and curated-site precomputation, and connect the frontend. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.

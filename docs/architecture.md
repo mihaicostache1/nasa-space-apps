@@ -2,7 +2,7 @@
 
 ## Stack
 
-The team plan separates Python/FastAPI data services from a React frontend. The existing frontend starter uses Next.js App Router and strict TypeScript. The Ephemeris lead's working package is under `backend/src/lunarwindow/ephemeris`; it is importable without invoking the CLI. Backend/data's first two milestones provide the FastAPI app under `backend/src/lunarwindow/api` and a reusable calculation engine under `backend/src/lunarwindow/visibility`. The HTTP provider still supplies synthetic inputs. No database is required at this stage.
+The team plan separates Python/FastAPI data services from a React frontend. The existing frontend starter uses Next.js App Router and strict TypeScript. The Ephemeris lead's package is under `backend/src/lunarwindow/ephemeris`; it is importable without invoking the CLI. FastAPI lives under `backend/src/lunarwindow/api`, with a reusable engine under `backend/src/lunarwindow/visibility`. The API supports synthetic demos and geometric evaluations of verified archived ephemerides. No database is required at this stage.
 
 Python uses FastAPI/Pydantic for HTTP contracts, Uvicorn for serving, the standard library for retrieval/storage, and JSON Schema for the ephemeris handoff boundary. Offline tests use `unittest` and FastAPI's HTTP test client. Matplotlib and Rasterio are optional analysis/acquisition extras. The frontend uses Zod for scenario validation, Vitest for tests, and ESLint/Prettier for code quality.
 
@@ -11,13 +11,14 @@ The package manifest overrides the TypeScript ESLint parser's `minimatch` depend
 ## Boundaries
 
 - `backend/src/lunarwindow/ephemeris`: P1 coordinate/time validation, Horizons query construction, strict parsing, source archives, and JSON/CSV export.
-- `backend/src/lunarwindow/api`: P3 FastAPI routes, request/response models, errors, CORS, and a replaceable synthetic-data provider.
-- `backend/src/lunarwindow/terrain`: P2 LOLA downloads, DEM access with projection checks, ray-cast horizon profiles, curated catalog and region-point selection, verified run bundles, and a cached custom-coordinate service. Rasterio/pyshp are needed only for reading files (`gis` extra); the algorithm needs only numpy.
+- `backend/src/lunarwindow/api`: P3 FastAPI routes, contracts, errors, CORS, synthetic demos, and the reference-data evaluation adapter.
+- `backend/src/lunarwindow/reference.py`: verified offline bundle/catalog loading and contained sampling-grid selection.
+- `backend/src/lunarwindow/terrain`: the `TerrainMask` (`lunarwindow.terrain-mask.v1`) handoff contract, plus P2 LOLA downloads, DEM access with projection checks, ray-cast horizon profiles, curated catalog and region-point selection, verified run bundles, and a cached custom-coordinate service. Rasterio/pyshp are needed only for reading files (`gis` extra); the algorithm needs only numpy.
 - `backend/src/lunarwindow/visibility`: input validation, circular horizon interpolation, disc states, duration-weighted metrics, merged windows, and event brackets; no HTTP, storage, or retrieval dependency.
 - `backend/tests`: offline Python tests and small archived NASA response fixtures.
 - `src/app`: UI entry points, layouts, metadata, and the frontend health endpoint. Keep scientific calculations out of page and route files.
 - `src/features`: user-facing workflows and components. The existing `scenarios` feature edits two independent configurations. Add `horizon`, `timeline`, `comparison`, and `sites` features as those views are built.
-- `src/domain`: frontend types and schemas; `ephemeris.ts` mirrors the team's flat Python export contract and `evaluation.ts` describes the FastAPI demo responses.
+- `src/domain`: frontend types and schemas; `ephemeris.ts` mirrors the Python export contract and `evaluation.ts` describes synthetic and reference evaluation contracts.
 - `src/server/providers`: reserved for an optional frontend proxy to the team backend; no active provider is configured.
 - `data`: downloaded inputs and generated outputs. Keep source metadata and checksums; ignore bulky data by default.
 - `scripts`: reproducible acquisition and preprocessing commands.
@@ -27,9 +28,9 @@ The package manifest overrides the TypeScript ESLint parser's `minimatch` depend
 
 The page runs independently of NASA services. Scenario fields are kept in React state and validated against `scenarioSchema`. The results panels are empty states. Reloading resets the scenarios. `GET /api/health` describes this frontend process and identifies its ephemeris provider as `not-configured`; it does not check the separate Python CLI.
 
-FastAPI runs separately on port 8000, with its own `/api/health`, `/api/sites`, `/api/sites/{site_id}`, and `POST /api/evaluations`. All data responses identify the synthetic source mode. Results include a 360-point horizon, time series, calculated disc visibility, metrics, windows, and countdown brackets. The response version is `lunarwindow.evaluation.v2`. The React workspace is not connected yet. See [the backend contract](backend-data.md) and [calculation model](visibility.md).
+FastAPI runs separately on port 8000. `POST /api/evaluations` supplies synthetic scenarios (`lunarwindow.evaluation.v2`). The reference catalog and ephemeris endpoints expose the verified archive, and `POST /api/reference/evaluations` calculates geometric visibility from selected real samples (`lunarwindow.reference-evaluation.v1`). Responses include source labels, a horizon, pointing series, metrics, windows, and setting brackets. Reference evaluations require `horizonMode: "geometric"` and retain original NASA evidence plus full archive coverage. The React workspace is not connected yet. See [the backend contract](backend-data.md) and [calculation model](visibility.md).
 
-The CLI can retrieve real Sun/Earth angles, cache exact provider responses, and export flat series plus provenance. A committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. QuickMap camera-observer comparisons and a pointing plot are documented in `docs/validation/report.md`. The visibility engine accepts the real sample contract, but real-data HTTP integration, team-approved mission coordinates, and the full multi-year dataset remain pending. One validated terrain mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, contract `lunarwindow.terrain-mask.v1`) matches the archived Site01 ephemeris observer; the API does not load it yet. Horizons for the other curated sites can be generated but are preliminary (see `docs/terrain-gis-lead.md`).
+The CLI retrieves real Sun/Earth angles, caches provider responses, and exports flat series plus provenance. The committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. The reference adapter validates that bundle, selects its requested grid, and supplies a zero-degree horizon to the engine. QuickMap camera-observer comparisons are documented in `docs/validation/report.md`; they validate displayed angles for observers about 100–144 km up, not ground-level terrain shadows. One validated terrain mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, contract `lunarwindow.terrain-mask.v1`) matches the archived Site01 ephemeris observer; the API does not load it yet. Horizons for the other curated sites are preliminary (see `docs/terrain-gis-lead.md`). Team-approved mission coordinates and the full multi-year dataset remain pending.
 
 ## Current data flow
 
@@ -37,17 +38,20 @@ The CLI can retrieve real Sun/Earth angles, cache exact provider responses, and 
 flowchart LR
   UI[React scenario workspace] -. integration pending .-> API[FastAPI service]
   API --> Demo[Synthetic provider]
+  API --> Reference[Geometric reference adapter]
+  Archive[Verified reference bundle] --> Reference
+  Reference --> Domain
   Demo --> Domain[Visibility and metrics engine]
   Domain --> Result[Metrics, windows, and event brackets]
   CLI[Working export CLI] --> Provider[Python ephemeris module]
   Provider --> Horizons[JPL Horizons]
   Provider --> Data[Normalized samples and provenance]
-  Data -. later integration .-> Domain
-  GIS[Terrain horizon profiles] -. backend join pending .-> Domain
+  Data --> Archive
+  Mask[Validated Site01 terrain mask] -. integration pending .-> Domain
   Domain -. pending .-> Views[Horizon, timeline, comparison]
 ```
 
-The workspace, FastAPI demo service, visibility engine, Python ephemeris module, and export CLI exist today. The ephemeris output type is `EphemerisDataset` in `src/domain/ephemeris.ts`; evaluation responses use `EvaluationDataset` in `src/domain/evaluation.ts`. Dashed arrows describe work still pending.
+The workspace, FastAPI service, visibility engine, Python ephemeris module, and export CLI exist today. The ephemeris type is `EphemerisDataset` in `src/domain/ephemeris.ts`; evaluation responses use `EvaluationDataset` or `ReferenceEvaluationDataset` in `src/domain/evaluation.ts`. Dashed arrows describe work still pending.
 
 ## HTTP contract
 
@@ -67,10 +71,10 @@ FastAPI implements `POST /api/evaluations` using the existing UI `Scenario` requ
 }
 ```
 
-The current provider generates explicitly synthetic horizon/series data and runs the visibility engine before returning the requested coordinates, sampling period, and calculated results. It shares `TimeRange` validation with P1 and returns structured input errors. Optional `visibilityRule` and `asOfUtc` fields select the visibility policy and countdown reference. Real-data integration must map the UI request to Python `Site` and `TimeRange`, preserve P1 and GIS provenance, and provide compatible source inputs to the engine. Never substitute generated data for a failed real-data request.
+The synthetic provider generates demo angles and masks. The reference endpoint instead accepts a catalog `siteId`, UTC range/step, and explicit geometric mode. Both use the shared engine and optional `visibilityRule`/`asOfUtc` controls. The reference path preserves P1 source evidence, validates archive-grid availability, and returns structured 404/422/503 errors without a synthetic fallback. GIS integration will supply verified masks and their provenance later.
 
-The Python client already bounds/chunks requests, uses timeouts and limited retries, checks response structure/observer coordinates, and reuses disk archives keyed by request URL. Cooperating workers now share OS request/cache locks, honor Retry-After, validate supported API signatures, and use atomic file writes. Export runs publish together with checksums only after all sites validate. The demo API validates HTTP inputs and bounds each request to 31 days / 10,000 samples. Before exposing real-data computation, backend still needs worker scheduling and cache retention limits. All workers must share the configured lock directory; blocking client calls belong in a worker.
+The Python client bounds/chunks requests, uses timeouts and limited retries, validates observer coordinates, and reuses disk archives keyed by URL. Cooperating export workers share OS locks, honor Retry-After, and publish complete checksummed bundles. Evaluation requests are bounded to 31 days / 10,000 samples. The synchronous reference route runs disk reads and calculations in FastAPI's worker thread and makes no NASA requests. Live on-demand retrieval will need worker scheduling and cache-retention controls; cooperating retrieval workers must share the configured lock directory.
 
 ## Build and hosting
 
-`npm run build` creates the Next.js production output; `npm start` serves it on port 3000. `pip install -e ./backend` installs the Python package, API dependencies, and CLI. `python -m uvicorn lunarwindow.api.app:app --port 8000` starts FastAPI. Docker Compose starts both services and CI checks both health endpoints. Python tests run separately in CI. Connecting the frontend and real-data pipeline remains a later integration task.
+`npm run build` creates the Next.js production output; `npm start` serves it on port 3000. `pip install -e ./backend` installs the Python package, API dependencies, and CLI. `python -m uvicorn lunarwindow.api.app:app --port 8000` starts FastAPI. Docker Compose starts both services; CI checks service health, archived data, and reference evaluation. Python tests run separately in CI. Connecting the frontend remains a later integration task.

@@ -19,11 +19,11 @@ See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not ye
 
 ## 2. Usable comparison
 
-Backend/data tasks 1 and 2 are complete: FastAPI serves explicit synthetic catalog/scenario data with HTTP contracts, validation, CORS, tests, and Docker startup. A reusable engine now calculates disc visibility, metrics, windows, and countdown brackets. See `docs/backend-data.md` and `docs/visibility.md`. Real-data integration, caching, and precomputation remain pending.
+The backend serves synthetic scenarios and verified reference-data geometric evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. All four archived-data integration steps are complete: reference catalog, range selection, response/provenance contracts, and engine integration. See `docs/backend-data.md` and `docs/visibility.md`. Terrain integration, caching, and extended precomputation remain pending.
 
-1. Connect each scenario to `POST /api/evaluations`, with loading, error, and stale-result states; the current API data is synthetic.
+1. Connect the frontend to the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states. Synthetic custom-coordinate demos remain at `POST /api/evaluations`.
 2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.
-3. Calculation engine complete: visibility duration, next sunset/Earthset brackets, longest gaps, selectable disc rules, and truncated-range markers. Feed it verified real inputs and expose its precision/model details in the UI.
+3. The engine and verified archived-data geometric integration are complete. Expose the visibility rule, timing precision, source provenance, and truncated-range markers in the UI.
 4. Compare the two scenarios side by side and include source/model details with each result.
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
