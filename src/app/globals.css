@@ -150,6 +150,23 @@ select {
   font: inherit;
   font-size: 14px;
 }
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.check input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  padding: 0;
+  accent-color: var(--accent);
+}
+.check strong {
+  color: #eef3f9;
+  font-weight: 600;
+}
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
@@ -226,6 +243,9 @@ button:disabled {
 .stats dd {
   margin: 4px 0 0;
 }
+.source-banner .model-line {
+  display: block;
+}
 .source-banner > p {
   margin: 12px 0 0;
   color: var(--muted);
@@ -268,12 +288,18 @@ button:disabled {
 }
 .stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin: 0 0 20px;
 }
 .stats dd {
   font-size: 16px;
+}
+.stats dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
 }
 .stats .accent dd {
   color: var(--accent);
@@ -512,10 +538,38 @@ tr.longest td:nth-child(3) {
 .sky .marker.earth {
   fill: var(--earth);
 }
-.sky figcaption {
+.sky figcaption,
+.lander figcaption {
   margin-top: 12px;
   color: var(--muted);
   font-size: 12px;
+}
+.lander-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+.lander-controls .play {
+  min-width: 150px;
+  padding: 9px 16px;
+}
+.lander-canvas {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #020409;
+}
+.lander-canvas canvas {
+  display: block;
+  width: 100%;
+  cursor: grab;
+  /* Horizontal drags pan the camera; vertical swipes still scroll the page. */
+  touch-action: pan-y;
+}
+.lander-canvas canvas:active {
+  cursor: grabbing;
 }
 footer p {
   max-width: 900px;

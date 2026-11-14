@@ -4,9 +4,12 @@ import type { VisibilityRule } from '@/domain/evaluation';
 import {
   lastStartDate,
   stepOptions,
+  terrainMask,
   utcDate,
   VISIBILITY_RULES,
   withSite,
+  withHorizonMode,
+  type HorizonMode,
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
 
@@ -25,6 +28,7 @@ export function ReferenceScenarioCard({
 }: Props) {
   const [query, setQuery] = useState('');
   const site = sites.find((candidate) => candidate.id === form.siteId);
+  const mask = terrainMask(site);
   const id = `scenario-${form.slot}`;
   return (
     <fieldset className="panel" aria-describedby={`${id}-issues`}>
@@ -76,37 +80,35 @@ export function ReferenceScenarioCard({
         <select
           value={form.horizonMode}
           onChange={(event) =>
-            onChange({
-              ...form,
-              horizonMode: event.target.value as 'geometric' | 'terrain',
-              maskId:
-                event.target.value === 'terrain'
-                  ? (site?.terrainMasks[0]?.maskId ?? '')
-                  : '',
-              allowMeanEarthApproximation: false,
-            })
+            onChange(
+              withHorizonMode(form, event.target.value as HorizonMode, site),
+            )
           }
         >
           <option value="geometric">Geometric · flat 0° horizon</option>
-          <option value="terrain" disabled={!site?.terrainMasks.length}>
+          <option value="terrain" disabled={!mask}>
             LOLA terrain
             {!site?.terrainMasks.length ? ' · unavailable' : ' · reviewed mask'}
           </option>
         </select>
       </label>
-      {form.horizonMode === 'terrain' && (
+      {form.horizonMode === 'terrain' && mask && (
         <div className="terrain-consent">
+          <p>
+            {mask.maskId} · {mask.observer.mastHeightM} m mast · LOLA DEMs at{' '}
+            {mask.demSources.map((source) => source.resolutionM).join(' / ')} m.
+          </p>
           <p>
             Reviewed 0 m mast. A 2 m mast can change this horizon by up to 1.9°.
           </p>
           <label className="checkbox-label">
             <input
               type="checkbox"
-              checked={form.allowMeanEarthApproximation}
+              checked={form.acceptFrameApproximation}
               onChange={(event) =>
                 onChange({
                   ...form,
-                  allowMeanEarthApproximation: event.target.checked,
+                  acceptFrameApproximation: event.target.checked,
                 })
               }
             />

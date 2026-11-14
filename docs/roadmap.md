@@ -30,9 +30,10 @@ The [offline evaluation precompute contract, generator, verifier, loader, and CL
 3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
 4. Compare the two scenarios side by side and include source/model details with each result.
 5. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
-6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, mission window finder, and a 2D azimuth/elevation sky explorer.
+6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, bracketed next sunset and Earthset countdowns, mission window finder, and sky visualizations.
 7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
 8. Done: backend data readiness, configurable resource limits, private validation-failure diagnostics, and a Chromium rehearsal against the production web/API images. See [deployment readiness](deployment-readiness.md). The [redesigned mission experience](mission-experience.md) adds terrain controls, a polar sky dome, a selectable coordinate map, sample playback, and archive-bounded mission shifts. A six-week shift requires a longer verified archive; external deployment remains separate.
+9. Done: Mihai's animated lander-eye view is integrated as a workspace tab. Sun/Earth camera tracking, period playback, visual interpolation and the verified skyline share the selected scenario and cursor with the dome, timelines, and metrics. Stars and surface lighting are illustrative.
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 

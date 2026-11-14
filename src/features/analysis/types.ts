@@ -2,7 +2,7 @@ import type { ReferenceEvaluationContract } from '@/domain/terrain-evaluation';
 
 export type Slot = 'A' | 'B';
 
-/** A completed reference evaluation shown in the analysis views. */
+/** A completed reference evaluation (geometric or terrain) shown in the analysis views. */
 export type ScenarioResult = {
   slot: Slot;
   data: ReferenceEvaluationContract;

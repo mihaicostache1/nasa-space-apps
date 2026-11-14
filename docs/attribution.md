@@ -27,6 +27,8 @@ NASA Space Apps Challenge 2026, [Lunar Landing Site Navigator](https://www.space
 
 ## What the data does and does not support
 
-- The app's results are geometric: a flat 0° horizon, with no terrain, eclipses, power or radio-link modelling.
+The landing-page lunar portrait is credited separately in [the image source notes](../public/images/README.md). Inter is bundled under [the SIL Open Font License](../public/fonts/OFL.txt). The lander-eye renderer is Mihai Costache's contribution; its display interpolation, decorative stars, schematic surface shading, and geometric Earth-phase approximation are distinct from the verified ephemerides and horizon profile.
+
+- The app's results use a flat 0° horizon unless the reviewed LOLA terrain horizon is selected (Site01 only, with an explicitly accepted frame approximation). Eclipses, power and radio-link performance are not modelled.
 - The reference points are DEM grid cells, not landing recommendations. The Artemis III points are representative points chosen by a documented rule, not landing targets.
 - The QuickMap comparisons validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen from the ground.

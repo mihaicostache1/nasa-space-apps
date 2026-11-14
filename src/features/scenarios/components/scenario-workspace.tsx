@@ -12,6 +12,8 @@ import { ComparisonTimeline } from '@/features/analysis/components/comparison-ti
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
 import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
+import { LanderView } from '@/features/analysis/components/lander-view';
+import { modelBadge } from '@/features/analysis/lib/model';
 import { AzimuthElevationChart } from '@/features/analysis/components/azimuth-elevation-chart';
 import { PolarSiteMap } from '@/features/mission/components/polar-site-map';
 import { MissionInsights } from '@/features/mission/components/mission-insights';
@@ -70,7 +72,10 @@ export function ScenarioWorkspace() {
   const [cursorHours, setCursorHours] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [activeSlot, setActiveSlot] = useState<'A' | 'B'>('A');
-  const [view, setView] = useState<'sky' | 'map'>('sky');
+  const [view, setView] = useState<'lander' | 'sky' | 'map'>('lander');
+  const [playbackOwner, setPlaybackOwner] = useState<
+    'lander' | 'samples' | null
+  >(null);
   const [shiftKeys, setShiftKeys] = useState<string[] | null>(null);
   const inFlight = useRef<AbortController | null>(null);
 
@@ -79,6 +84,7 @@ export function ScenarioWorkspace() {
       current: ReferenceScenarioForm[],
       sites: ReferenceSiteCatalog['sites'],
     ) => {
+      setPlaybackOwner(null);
       inFlight.current?.abort();
       const controller = new AbortController();
       inFlight.current = controller;
@@ -209,10 +215,16 @@ export function ScenarioWorkspace() {
   const activeSite = sites.find((site) => site.id === activeForm.siteId)!;
   const activeResult = results.find((result) => result.slot === activeSlot);
   const step = Math.min(...forms.map((form) => form.stepMinutes)) / 60;
-  const changeForm = (next: ReferenceScenarioForm) =>
+  const changeForm = (next: ReferenceScenarioForm) => {
+    setPlaybackOwner(null);
     setForms((current) =>
       current.map((form) => (form.slot === next.slot ? next : form)),
     );
+  };
+  const selectSlot = (slot: 'A' | 'B') => {
+    setPlaybackOwner(null);
+    setActiveSlot(slot);
+  };
   const shiftMatches =
     shiftKeys !== null &&
     forms.every((form, index) => requestKey(form) === shiftKeys[index]);
@@ -240,7 +252,13 @@ export function ScenarioWorkspace() {
           <h2 id="workspace-heading">The view from your landing site.</h2>
         </div>
         <span className="badge">
-          <i className="earth-dot" /> VERIFIED REFERENCE DATA
+          <i className="earth-dot" /> VERIFIED DATA ·{' '}
+          {modelBadge(
+            results.map(({ slot, data }) => ({
+              slot,
+              horizonMode: data.horizonMode,
+            })),
+          )}
         </span>
       </div>
       <div className="mission-bar">
@@ -267,7 +285,7 @@ export function ScenarioWorkspace() {
                   type="button"
                   key={slot}
                   aria-pressed={activeSlot === slot}
-                  onClick={() => setActiveSlot(slot)}
+                  onClick={() => selectSlot(slot)}
                 >
                   {slot}
                 </button>
@@ -317,15 +335,31 @@ export function ScenarioWorkspace() {
             <div className="toggle" role="group" aria-label="Visualization">
               <button
                 type="button"
+                aria-pressed={view === 'lander'}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('lander');
+                }}
+              >
+                Lander view
+              </button>
+              <button
+                type="button"
                 aria-pressed={view === 'sky'}
-                onClick={() => setView('sky')}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('sky');
+                }}
               >
                 Sky dome
               </button>
               <button
                 type="button"
                 aria-pressed={view === 'map'}
-                onClick={() => setView('map')}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('map');
+                }}
               >
                 Polar map
               </button>
@@ -340,6 +374,20 @@ export function ScenarioWorkspace() {
                 sites={sites}
                 selectedId={activeForm.siteId}
                 onSelect={(site) => changeForm(withSite(activeForm, site))}
+              />
+            ) : view === 'lander' && activeResult ? (
+              <LanderView
+                key={slots[activeSlot === 'A' ? 0 : 1].requestKey}
+                results={results}
+                selectedSlot={activeSlot}
+                onSelectSlot={selectSlot}
+                cursorHours={cursor}
+                onCursorChange={setCursorHours}
+                disabled={loading || anyStale}
+                playing={playbackOwner === 'lander'}
+                onPlayingChange={(playing) =>
+                  setPlaybackOwner(playing ? 'lander' : null)
+                }
               />
             ) : activeResult ? (
               <SkyExplorer
@@ -381,6 +429,10 @@ export function ScenarioWorkspace() {
                 <h2>Compare two scenarios</h2>
               </div>
               <PlaybackControl
+                playing={playbackOwner === 'samples'}
+                onPlayingChange={(playing) =>
+                  setPlaybackOwner(playing ? 'samples' : null)
+                }
                 hours={cursor}
                 max={Math.max(0, maxHours - step)}
                 step={step}

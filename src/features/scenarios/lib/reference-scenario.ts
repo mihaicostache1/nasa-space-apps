@@ -2,11 +2,13 @@ import type {
   ReferenceEvaluationRequest,
   VisibilityRule,
 } from '@/domain/evaluation';
-import type { ReferenceSite } from '@/domain/reference';
+import type { ReferenceSite, ReferenceTerrainMask } from '@/domain/reference';
 import type { ReferenceEvaluationRequestContract } from '@/domain/terrain-evaluation';
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
+
+export type HorizonMode = 'geometric' | 'terrain';
 
 /** One comparison slot: a verified reference site and a whole-day UTC period. */
 export type ReferenceScenarioForm = {
@@ -18,10 +20,19 @@ export type ReferenceScenarioForm = {
   endDate: string;
   stepMinutes: number;
   visibilityRule: VisibilityRule;
-  horizonMode: 'geometric' | 'terrain';
+  /** Flat 0° horizon, or the site's server-reviewed LOLA terrain mask. */
+  horizonMode: HorizonMode;
+  /** Mask selected for terrain mode; empty for the geometric horizon. */
   maskId: string;
-  allowMeanEarthApproximation: boolean;
+  /** The terrain mask's frame approximation must be accepted explicitly. */
+  acceptFrameApproximation: boolean;
 };
+
+const GEOMETRIC = {
+  horizonMode: 'geometric',
+  maskId: '',
+  acceptFrameApproximation: false,
+} as const;
 
 export const VISIBILITY_RULES: { value: VisibilityRule; label: string }[] = [
   { value: 'any-disc', label: 'Any part of the disc is up' },
@@ -48,6 +59,15 @@ export function stepOptions(site: ReferenceSite | undefined): number[] {
     .filter((minutes) => minutes <= 1440);
 }
 
+/** The reviewed terrain mask a site advertises, if any (at most one today). */
+export function terrainMask(
+  site: ReferenceSite | undefined,
+): ReferenceTerrainMask | undefined {
+  return site?.supportedHorizonModes.includes('terrain')
+    ? site.terrainMasks[0]
+    : undefined;
+}
+
 export function defaultForm(
   slot: 'A' | 'B',
   site: ReferenceSite,
@@ -59,9 +79,7 @@ export function defaultForm(
     endDate: utcDate(site.availability.endUtc),
     stepMinutes: site.availability.stepMinutes,
     visibilityRule: 'any-disc',
-    horizonMode: 'geometric',
-    maskId: '',
-    allowMeanEarthApproximation: false,
+    ...GEOMETRIC,
   };
 }
 
@@ -81,22 +99,39 @@ export function withSite(
   const stepMinutes = stepOptions(site).includes(form.stepMinutes)
     ? form.stepMinutes
     : site.availability.stepMinutes;
+  // A mask belongs to one site: another site starts again from the flat horizon.
+  const horizon = site.id === form.siteId ? {} : GEOMETRIC;
   return {
     ...form,
     siteId: site.id,
     startDate,
     endDate,
     stepMinutes,
-    horizonMode: 'geometric',
-    maskId: '',
-    allowMeanEarthApproximation: false,
+    ...horizon,
   };
+}
+
+/** Switch horizon; terrain falls back to geometric when the site has no mask. */
+export function withHorizonMode(
+  form: ReferenceScenarioForm,
+  mode: HorizonMode,
+  site: ReferenceSite | undefined,
+): ReferenceScenarioForm {
+  const mask = mode === 'terrain' ? terrainMask(site) : undefined;
+  return mask
+    ? {
+        ...form,
+        horizonMode: 'terrain',
+        maskId: mask.maskId,
+        acceptFrameApproximation: false,
+      }
+    : { ...form, ...GEOMETRIC };
 }
 
 export function toRequest(
   form: ReferenceScenarioForm,
 ): ReferenceEvaluationRequestContract {
-  const common: ReferenceEvaluationRequest = {
+  const request: ReferenceEvaluationRequest = {
     siteId: form.siteId,
     horizonMode: 'geometric',
     startUtc: `${form.startDate}T00:00:00Z`,
@@ -104,14 +139,13 @@ export function toRequest(
     stepMinutes: form.stepMinutes,
     visibilityRule: form.visibilityRule,
   };
-  return form.horizonMode === 'terrain'
-    ? {
-        ...common,
-        horizonMode: 'terrain',
-        maskId: form.maskId,
-        allowMeanEarthApproximation: form.allowMeanEarthApproximation,
-      }
-    : common;
+  if (form.horizonMode !== 'terrain') return request;
+  return {
+    ...request,
+    horizonMode: 'terrain',
+    maskId: form.maskId,
+    allowMeanEarthApproximation: form.acceptFrameApproximation,
+  };
 }
 
 /** Client-side checks mirroring the API, so most mistakes never leave the page. */
@@ -121,18 +155,6 @@ export function validateForm(
 ): string[] {
   if (!site) return ['Choose a reference site.'];
   const issues: string[] = [];
-  if (form.horizonMode === 'terrain') {
-    const mask = site.terrainMasks.find((item) => item.maskId === form.maskId);
-    if (!site.supportedHorizonModes.includes('terrain') || !mask)
-      issues.push('A reviewed terrain mask is not available for this site.');
-    if (
-      mask?.requiresMeanEarthApproximation &&
-      !form.allowMeanEarthApproximation
-    )
-      issues.push(
-        'Accept the Mean Earth frame approximation before evaluating terrain.',
-      );
-  }
   const start = Date.parse(`${form.startDate}T00:00:00Z`);
   const end = Date.parse(`${form.endDate}T00:00:00Z`);
   if (Number.isNaN(start) || Number.isNaN(end)) {
@@ -153,6 +175,13 @@ export function validateForm(
     issues.push(
       `The step must be a multiple of the archive's ${availability.stepMinutes}-minute interval.`,
     );
+  }
+  if (form.horizonMode === 'terrain') {
+    if (terrainMask(site)?.maskId !== form.maskId) {
+      issues.push('This site has no reviewed terrain horizon.');
+    } else if (!form.acceptFrameApproximation) {
+      issues.push('Accept the frame approximation to use the terrain horizon.');
+    }
   }
   return issues;
 }

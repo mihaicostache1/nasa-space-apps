@@ -748,3 +748,64 @@ select:focus {
 input[type='checkbox'] {
   accent-color: var(--interactive);
 }
+
+/* Mihai's lander-eye renderer, integrated with the shared mission controls. */
+.lander-view.analysis {
+  margin: 0;
+  padding: 20px;
+}
+.lander-view > .section-heading {
+  margin-bottom: 16px;
+}
+.lander-view > .section-heading h2 {
+  font-size: 18px;
+  letter-spacing: -0.4px;
+}
+.lander-view .lander {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.lander-view .lander-controls {
+  gap: 12px;
+}
+.lander-view .lander-controls .play {
+  min-width: 125px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+.lander-canvas {
+  border-radius: 3px;
+  background: var(--background);
+}
+.lander figcaption {
+  font-size: 10px;
+  line-height: 1.9;
+}
+.timeline .stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.timeline .stats small {
+  font-size: 9px;
+  line-height: 1.7;
+  margin-top: 7px;
+}
+@media (max-width: 800px) {
+  .stage-toolbar {
+    flex-wrap: wrap;
+  }
+  .stage-toolbar > .toggle {
+    flex-wrap: wrap;
+  }
+  .timeline .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .lander-view.analysis {
+    padding: 20px 12px;
+  }
+  .lander-controls > .toggle {
+    flex-wrap: wrap;
+  }
+}

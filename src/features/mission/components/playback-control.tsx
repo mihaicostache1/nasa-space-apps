@@ -8,14 +8,20 @@ export function PlaybackControl({
   step,
   disabled,
   onChange,
+  playing: controlledPlaying,
+  onPlayingChange,
 }: {
   hours: number;
   max: number;
   step: number;
   disabled: boolean;
   onChange: (value: number) => void;
+  playing?: boolean;
+  onPlayingChange?: (playing: boolean) => void;
 }) {
-  const [playing, setPlaying] = useState(false);
+  const [localPlaying, setLocalPlaying] = useState(false);
+  const playing = controlledPlaying ?? localPlaying;
+  const setPlaying = onPlayingChange ?? setLocalPlaying;
   const running = playing && !disabled && hours < max;
   useEffect(() => {
     if (!running) return;

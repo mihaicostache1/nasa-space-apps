@@ -69,6 +69,74 @@ try {
     assert.equal(response.data.series.length, 720);
   }
   const scenario = page.getByRole('group', { name: 'Scenario A' });
+  const lander = page.getByRole('img', {
+    name: /Animated view from the reference point/,
+  });
+  await lander.waitFor();
+  await page.waitForFunction(
+    () => document.querySelector('.lander-canvas canvas')?.width > 0,
+  );
+  assert.equal(
+    await lander.evaluate((canvas) =>
+      canvas
+        .getContext('2d')
+        .getImageData(0, 0, canvas.width, canvas.height)
+        .data.some((value) => value !== 0),
+    ),
+    true,
+  );
+  await page
+    .getByRole('group', { name: 'Camera', exact: true })
+    .getByRole('button', { name: 'Follow Earth' })
+    .click();
+  await lander.focus();
+  await lander.press('ArrowRight');
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Free look', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
+  await lander.press('Home');
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Follow Sun', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
+  const evaluationCountBeforePlayback = evaluations.length;
+  await page
+    .getByRole('button', { name: 'Play the period', exact: true })
+    .click();
+  await page.waitForFunction(
+    () => Number(document.querySelector('.cursor-control input').value) > 0,
+  );
+  await page.getByRole('button', { name: 'Play archived samples' }).click();
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Play the period', exact: true })
+      .count(),
+    1,
+  );
+  await page.getByRole('button', { name: 'Pause archived samples' }).click();
+  const pausedCursor = await page.locator('.cursor-control input').inputValue();
+  await page.waitForTimeout(180);
+  assert.equal(
+    await page.locator('.cursor-control input').inputValue(),
+    pausedCursor,
+  );
+  assert.equal(evaluations.length, evaluationCountBeforePlayback);
+  assert.ok(
+    (await page.locator('.timeline .stats dt').allTextContents()).includes(
+      'Next sunset',
+    ),
+  );
+  assert.ok(
+    (await page.locator('.timeline .stats dt').allTextContents()).includes(
+      'Next Earthset',
+    ),
+  );
+  await page.getByRole('button', { name: 'Sky dome', exact: true }).click();
   await scenario.getByLabel('Visible when').selectOption('full-disc');
   await page
     .getByText(
@@ -123,11 +191,11 @@ try {
 
   // The keyboard playhead and sample-driven playback update the dome.
   const cursor = page.locator('.cursor-control input');
+  await cursor.focus();
+  await cursor.press('Home');
   const markerBefore = await page
     .locator('.dome-marker-position.sun')
     .getAttribute('style');
-  await cursor.focus();
-  await cursor.press('Home');
   await cursor.press('ArrowRight');
   assert.equal(await cursor.inputValue(), '1');
   assert.notEqual(
@@ -311,6 +379,7 @@ try {
     'none',
   );
   await mobile.locator('.visual-stage').scrollIntoViewIfNeeded();
+  await mobile.getByRole('button', { name: 'Sky dome', exact: true }).click();
   assert.equal(
     await mobile.locator('.experience').getAttribute('data-motion'),
     'reduced',
@@ -357,6 +426,8 @@ try {
       terrain: 'verified with explicit frame acceptance',
       mapSelection: 'ok',
       sharedCursorAndPlayback: 'ok',
+      landerViewAndPlaybackOwnership: 'ok',
+      landerKeyboardCamera: 'ok',
       palette: 'midnight / electric blue / cantaloupe',
       motionAndReducedMotion: 'ok',
       shiftPercentagePointDifferences: 'verified against API responses',
