@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from lunarwindow.api.app import create_app, get_reference_directory
+from lunarwindow.api.app import create_app, get_reference_directory, get_terrain_directory
 
 REFERENCE = (
     Path(
@@ -30,6 +30,9 @@ class ReferenceApiTests(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.app.dependency_overrides[get_reference_directory] = lambda: REFERENCE
+        self.app.dependency_overrides[get_terrain_directory] = lambda: (
+            REFERENCE.parent / "terrain-masks"
+        )
         self.client = TestClient(self.app)
         self.addCleanup(self.client.close)
 

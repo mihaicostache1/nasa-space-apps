@@ -14,7 +14,6 @@ from starlette.exceptions import HTTPException
 from lunarwindow.ephemeris.contract import dataset_schema
 from lunarwindow.reference import (
     ReferenceSelectionError,
-    load_reference_catalog,
     load_reference_dataset,
     select_reference_dataset,
 )
@@ -35,6 +34,7 @@ from .models import (
     ReferenceSiteCatalog,
     SiteCatalog,
 )
+from .reference_catalog import build_reference_catalog
 from .reference_provider import evaluate_reference
 from .terrain_models import ReferenceEvaluationContract, ReferenceEvaluationRequestContract
 
@@ -138,14 +138,19 @@ def create_app() -> FastAPI:
         response_model=ReferenceSiteCatalog,
         responses={503: {"model": ErrorResponse}},
         tags=["reference"],
-        summary="List verified reference points and their archive coverage",
-        description="Sourced DEM reference points with available UTC dates and sampling intervals.",
+        summary="List verified reference points, archive coverage, and terrain availability",
+        description=(
+            "Sourced reference points with UTC dates, sampling intervals, supported horizon "
+            "modes, and verified mask IDs, checksums, observer heights, DEM sources, and "
+            "frame-approximation requirements. Invalid registered artifacts return HTTP 503."
+        ),
     )
     def reference_sites(
         directory: Annotated[Path, Depends(get_reference_directory)],
+        terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
     ) -> ReferenceSiteCatalog:
         try:
-            return ReferenceSiteCatalog(sites=load_reference_catalog(directory))
+            return build_reference_catalog(directory, terrain_directory)
         except ValueError as exc:
             raise HTTPException(
                 status_code=503, detail="Reference data is unavailable or failed validation."

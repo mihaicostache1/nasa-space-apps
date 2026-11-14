@@ -53,6 +53,22 @@ curl http://localhost:8000/api/reference/sites
 
 The response declares `schemaVersion: "lunarwindow.reference-catalog.v1"`, provider `NASA/JPL Horizons`, UTC time, and east-positive longitude. Each entry in `sites` contains `id`, `name`, `lat`, `lon`, `altitudeKm`, the original `coordinateSource`, and `availability` with `startUtc`, `endUtc`, `endExclusive`, `stepMinutes`, and `sampleCount`.
 
+Each site also includes `supportedHorizonModes` and `terrainMasks`. These are additive v1 fields; existing identity and archive-coverage fields retain their meanings. Site01 advertises `["geometric", "terrain"]` and the reviewed `lola-site01-reference-mast-0m` mask. Site04 and Site23 advertise `["geometric"]` with an empty mask list. A mask entry contains:
+
+| Field                            | Meaning                                                                  |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| `maskId`                         | Server-reviewed ID to pass to the evaluation endpoint                    |
+| `artifactSha256`                 | Pinned checksum verified against the exact artifact bytes                |
+| `observer`                       | Original coordinates, surface elevation, mast height, and total altitude |
+| `referenceFrame`                 | Original lunar frame declaration and reference sphere                    |
+| `demSources`                     | Original DEM product IDs, versions, resolutions, URLs, and checksums     |
+| `requiresMeanEarthApproximation` | Whether evaluation requires explicit `allowMeanEarthApproximation: true` |
+| `framePolicy`, `limitation`      | Compatibility policy and its reference-demo limitation                   |
+
+The current mask records `observer.mastHeightM: 0`, meaning ground level rather than a chosen lander antenna height. Its `requiresMeanEarthApproximation` is `true`; the backend applies no frame transformation. Catalog discovery does not accept this approximation on the user's behalf. The frontend can enable its toggle using `supportedHorizonModes`, select a returned `maskId`, and explain the observer and frame assumptions before requesting a terrain evaluation. A new antenna height requires matching reviewed mask and ephemeris artifacts.
+
+Before advertising a mask, the API checks its server registration, pinned checksum, strict `TerrainMask` contract, and observer/frame compatibility against the site's full archived period. A missing, corrupted, or incompatible registered mask returns HTTP 503 for the catalog, with no partial catalog or filesystem paths. Unregistered files and preliminary GIS horizons are ignored. Geometric evaluations and the raw ephemeris endpoint remain independent of terrain artifacts. Full horizon samples are returned by evaluations, not this discovery endpoint.
+
 The catalog is derived from the complete verified bundle. Currently it lists three LOLA DEM reference points, each with 720 hourly samples covering 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z (end excluded). Their source descriptions identify them as reference points rather than selected landing targets. Missing, corrupted, or invalid source data returns a structured HTTP 503; no partial catalog is published. The endpoint performs no downloads or writes.
 
 Use an entry's `id` with the reference ephemeris endpoint below. Availability describes the full archive and its native sampling interval; optional selections do not change the catalog. The OpenAPI documentation includes the catalog's typed response schema.
