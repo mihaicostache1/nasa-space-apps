@@ -1,9 +1,9 @@
-import type {
-  ApiErrorResponse,
-  ReferenceEvaluationDataset,
-  ReferenceEvaluationRequest,
-} from '@/domain/evaluation';
+import type { ApiErrorResponse } from '@/domain/evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import type {
+  ReferenceEvaluationContract,
+  ReferenceEvaluationRequestContract,
+} from '@/domain/terrain-evaluation';
 
 /** Browser-visible FastAPI origin; inlined at build time. */
 export const API_BASE_URL = (
@@ -50,7 +50,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       throw cause;
     }
     throw new ApiError(
-      `Cannot reach the LunarWindow API at ${API_BASE_URL}. Start it with "docker compose up -d --wait api" or uvicorn, then retry.`,
+      `Cannot reach the LunarWindow API at ${API_BASE_URL}. A hosted API may be waking up (up to a minute); locally, start it with "docker compose up -d --wait api". Then retry.`,
       0,
     );
   }
@@ -69,10 +69,10 @@ export function fetchReferenceSites(signal?: AbortSignal) {
 }
 
 export function evaluateReference(
-  body: ReferenceEvaluationRequest,
+  body: ReferenceEvaluationRequestContract,
   signal?: AbortSignal,
 ) {
-  return request<ReferenceEvaluationDataset>('/api/reference/evaluations', {
+  return request<ReferenceEvaluationContract>('/api/reference/evaluations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ReferenceEvaluationDataset } from '@/domain/evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import type { ReferenceEvaluationContract } from '@/domain/terrain-evaluation';
 import {
   ApiError,
   evaluateReference,
@@ -12,6 +12,7 @@ import { ComparisonTimeline } from '@/features/analysis/components/comparison-ti
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
 import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
+import { modelBadge } from '@/features/analysis/lib/model';
 import { domainHours, domainOf } from '@/features/analysis/lib/timeline';
 import type { ScenarioResult } from '@/features/analysis/types';
 import {
@@ -29,7 +30,7 @@ type CatalogState =
 
 type SlotState = {
   status: 'idle' | 'loading' | 'ready' | 'error';
-  data?: ReferenceEvaluationDataset;
+  data?: ReferenceEvaluationContract;
   /** The request that produced `data`, to detect stale results. */
   requestKey?: string;
   message?: string;
@@ -200,7 +201,15 @@ export function ScenarioWorkspace() {
     <section className="workspace" aria-labelledby="workspace-heading">
       <div className="section-heading">
         <h2 id="workspace-heading">Compare two scenarios</h2>
-        <span className="badge">ARCHIVED NASA DATA · GEOMETRIC</span>
+        <span className="badge">
+          ARCHIVED NASA DATA ·{' '}
+          {modelBadge(
+            results.map((result) => ({
+              slot: result.slot,
+              horizonMode: result.data.horizonMode,
+            })),
+          )}
+        </span>
       </div>
       <DataSourceBanner catalog={catalog.data} results={results} />
       <div className="scenarios">

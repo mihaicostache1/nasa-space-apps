@@ -1,8 +1,26 @@
 # LunarWindow - Lunar Landing Site Navigator
 
-Project scaffold for the [NASA Space Apps 2026 challenge](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/).
+Our entry for the [NASA Space Apps 2026 challenge](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) "Lunar Landing Site Navigator".
 
-The intended application compares lunar landing locations and dates through Sun/Earth positions, sunlight duration, and direct-to-Earth visibility windows. The initial focus is the lunar south pole. The team plan separates a Python/FastAPI data backend from a React frontend; this repository now includes the Ephemeris lead's Python package alongside the existing Next.js/React UI starter.
+LunarWindow compares lunar south-pole sites and dates. For each one it shows when the Sun is up (power), when Earth is up (direct-to-Earth link), and when both are. It runs entirely on archived, checksummed NASA data: JPL Horizons ephemerides and LOLA elevation models. A Python/FastAPI backend serves the calculations, and a Next.js/React app shows a three-lane timeline with a shared cursor, a mission window finder, and a 2D sky explorer.
+
+![LunarWindow comparing two south-pole reference sites](docs/screenshots/02-timeline.png)
+
+|              |                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| Run it       | `docker compose up --build -d --wait`, then open [localhost:3000](http://localhost:3000) |
+| Deploy       | Render (API) + Vercel (web): [docs/deploy.md](docs/deploy.md)                            |
+| Demo         | [docs/demo-script.md](docs/demo-script.md), [screenshots](docs/screenshots/)             |
+| Data sources | [docs/attribution.md](docs/attribution.md)                                               |
+| License      | [MIT](LICENSE) for code; data keeps its providers' terms                                 |
+
+**Scientific limits.**
+
+- Results use a flat 0° horizon unless a scenario selects the reviewed LOLA terrain horizon. Eclipses, power and radio-link performance are not modelled.
+- Event times are bracketed by the sampling interval.
+- Reference points are DEM grid cells, not landing recommendations.
+- The terrain horizon exists for one site (Site01, 0 m observer) and requires accepting a documented frame approximation; other curated horizons are preliminary.
+- The QuickMap comparisons validate Sun/Earth angles for observers about 100–144 km up, not ground-level terrain shadows.
 
 ## Start with Docker
 
@@ -87,12 +105,12 @@ Start the FastAPI service as well (see Backend/data above, or `docker compose up
 - Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
 - A sourced 30-day, three-point NASA reference dataset, pointing plot, and reproducible QuickMap comparison evidence.
 - A validated terrain horizon mask for the Site01 reference point (`lunarwindow.terrain-mask.v1`), plus tooling for a sourced 17-site catalog (9 Artemis III regions, Shackleton rim, landing sites, contrast cases) whose preliminary horizons match NASA PGDA 18.6-year sunlight averages within 4 percentage points at 12 of 14 polar sites.
-- Web app on archived NASA data: two-scenario comparison of verified reference sites, a three-lane Sun/Earth/both timeline with a shared cursor, longest simultaneous operation and communication-outage indicators, a mission window finder, and a 2D azimuth/elevation sky explorer. Loading, error, and stale-result states; the geometric model and data source are stated on the page.
-- Process health at `GET /api/health` and verified backend data readiness at `GET /api/ready`, with [resource limits and deployed-browser checks](docs/deployment-readiness.md).
+- Web app on archived NASA data: two-scenario comparison of verified reference sites, a three-lane Sun/Earth/both timeline with a shared cursor, longest simultaneous operation and communication-outage indicators, next sunset and Earthset countdowns bracketed by the sampling interval, a mission window finder, and a 2D azimuth/elevation sky explorer. Each scenario selects a flat 0° horizon or, for Site01, the reviewed LOLA terrain horizon after accepting its frame approximation. Loading, error, and stale-result states; the horizon model and data source are stated on the page for each scenario.
+- Health endpoint at `GET /api/health`.
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The web app evaluates verified reference sites through `POST /api/reference/evaluations` and does not persist inputs. The API supports geometric or reviewed-terrain horizons and can serve exact verified saved results from the [versioned demo release](docs/data-releases.md). Terrain currently supports Site01 at ground + 0 m mast and requires explicit frame-approximation acceptance; sampling, disc-model, and near-field limitations remain. Other curated GIS horizons are preliminary and are not registered for reference API terrain evaluation. These DEM reference points are not approved landing targets. The recorded QuickMap camera-observer checks validate displayed angles for elevated observers, not a lander's surface illumination; see the [validation report](docs/validation/report.md).
+The web app evaluates the verified reference sites through `POST /api/reference/evaluations`; it validates inputs locally, does not persist them, and maps and custom coordinates remain pending. The API calculates visibility and metrics from synthetic demos or verified archived ephemerides, with an explicit geometric or reviewed-terrain horizon mode. Terrain mode currently supports the Site01 0 m mask and requires acceptance of its frame approximation, in the API and in the web form; sampling, disc-model, and near-field limitations remain. A sourced 17-site GIS catalog is also available (see the [terrain work package](docs/terrain-gis-lead.md)); its other horizons are preliminary and are not registered for reference API evaluations. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -153,4 +171,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-The [terrain-aware evaluation endpoint](docs/backend-data.md#terrain-aware-evaluation-contract) connects archived ephemerides and the reviewed Site01 mask to the visibility engine, with checksum verification, observer/frame checks, and complete provenance. Geometric v1 remains available; terrain v2 requires explicit acceptance of the frame approximation. [Dedicated regression tests](docs/validation/terrain-regression.md) cover terrain blocking and independently derived Site01 model baselines. Next add caching and curated-site precomputation, and connect the frontend. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+The [terrain-aware evaluation endpoint](docs/backend-data.md#terrain-aware-evaluation-contract) connects archived ephemerides and the reviewed Site01 mask to the visibility engine, with checksum verification, observer/frame checks, and complete provenance. Geometric v1 remains available; terrain v2 requires explicit acceptance of the frame approximation. [Dedicated regression tests](docs/validation/terrain-regression.md) cover terrain blocking and independently derived Site01 model baselines. Verified evaluations are cached, and the web app selects the terrain horizon per scenario. Next, review and register masks for further curated sites. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
