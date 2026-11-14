@@ -1,5 +1,6 @@
 """Synthetic demos and geometric/terrain evaluations of verified reference ephemerides."""
 
+import logging
 import os
 from pathlib import Path
 from typing import Annotated
@@ -31,13 +32,27 @@ from .models import (
     EvaluationRequest,
     Health,
     Location,
+    Readiness,
     ReferenceSiteCatalog,
     SiteCatalog,
 )
+from .readiness import check_readiness
 from .reference_cache import ReferenceEvaluationCache
 from .reference_catalog import build_reference_catalog
 from .reference_provider import evaluate_reference
+from .settings import configured_reference_cache
 from .terrain_models import ReferenceEvaluationContract, ReferenceEvaluationRequestContract
+
+_LOG = logging.getLogger("uvicorn.error")
+
+
+def _reference_unavailable(operation: str, error: Exception, site_id: str = "-") -> HTTPException:
+    _LOG.warning(
+        "reference_data_unavailable operation=%s siteId=%s reason=%s", operation, site_id, error
+    )
+    return HTTPException(
+        status_code=503, detail="Reference data is unavailable or failed validation."
+    )
 
 
 def get_provider() -> DemoProvider:
@@ -54,6 +69,11 @@ def get_terrain_directory() -> Path:
 
 def get_reference_cache(request: Request) -> ReferenceEvaluationCache:
     return request.app.state.reference_evaluation_cache
+
+
+def get_precomputed_directory() -> Path | None:
+    value = os.environ.get("LUNARWINDOW_PRECOMPUTED_DIR")
+    return Path(value) if value and value.strip() else None
 
 
 def query_period(
@@ -90,7 +110,7 @@ def create_app() -> FastAPI:
         ),
         responses={422: {"model": ErrorResponse}},
     )
-    app.state.reference_evaluation_cache = ReferenceEvaluationCache()
+    app.state.reference_evaluation_cache = configured_reference_cache()
     origins = os.environ.get(
         "LUNARWINDOW_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
     )
@@ -135,6 +155,24 @@ def create_app() -> FastAPI:
     def health() -> Health:
         return Health()
 
+    @app.get(
+        "/api/ready",
+        response_model=Readiness,
+        responses={503: {"model": ErrorResponse}},
+        tags=["health"],
+        summary="Verify configured reference data and precomputed bundle readiness",
+    )
+    def ready(
+        directory: Annotated[Path, Depends(get_reference_directory)],
+        terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
+        precomputed_directory: Annotated[Path | None, Depends(get_precomputed_directory)],
+        cache: Annotated[ReferenceEvaluationCache, Depends(get_reference_cache)],
+    ) -> Readiness:
+        try:
+            return check_readiness(directory, terrain_directory, precomputed_directory, cache)
+        except ValueError as exc:
+            raise _reference_unavailable("readiness", exc) from exc
+
     @app.get("/api/sites", response_model=SiteCatalog, tags=["sites"])
     def sites(provider: Annotated[DemoProvider, Depends(get_provider)]) -> SiteCatalog:
         return SiteCatalog(sites=provider.list_sites())
@@ -158,9 +196,7 @@ def create_app() -> FastAPI:
         try:
             return build_reference_catalog(directory, terrain_directory)
         except ValueError as exc:
-            raise HTTPException(
-                status_code=503, detail="Reference data is unavailable or failed validation."
-            ) from exc
+            raise _reference_unavailable("catalog", exc) from exc
 
     @app.post(
         "/api/reference/evaluations",
@@ -175,6 +211,8 @@ def create_app() -> FastAPI:
             "Returns visibility, metrics, windows, and setting brackets with original "
             "NASA evidence, archive coverage, and terrain/compatibility provenance when selected."
             " Successful results are cached after source, selection, and compatibility checks."
+            " An optional server-configured precomputed bundle supplies exact verified matches; "
+            "absent keys use live calculation or memory cache. Invalid bundles return HTTP 503."
         ),
     )
     def reference_evaluation(
@@ -182,9 +220,16 @@ def create_app() -> FastAPI:
         directory: Annotated[Path, Depends(get_reference_directory)],
         terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
         cache: Annotated[ReferenceEvaluationCache, Depends(get_reference_cache)],
+        precomputed_directory: Annotated[Path | None, Depends(get_precomputed_directory)],
     ) -> ReferenceEvaluationContract:
         try:
-            return evaluate_reference(scenario, directory, terrain_directory, cache=cache)
+            return evaluate_reference(
+                scenario,
+                directory,
+                terrain_directory,
+                cache=cache,
+                precomputed_directory=precomputed_directory,
+            )
         except (ReferenceSelectionError, TerrainCompatibilityError) as exc:
             raise RequestValidationError(
                 [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]
@@ -196,9 +241,7 @@ def create_app() -> FastAPI:
                 status_code=404, detail=f"Unknown reference site: {scenario.siteId}"
             ) from exc
         except ValueError as exc:
-            raise HTTPException(
-                status_code=503, detail="Reference data is unavailable or failed validation."
-            ) from exc
+            raise _reference_unavailable("evaluation", exc, scenario.siteId) from exc
 
     @app.get(
         "/api/reference/sites/{site_id}/ephemeris",
@@ -250,9 +293,7 @@ def create_app() -> FastAPI:
                 status_code=404, detail=f"Unknown reference site: {site_id}"
             ) from exc
         except ValueError as exc:
-            raise HTTPException(
-                status_code=503, detail="Reference data is unavailable or failed validation."
-            ) from exc
+            raise _reference_unavailable("ephemeris", exc, site_id) from exc
 
     @app.get(
         "/api/sites/{site_id}",

@@ -28,12 +28,15 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 | Method | Route                                      | Response                                                        |
 | ------ | ------------------------------------------ | --------------------------------------------------------------- |
 | GET    | `/api/health`                              | Backend process health and `dataMode: "synthetic"`              |
+| GET    | `/api/ready`                               | Verified data readiness, saved-job counts, and cache caps       |
 | GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels  |
 | GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                        |
 | POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request     |
 | POST   | `/api/reference/evaluations`               | Geometric or reviewed-terrain metrics and windows from archives |
 | GET    | `/api/reference/sites`                     | Verified reference coordinates and archive availability         |
 | GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance     |
+
+See [deployment readiness](deployment-readiness.md) for readiness failures, environment-configured resource limits, server diagnostics, and the deployed browser rehearsal.
 
 The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
 
@@ -221,15 +224,36 @@ Storage performs no source loading, downloads, filesystem writes, JSON/response 
 
 ## Cached reference evaluations
 
-`POST /api/reference/evaluations` uses one `ReferenceEvaluationCache` owned by each FastAPI application instance. `get_reference_cache` exposes it as a dependency; independently created applications and worker processes do not share entries. The default limits are 32 responses and 16 MiB of serialized payloads. The application-owned instance is `app.state.reference_evaluation_cache`; deployments or tests can replace it with an instance using different limits, including `max_entries=0` to disable storage. There is no client-supplied cache switch and no filesystem persistence.
+`POST /api/reference/evaluations` uses one `ReferenceEvaluationCache` owned by each FastAPI application instance. `get_reference_cache` exposes it as a dependency; independently created applications and worker processes do not share entries. The default limits are 32 responses and 16 MiB of serialized payloads, configurable at startup through `LUNARWINDOW_CACHE_MAX_ENTRIES` and `LUNARWINDOW_CACHE_MAX_BYTES`. Either limit being zero disables caching; invalid values fail startup. The application-owned instance is `app.state.reference_evaluation_cache`; tests can also replace it directly. This cache is process-local. Optional persisted lookup is configured separately below; neither choice is a client request option.
 
 For both geometric and terrain requests, the provider first verifies the entire source bundle and selects the requested range/grid. `load_verified_reference_dataset` returns the dataset and SHA-256 of the exact JSON bytes parsed and validated in the same read; it never rereads a potentially changed file to identify an earlier snapshot. The original `load_reference_dataset` interface still returns the dataset unchanged. Terrain mode also reloads the registered mask, checks its pinned checksum, and checks observer/frame compatibility and explicit approximation acceptance. All these checks run on every request, including cache hits.
 
-Only then does the provider build the complete cache key and look up a response. A hit deserializes a fresh model through the existing geometric/terrain response contract and skips `calculate_visibility`. A miss runs the calculation, constructs and validates the full response, and stores its immutable UTF-8 JSON snapshot. An invalid internal cached snapshot is treated as a miss and replaced after successful recalculation. Errors and invalid calculated responses are not stored. Oversized responses and disabled caches still return normal validated results without retention.
+Only then does the provider build the complete cache key. If persisted lookup is configured, it first verifies that bundle and uses an exact saved match as described below. With no configured bundle or after a verified persisted miss, it checks memory cache. A memory hit deserializes a fresh model through the existing geometric/terrain response contract and skips `calculate_visibility`. A miss runs the calculation, constructs and validates the full response, and stores its immutable UTF-8 JSON snapshot. An invalid internal memory snapshot is treated as a miss and replaced after successful recalculation. Errors and invalid calculated responses are not stored. Oversized responses and disabled caches still return normal validated results without retention.
 
 The HTTP response schemas and error envelopes are unchanged. Source checksum/metadata changes, reviewed mask revisions, request options, or calculation-model version changes produce different keys. Source failures still return 503 before lookup, even with a warmed cache; invalid selections/policies return 422 and unknown IDs return 404. Geometric evaluation remains independent of mask files. Reusing calculation results does not bypass scientific limitations or accept an approximation for the caller. The catalog, raw ephemeris, and synthetic endpoints do not use this result cache.
 
 Cache hits still perform source I/O and contract validation; the optimization avoids repeated visibility calculation. Simultaneous identical misses may calculate independently, while storage operations remain thread-safe and bounded. This process-local cache does not precompute additional sites or dates. `backend/tests/test_reference_cache_api.py` verifies hits/misses, canonical request equivalence, source/mask/model revisions, validation before lookup, mutable-result isolation, disabled/oversized storage, eviction, application isolation, and recovery from invalid responses/snapshots.
+
+## Serve precomputed reference evaluations
+
+Set `LUNARWINDOW_PRECOMPUTED_DIR` in the FastAPI process environment to opt into one previously generated complete bundle:
+
+```sh
+LUNARWINDOW_PRECOMPUTED_DIR=data/processed/site01-cli-example \
+  python -m uvicorn lunarwindow.api.app:app --port 8000
+```
+
+For native startup, unset or blank disables persisted lookup and preserves the existing memory-cache/calculation flow. Paths are resolved in the API process working directory. Docker now ships and verifies the [read-only demo release](data-releases.md) and enables it by default; an explicit blank variable disables lookup. Custom container paths must exist inside the API container and custom bundles should be mounted read-only. Adding a value to a local `.env` file alone does not export it into a native Uvicorn process or add a Docker mount. `get_precomputed_directory` is the server-side dependency boundary, with no additional HTTP request fields or query parameters.
+
+Every evaluation still validates the source bundle, selects the requested range/grid, and checks terrain observer/frame compatibility and explicit approximation acceptance before persisted lookup. The resulting key includes checksums of the exact verified artifacts. The configured bundle is then fully verified on each request, before memory-cache access. An exact saved key match returns a fresh model from the checked byte snapshot and skips calculation. Saved matches return directly without populating memory cache. A valid bundle with no matching key falls through to memory cache and then calculation as needed; returned API schemas and original source/model provenance are unchanged.
+
+There is no slicing of a larger saved range or substitution of another site, rule, sampling interval, countdown time, or mask. Each must match the complete canonical key. Corrupt, missing, incomplete, stale-source, or unsupported configured bundles produce the existing generic HTTP 503 without filesystem paths. A warm memory cache cannot hide those failures. Invalid request ranges/policies and unknown site/mask IDs retain their existing 422/404 responses before bundle lookup. The catalog, raw ephemeris, synthetic, and health endpoints remain independent of this optional result source.
+
+Tests in `backend/tests/test_precomputed_reference_api.py` cover geometric/terrain saved hits, normalized equivalent requests, absent-key calculation and memory reuse, warm-cache failure behavior, validation order, configuration enable/disable, stale source revisions, same-read snapshot delivery, and server-only path selection.
+
+## Offline precompute manifest contract
+
+The [offline evaluation precompute contract, generator, verifier, loader, and CLI](precompute.md) define, produce, audit, and load `lunarwindow.precompute-manifest.v1` bundles for explicit reference evaluation jobs. They reuse cache-key identities to record source/mask checksums, request options, model version, and approximation acceptance. Each completed job records its output filename, SHA-256, and response schema version. Run/job validation rejects duplicates, inconsistent completion claims, unsafe filenames, and output/mode disagreement. The generator verifies inputs against planned identities, validates results, and checkpoints atomic writes in a fresh directory, retaining an incomplete manifest on failure. The read-only `verify_bundle` helper checks saved outputs against their checksums, response contracts, recorded jobs, verified archive samples/provenance, and reviewed masks; unsupported model versions are rejected. `load_precomputed_evaluation` verifies the complete bundle and returns a fresh matching response directly from its checked byte snapshot, or `None` for an absent key; invalid artifacts remain errors. `lunarwindow-precompute generate` accepts an explicit pending-manifest plan; `lunarwindow-precompute verify` audits a saved run. Both commands also work with `python -m lunarwindow.precompute`, require a reference archive path, and report JSON success summaries and nonzero failure codes. Models, helpers, and the packaged JSON Schema are in `backend/src/lunarwindow/precompute`. The [data-release workflow](data-releases.md) now pins, independently replays, packages, and checks the shipped four-job demo release.
 
 ## Synthetic scenario evaluation contract
 

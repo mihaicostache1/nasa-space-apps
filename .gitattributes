@@ -2,6 +2,7 @@
 
 # Keep generated evidence bytes unchanged so manifest hashes survive checkout.
 data/reference/** -text
+data/releases/** -text
 backend/tests/fixtures/** -text
 docs/validation/evidence/** -text
 docs/validation/quickmap-results.json -text

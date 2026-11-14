@@ -38,11 +38,11 @@ docker compose run --build --rm ephemeris \
   --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z
 ```
 
-Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric evaluations of verified archived ephemerides; the web app at port 3000 shows them, with no live NASA requests.
+Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric or reviewed Site01 terrain evaluations of archived ephemerides. Docker ships a verified, read-only [demo data release](docs/data-releases.md) covering four default full-month jobs; valid misses calculate normally, with no live NASA requests.
 
 ## Native setup: Backend/data
 
-The first two backend tasks, **API skeleton with fake data** and **visibility metrics, windows, and countdowns**, are implemented:
+The backend serves verified reference evaluations, visibility metrics/windows, and reviewed Site01 terrain, with memory caching and versioned offline data releases:
 
 ```sh
 python3 -m venv .venv
@@ -51,7 +51,7 @@ python -m pip install -e './backend[dev]'
 python -m uvicorn lunarwindow.api.app:app --reload --port 8000
 ```
 
-Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
+Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric or reviewed Site01 terrain horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
 
 ## Native setup: Ephemeris lead
 
@@ -121,12 +121,14 @@ backend/
   src/lunarwindow/api/        FastAPI app, contracts, demo and reference providers
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
   src/lunarwindow/visibility/ Visibility engine, metrics, windows, and contracts
+  src/lunarwindow/precompute/ Offline bundles, replay, release tools, and lookup
   src/lunarwindow/terrain/    LOLA downloads, horizon ray casting, site catalog, service
   tests/                     Offline tests and archived NASA fixtures
 data/
   sites.example.json          Illustrative input catalog
   raw/                        Downloaded source data (ignored)
   processed/                  Derived data (ignored)
+  releases/                   Versioned demo release, pinned plan, and checksums
   README.md                   Provenance and storage conventions
 docs/
   challenge.md                Requirements mapped from the NASA brief

@@ -9,6 +9,7 @@ next-env.d.ts
 data/raw
 data/processed
 data/reference
+data/releases
 data/regions
 docs/validation/evidence
 docs/validation/quickmap-results.json

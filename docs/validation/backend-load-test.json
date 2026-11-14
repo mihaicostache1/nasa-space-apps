@@ -1,0 +1,1704 @@
+{
+  "schemaVersion": "lunarwindow.api-load-test.v1",
+  "startedAtUtc": "2026-11-14T16:51:22.731005+00:00",
+  "status": "passed",
+  "settings": {
+    "image": "lunarwindow-api:deployment-check",
+    "requests": 24,
+    "concurrency": [1, 4, 8],
+    "horizon_modes": ["geometric", "terrain"],
+    "memory": "1g",
+    "cpus": 2.0,
+    "timeout": 60
+  },
+  "phases": [
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.269,
+        "successfulRequestsPerSecond": 1.475,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 655.697,
+            "p95": 714.662,
+            "p99": 842.558,
+            "max": 842.558
+          }
+        },
+        "responseBytes": 5877216,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 78860288,
+            "cgroupCurrentBytes": 68104192,
+            "cgroupLifetimePeakBytes": 68431872,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 82599936,
+            "cgroupCurrentBytes": 68104192
+          },
+          "after": {
+            "rssBytes": 82599936,
+            "cgroupCurrentBytes": 64630784,
+            "cgroupLifetimePeakBytes": 68431872,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 391,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.057,
+        "successfulRequestsPerSecond": 1.495,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 2671.736,
+            "p95": 2849.448,
+            "p99": 3023.65,
+            "max": 3023.65
+          }
+        },
+        "responseBytes": 5877216,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 82616320,
+            "cgroupCurrentBytes": 64692224,
+            "cgroupLifetimePeakBytes": 68431872,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 104075264,
+            "cgroupCurrentBytes": 86753280
+          },
+          "after": {
+            "rssBytes": 104075264,
+            "cgroupCurrentBytes": 86388736,
+            "cgroupLifetimePeakBytes": 87130112,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 177,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 15.767,
+        "successfulRequestsPerSecond": 1.522,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5123.171,
+            "p95": 5503.773,
+            "p99": 5579.934,
+            "max": 5579.934
+          }
+        },
+        "responseBytes": 5877216,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 104329216,
+            "cgroupCurrentBytes": 86650880,
+            "cgroupLifetimePeakBytes": 87130112,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 131059712,
+            "cgroupCurrentBytes": 113549312
+          },
+          "after": {
+            "rssBytes": 131059712,
+            "cgroupCurrentBytes": 113471488,
+            "cgroupLifetimePeakBytes": 113811456,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 90,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "memory",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.054,
+        "successfulRequestsPerSecond": 1.495,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 639.447,
+            "p95": 796.782,
+            "p99": 811.046,
+            "max": 811.046
+          }
+        },
+        "responseBytes": 5877528,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 244897,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 131411968,
+            "cgroupCurrentBytes": 113672192,
+            "cgroupLifetimePeakBytes": 113995776,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 131796992,
+            "cgroupCurrentBytes": 114196480
+          },
+          "after": {
+            "rssBytes": 121704448,
+            "cgroupCurrentBytes": 103714816,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 392,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "memory",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 19.596,
+        "successfulRequestsPerSecond": 1.225,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 2725.641,
+            "p95": 4884.421,
+            "p99": 5159.881,
+            "max": 5159.881
+          }
+        },
+        "responseBytes": 5877528,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 244897,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 121704448,
+            "cgroupCurrentBytes": 103714816,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 124145664,
+            "cgroupCurrentBytes": 106336256
+          },
+          "after": {
+            "rssBytes": 119828480,
+            "cgroupCurrentBytes": 101879808,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 193,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "memory",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.607,
+        "successfulRequestsPerSecond": 1.445,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5311.677,
+            "p95": 5871.442,
+            "p99": 6011.235,
+            "max": 6011.235
+          }
+        },
+        "responseBytes": 5877528,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 244897,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 119828480,
+            "cgroupCurrentBytes": 101879808,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 123351040,
+            "cgroupCurrentBytes": 105738240
+          },
+          "after": {
+            "rssBytes": 123351040,
+            "cgroupCurrentBytes": 105291776,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 88,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "fresh",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.818,
+        "successfulRequestsPerSecond": 1.427,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 682.717,
+            "p95": 742.753,
+            "p99": 887.857,
+            "max": 887.857
+          }
+        },
+        "responseBytes": 5877420,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 24,
+          "stored_bytes": 5877420,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 122372096,
+            "cgroupCurrentBytes": 104439808,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 124076032,
+            "cgroupCurrentBytes": 106704896
+          },
+          "after": {
+            "rssBytes": 121802752,
+            "cgroupCurrentBytes": 104218624,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 444,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "fresh",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 16.86,
+        "successfulRequestsPerSecond": 1.423,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 2773.659,
+            "p95": 2950.782,
+            "p99": 3110.773,
+            "max": 3110.773
+          }
+        },
+        "responseBytes": 5877424,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836558,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 122126336,
+            "cgroupCurrentBytes": 104480768,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 129396736,
+            "cgroupCurrentBytes": 111902720
+          },
+          "after": {
+            "rssBytes": 129396736,
+            "cgroupCurrentBytes": 111443968,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 199,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "fresh",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 17.421,
+        "successfulRequestsPerSecond": 1.378,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5624.353,
+            "p95": 6063.232,
+            "p99": 6183.853,
+            "max": 6183.853
+          }
+        },
+        "responseBytes": 5877420,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836558,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 129474560,
+            "cgroupCurrentBytes": 111443968,
+            "cgroupLifetimePeakBytes": 114458624,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 136019968,
+            "cgroupCurrentBytes": 118636544
+          },
+          "after": {
+            "rssBytes": 131952640,
+            "cgroupCurrentBytes": 114204672,
+            "cgroupLifetimePeakBytes": 118898688,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 116,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 32,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 8.267,
+        "successfulRequestsPerSecond": 1.451,
+        "statusCounts": {
+          "200": 12,
+          "503": 20
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 8072.704,
+            "p95": 8254.39,
+            "p99": 8254.39,
+            "max": 8254.39
+          },
+          "503": {
+            "p50": 20.944,
+            "p95": 29.3,
+            "p99": 29.682,
+            "max": 29.682
+          }
+        },
+        "responseBytes": 2938988,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 12
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836558,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 131952640,
+            "cgroupCurrentBytes": 113938432,
+            "cgroupLifetimePeakBytes": 118898688,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 168398848,
+            "cgroupCurrentBytes": 151040000
+          },
+          "after": {
+            "rssBytes": 166301696,
+            "cgroupCurrentBytes": 148520960,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 34,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "saved",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 17.63,
+        "successfulRequestsPerSecond": 1.361,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 715.532,
+            "p95": 814.151,
+            "p99": 851.508,
+            "max": 851.508
+          }
+        },
+        "responseBytes": 6773928,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 151531520,
+            "cgroupCurrentBytes": 133898240,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 151609344,
+            "cgroupCurrentBytes": 133898240
+          },
+          "after": {
+            "rssBytes": 131026944,
+            "cgroupCurrentBytes": 115912704,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 423,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "saved",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 18.072,
+        "successfulRequestsPerSecond": 1.328,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 2989.109,
+            "p95": 3219.256,
+            "p99": 3332.112,
+            "max": 3332.112
+          }
+        },
+        "responseBytes": 6773928,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 131026944,
+            "cgroupCurrentBytes": 115912704,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 135794688,
+            "cgroupCurrentBytes": 122548224
+          },
+          "after": {
+            "rssBytes": 135794688,
+            "cgroupCurrentBytes": 122236928,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 182,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "saved",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 18.401,
+        "successfulRequestsPerSecond": 1.304,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 6003.43,
+            "p95": 6377.26,
+            "p99": 6405.762,
+            "max": 6405.762
+          }
+        },
+        "responseBytes": 6773928,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 24
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 136048640,
+            "cgroupCurrentBytes": 122499072,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 139927552,
+            "cgroupCurrentBytes": 126533632
+          },
+          "after": {
+            "rssBytes": 137871360,
+            "cgroupCurrentBytes": 125378560,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 96,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "memory",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 19.47,
+        "successfulRequestsPerSecond": 1.233,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 787.051,
+            "p95": 890.583,
+            "p99": 993.333,
+            "max": 993.333
+          }
+        },
+        "responseBytes": 6774552,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 282273,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 137609216,
+            "cgroupCurrentBytes": 125775872,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 138493952,
+            "cgroupCurrentBytes": 126550016
+          },
+          "after": {
+            "rssBytes": 128806912,
+            "cgroupCurrentBytes": 118308864,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 459,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "memory",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 19.289,
+        "successfulRequestsPerSecond": 1.244,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 3166.135,
+            "p95": 3435.747,
+            "p99": 3491.424,
+            "max": 3491.424
+          }
+        },
+        "responseBytes": 6774552,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 282273,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 128806912,
+            "cgroupCurrentBytes": 118308864,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 132009984,
+            "cgroupCurrentBytes": 121913344
+          },
+          "after": {
+            "rssBytes": 132009984,
+            "cgroupCurrentBytes": 121376768,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 191,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "memory",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 19.427,
+        "successfulRequestsPerSecond": 1.235,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 6374.337,
+            "p95": 6991.893,
+            "p99": 7289.296,
+            "max": 7289.296
+          }
+        },
+        "responseBytes": 6774552,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryHits": 24
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 282273,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 132407296,
+            "cgroupCurrentBytes": 121638912,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 135761920,
+            "cgroupCurrentBytes": 125632512
+          },
+          "after": {
+            "rssBytes": 134713344,
+            "cgroupCurrentBytes": 123097088,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 96,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "fresh",
+      "concurrency": 1,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 19.366,
+        "successfulRequestsPerSecond": 1.239,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 792.589,
+            "p95": 848.581,
+            "p99": 863.909,
+            "max": 863.909
+          }
+        },
+        "responseBytes": 6774344,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 24,
+          "stored_bytes": 6774344,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 134430720,
+            "cgroupCurrentBytes": 122814464,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 136601600,
+            "cgroupCurrentBytes": 125972480
+          },
+          "after": {
+            "rssBytes": 134942720,
+            "cgroupCurrentBytes": 125140992,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 497,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "fresh",
+      "concurrency": 4,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 20.093,
+        "successfulRequestsPerSecond": 1.194,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 3259.603,
+            "p95": 3681.859,
+            "p99": 3777.504,
+            "max": 3777.504
+          }
+        },
+        "responseBytes": 6774348,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 9032452,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 135688192,
+            "cgroupCurrentBytes": 125923328,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 142278656,
+            "cgroupCurrentBytes": 133238784
+          },
+          "after": {
+            "rssBytes": 142278656,
+            "cgroupCurrentBytes": 133238784,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 214,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "fresh",
+      "concurrency": 8,
+      "http": {
+        "requests": 24,
+        "elapsedSeconds": 20.06,
+        "successfulRequestsPerSecond": 1.196,
+        "statusCounts": {
+          "200": 24
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 6595.343,
+            "p95": 7009.195,
+            "p99": 7021.102,
+            "max": 7021.102
+          }
+        },
+        "responseBytes": 6774344,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 24,
+          "memoryMisses": 24,
+          "calculations": 24,
+          "cachePuts": 24
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 9032452,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 142422016,
+            "cgroupCurrentBytes": 133500928,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 147103744,
+            "cgroupCurrentBytes": 137900032
+          },
+          "after": {
+            "rssBytes": 144785408,
+            "cgroupCurrentBytes": 136564736,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 124,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    },
+    {
+      "horizonMode": "terrain",
+      "path": "saved",
+      "concurrency": 32,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 11.364,
+        "successfulRequestsPerSecond": 1.32,
+        "statusCounts": {
+          "200": 15,
+          "503": 17
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 10963.227,
+            "p95": 11345.609,
+            "p99": 11345.609,
+            "max": 11345.609
+          },
+          "503": {
+            "p50": 7.277,
+            "p95": 66.312,
+            "p99": 66.312,
+            "max": 66.312
+          }
+        },
+        "responseBytes": 4234028,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 15
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 9032452,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 144785408,
+            "cgroupCurrentBytes": 136564736,
+            "cgroupLifetimePeakBytes": 151388160,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 174723072,
+            "cgroupCurrentBytes": 166957056
+          },
+          "after": {
+            "rssBytes": 173903872,
+            "cgroupCurrentBytes": 166408192,
+            "cgroupLifetimePeakBytes": 167256064,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 37,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    }
+  ],
+  "readiness": {
+    "schemaVersion": "lunarwindow.readiness.v1",
+    "status": "ready",
+    "service": "lunarwindow-backend",
+    "dataMode": "reference",
+    "referenceSiteCount": 3,
+    "terrainMaskCount": 1,
+    "precomputed": "verified",
+    "precomputedJobCount": 4,
+    "cacheMaxEntries": 32,
+    "cacheMaxBytes": 16777216
+  },
+  "deployment": {
+    "image": "lunarwindow-api:deployment-check",
+    "imageId": "sha256:3250c0069fa290a51a880b7cbcc5ce579a3bd1c430d6b32f17d3064da0b9cfe9",
+    "memoryLimitBytes": 1073741824,
+    "nanoCpus": 2000000000,
+    "concurrencyLimit": 16,
+    "keepAliveSeconds": 5,
+    "healthcheckDuringMeasurement": false,
+    "clientPlatform": "macOS-26.6-arm64-arm-64bit",
+    "samplerIntervalMs": 20,
+    "releaseChecksums": "4d4083aac729fadcf684579db8582429c9b7a75dae6027cde52196c45bc5b67f  bundle/bcf756b2ccb8b8092577288ae77e0f955922228745f9a778dc1a98d69599d15f.json\ncf4da17cc77aa129bbc2dc944f0ffd4d6c01ef05dd8c79a66ccecaaf8c479bb2  bundle/c269f1768c2ce7165a4cf67b9ce3c349dca8f433ac6d437762ccb04a2aed758d.json\n9b601e15af329a1e28cba66f8a13812a3392e7ef45b83a8bb3fc17f6a0a3664a  bundle/cfd797e74c84793cecb70df8144806430336242d9a5c8cc5fbf2549251be3340.json\n1d841d3ec95e7b3eac3565dcdfb10d4dd8e957525fd337511edf82c50fb07189  bundle/eb306b1be4ca18be9e7a866eead5a6eede450744c64d0334729308cf27d4b4b1.json\n6d306ad38118492252b73e60d3825f27d4789026b60a6bcd4ef33d5d52f41e69  bundle/manifest.json\n006162e59a500b635835706649bc18782f1bff939da042f6933ba760d9578de3  plan.json"
+  },
+  "overloadRecovery": {
+    "heldConnections": 16,
+    "rejectedStatus": 503,
+    "readinessAfter": "ready"
+  },
+  "containerLogs": "INFO:     Started server process [1]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit."
+}

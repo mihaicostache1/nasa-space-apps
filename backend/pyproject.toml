@@ -25,6 +25,8 @@ lunarwindow-ephemeris = "lunarwindow.ephemeris.cli:main"
 lunarwindow-report = "lunarwindow.ephemeris.report:main"
 lunarwindow-validate = "lunarwindow.ephemeris.contract:main"
 lunarwindow-terrain = "lunarwindow.terrain.cli:main"
+lunarwindow-precompute = "lunarwindow.precompute.cli:main"
+lunarwindow-data-release = "lunarwindow.precompute.release:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -32,6 +34,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "lunarwindow.ephemeris" = ["*.schema.json"]
 "lunarwindow.terrain" = ["*.schema.json"]
+"lunarwindow.precompute" = ["*.schema.json"]
 
 [tool.ruff]
 line-length = 100

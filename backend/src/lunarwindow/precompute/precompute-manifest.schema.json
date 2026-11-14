@@ -1,0 +1,229 @@
+{
+  "$defs": {
+    "PrecomputeJob": {
+      "additionalProperties": false,
+      "properties": {
+        "evaluation": {
+          "$ref": "#/$defs/ReferenceEvaluationCacheKey"
+        },
+        "status": {
+          "enum": ["pending", "complete", "failed"],
+          "title": "Status",
+          "type": "string"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PrecomputeOutput"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": ["evaluation", "status"],
+      "title": "PrecomputeJob",
+      "type": "object"
+    },
+    "PrecomputeOutput": {
+      "additionalProperties": false,
+      "description": "One serialized evaluation beside the manifest, named by its evaluation key.",
+      "properties": {
+        "filename": {
+          "pattern": "^[0-9a-f]{64}\\.json$",
+          "title": "Filename",
+          "type": "string"
+        },
+        "sha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "responseSchemaVersion": {
+          "enum": [
+            "lunarwindow.reference-evaluation.v1",
+            "lunarwindow.reference-evaluation.v2"
+          ],
+          "title": "Responseschemaversion",
+          "type": "string"
+        }
+      },
+      "required": ["filename", "sha256", "responseSchemaVersion"],
+      "title": "PrecomputeOutput",
+      "type": "object"
+    },
+    "ReferenceEvaluationCacheKey": {
+      "additionalProperties": false,
+      "description": "Immutable, inspectable identity for a complete reference evaluation response.\n\nThe ephemeris hash identifies the site's full archived JSON, including original\nprovenance and coverage. The terrain hash identifies the complete reviewed mask.\nA hash with valid syntax is not evidence that its source bytes were verified.",
+      "properties": {
+        "startUtc": {
+          "examples": ["2026-11-14T00:00:00Z"],
+          "title": "Startutc",
+          "type": "string"
+        },
+        "endUtc": {
+          "examples": ["2026-11-15T00:00:00Z"],
+          "title": "Endutc",
+          "type": "string"
+        },
+        "stepMinutes": {
+          "default": 60,
+          "maximum": 1440,
+          "minimum": 1,
+          "title": "Stepminutes",
+          "type": "integer"
+        },
+        "visibilityRule": {
+          "default": "any-disc",
+          "enum": ["any-disc", "body-center", "full-disc"],
+          "title": "Visibilityrule",
+          "type": "string"
+        },
+        "asOfUtc": {
+          "title": "Asofutc",
+          "type": "string"
+        },
+        "siteId": {
+          "examples": ["lola-site01-reference"],
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "title": "Siteid",
+          "type": "string"
+        },
+        "schemaVersion": {
+          "const": "lunarwindow.reference-cache-key.v1",
+          "default": "lunarwindow.reference-cache-key.v1",
+          "title": "Schemaversion",
+          "type": "string"
+        },
+        "calculationModelVersion": {
+          "minLength": 1,
+          "title": "Calculationmodelversion",
+          "type": "string"
+        },
+        "ephemerisSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ephemerissha256",
+          "type": "string"
+        },
+        "horizonMode": {
+          "enum": ["geometric", "terrain"],
+          "title": "Horizonmode",
+          "type": "string"
+        },
+        "maskId": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maskid"
+        },
+        "terrainMaskSha256": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Terrainmasksha256"
+        },
+        "allowMeanEarthApproximation": {
+          "title": "Allowmeanearthapproximation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "startUtc",
+        "endUtc",
+        "asOfUtc",
+        "siteId",
+        "calculationModelVersion",
+        "ephemerisSha256",
+        "horizonMode",
+        "maskId",
+        "terrainMaskSha256",
+        "allowMeanEarthApproximation"
+      ],
+      "title": "ReferenceEvaluationCacheKey",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "lunarwindow.precompute-manifest.v1",
+      "default": "lunarwindow.precompute-manifest.v1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "runId": {
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Runid",
+      "type": "string"
+    },
+    "createdAtUtc": {
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$",
+      "title": "Createdatutc",
+      "type": "string"
+    },
+    "completedAtUtc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completedatutc"
+    },
+    "status": {
+      "enum": ["incomplete", "complete"],
+      "title": "Status",
+      "type": "string"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/PrecomputeJob"
+      },
+      "minItems": 1,
+      "title": "Jobs",
+      "type": "array"
+    }
+  },
+  "required": ["runId", "createdAtUtc", "status", "jobs"],
+  "title": "PrecomputeManifest",
+  "type": "object"
+}
