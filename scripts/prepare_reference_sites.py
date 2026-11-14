@@ -17,7 +17,8 @@ from rasterio.windows import Window
 ROOT = Path(__file__).resolve().parents[1]
 SITES = {
     "Site01": "Connecting ridge",
-    "Site04": "Shackleton rim",
+    # The Site04 product is named for the rim region; its center pixel is on the inner wall.
+    "Site04": "Shackleton inner wall",
     "Site23": "Malapert massif",
 }
 

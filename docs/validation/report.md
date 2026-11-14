@@ -4,7 +4,9 @@ Reviewed November 13, 2026. Software: `lunarwindow-ephemeris` 0.2.0; contract: `
 
 ## Reference dataset
 
-The committed bundle at `data/reference/validation-30d` spans **2026-11-14 00:00 UTC through 2026-12-14 00:00 UTC, end excluded**. It contains 720 hourly samples for each of three NASA GSFC LOLA DEM center-pixel reference points: Connecting ridge (Site01), Shackleton rim (Site04), and Malapert massif (Site23).
+The committed bundle at `data/reference/validation-30d` spans **2026-11-14 00:00 UTC through 2026-12-14 00:00 UTC, end excluded**. It contains 720 hourly samples for each of three NASA GSFC LOLA DEM center-pixel reference points: Connecting ridge (Site01), Shackleton inner wall (Site04), and Malapert massif (Site23).
+
+The PGDA Site04 product is labeled "Shackleton rim"; the center pixel used for `lola-site04-reference` lies on Shackleton's inner wall. The location label was corrected on November 14, 2026; the coordinates and ephemeris samples are unchanged.
 
 Coordinates and surface heights were derived from the source products' actual pixel transforms and sampled heights, using the documented DE421 MOON_ME frame, south polar stereographic projection, and 1737.4 km sphere. Mast height is explicitly zero. These points are reproducible geographic references, not nominated landing sites. Original DEMs remain outside Git; `data/reference/site-provenance.json` records file hashes, projection, grid cell, and sampled height. The source products include interpolation and uncertainty; their 5 m pixel spacing is not a claim of 5 m independent measurement accuracy.
 
@@ -20,7 +22,7 @@ For each case, the camera's Cartesian coordinates were preserved from the actual
 
 | Case | Nearby reference region | Camera altitude (km) | Largest absolute angle difference (deg) | Result                    |
 | ---- | ----------------------- | -------------------- | --------------------------------------- | ------------------------- |
-| 01   | Shackleton rim          | 144.364890           | 0.004505486                             | Pass at display precision |
+| 01   | Shackleton inner wall   | 144.364890           | 0.004505486                             | Pass at display precision |
 | 02   | Connecting ridge        | 100.000000           | 0.004807782                             | Pass at display precision |
 | 03   | Malapert massif         | 100.000000           | 0.003300457                             | Pass at display precision |
 
