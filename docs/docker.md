@@ -50,6 +50,16 @@ The container uses UID/GID 1000 by default. Docker Desktop normally handles the 
 docker compose run --build --rm --user "$(id -u):$(id -g)" ephemeris --help
 ```
 
+## Run terrain tools
+
+The `terrain` image adds Rasterio, pyshp, and Matplotlib. Downloads (~3.7 GB) and runs persist in `./data`.
+
+```sh
+docker compose run --build --rm terrain download --all
+docker compose run --build --rm terrain horizons --plots \
+  --sites data/sites.curated.json data/sites.shackleton-rim.json data/sites.artemis-regions.json
+```
+
 ## Run offline Python tests
 
 ```sh

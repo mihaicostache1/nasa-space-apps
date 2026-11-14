@@ -1,0 +1,324 @@
+{
+  "run": "20261114T103253Z-5c3486c9973c",
+  "period": {
+    "startUtc": "2026-11-14T00:00:00Z",
+    "endUtc": "2027-11-14T00:00:00Z",
+    "stepMinutes": 360
+  },
+  "rule": "any-disc",
+  "sites": [
+    {
+      "siteId": "lola-site04-reference",
+      "terrain": {
+        "pctSun": 12.7,
+        "pctEarth": 0.0,
+        "pctBoth": 0.0,
+        "longestDarkHrs": 4902.0
+      },
+      "noTerrain": {
+        "pctSun": 56.2,
+        "pctEarth": 51.7,
+        "pctBoth": 29.9,
+        "longestDarkHrs": 3834.0
+      },
+      "pgdaAvgSunPct": 11.2,
+      "pgdaAvgEarthPct": 11.4,
+      "sunDiffPct": 1.5,
+      "earthDiffPct": -11.4
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "terrain": {
+        "pctSun": 51.8,
+        "pctEarth": 46.6,
+        "pctBoth": 25.3,
+        "longestDarkHrs": 498.0
+      },
+      "noTerrain": {
+        "pctSun": 57.3,
+        "pctEarth": 51.0,
+        "pctBoth": 29.6,
+        "longestDarkHrs": 3300.0
+      },
+      "pgdaAvgSunPct": 49.3,
+      "pgdaAvgEarthPct": 43.1,
+      "sunDiffPct": 2.5,
+      "earthDiffPct": 3.5
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "terrain": {
+        "pctSun": 25.0,
+        "pctEarth": 52.0,
+        "pctBoth": 13.3,
+        "longestDarkHrs": 2790.0
+      },
+      "noTerrain": {
+        "pctSun": 53.6,
+        "pctEarth": 74.7,
+        "pctBoth": 40.4,
+        "longestDarkHrs": 426.0
+      },
+      "pgdaAvgSunPct": 34.8,
+      "pgdaAvgEarthPct": 52.7,
+      "sunDiffPct": -9.8,
+      "earthDiffPct": -0.7
+    },
+    {
+      "siteId": "im-2-target",
+      "terrain": {
+        "pctSun": 47.5,
+        "pctEarth": 92.1,
+        "pctBoth": 44.1,
+        "longestDarkHrs": 450.0
+      },
+      "noTerrain": {
+        "pctSun": 53.2,
+        "pctEarth": 80.2,
+        "pctBoth": 43.1,
+        "longestDarkHrs": 408.0
+      },
+      "pgdaAvgSunPct": 46.4,
+      "pgdaAvgEarthPct": 92.1,
+      "sunDiffPct": 1.1,
+      "earthDiffPct": 0.0
+    },
+    {
+      "siteId": "shackleton-rim",
+      "terrain": {
+        "pctSun": 89.1,
+        "pctEarth": 51.9,
+        "pctBoth": 47.9,
+        "longestDarkHrs": 66.0
+      },
+      "noTerrain": {
+        "pctSun": 56.2,
+        "pctEarth": 51.5,
+        "pctBoth": 29.7,
+        "longestDarkHrs": 3840.0
+      },
+      "pgdaAvgSunPct": 89.6,
+      "pgdaAvgEarthPct": 53.8,
+      "sunDiffPct": -0.5,
+      "earthDiffPct": -1.9
+    },
+    {
+      "siteId": "artemis3-haworth",
+      "terrain": {
+        "pctSun": 76.2,
+        "pctEarth": 65.1,
+        "pctBoth": 47.3,
+        "longestDarkHrs": 336.0
+      },
+      "noTerrain": {
+        "pctSun": 53.4,
+        "pctEarth": 70.3,
+        "pctBoth": 37.6,
+        "longestDarkHrs": 432.0
+      },
+      "pgdaAvgSunPct": 75.2,
+      "pgdaAvgEarthPct": 68.3,
+      "sunDiffPct": 1.0,
+      "earthDiffPct": -3.2
+    },
+    {
+      "siteId": "artemis3-malapert-massif",
+      "terrain": {
+        "pctSun": 78.4,
+        "pctEarth": 77.3,
+        "pctBoth": 57.2,
+        "longestDarkHrs": 432.0
+      },
+      "noTerrain": {
+        "pctSun": 53.5,
+        "pctEarth": 74.8,
+        "pctBoth": 40.3,
+        "longestDarkHrs": 426.0
+      },
+      "pgdaAvgSunPct": 84.5,
+      "pgdaAvgEarthPct": 71.0,
+      "sunDiffPct": -6.1,
+      "earthDiffPct": 6.3
+    },
+    {
+      "siteId": "artemis3-mons-mouton",
+      "terrain": {
+        "pctSun": 77.5,
+        "pctEarth": 66.6,
+        "pctBoth": 46.4,
+        "longestDarkHrs": 438.0
+      },
+      "noTerrain": {
+        "pctSun": 53.6,
+        "pctEarth": 75.2,
+        "pctBoth": 40.9,
+        "longestDarkHrs": 414.0
+      },
+      "pgdaAvgSunPct": 80.0,
+      "pgdaAvgEarthPct": 64.3,
+      "sunDiffPct": -2.5,
+      "earthDiffPct": 2.3
+    },
+    {
+      "siteId": "artemis3-mons-mouton-plateau",
+      "terrain": {
+        "pctSun": 76.3,
+        "pctEarth": 67.6,
+        "pctBoth": 47.3,
+        "longestDarkHrs": 432.0
+      },
+      "noTerrain": {
+        "pctSun": 53.4,
+        "pctEarth": 75.3,
+        "pctBoth": 40.8,
+        "longestDarkHrs": 420.0
+      },
+      "pgdaAvgSunPct": 78.4,
+      "pgdaAvgEarthPct": 67.8,
+      "sunDiffPct": -2.1,
+      "earthDiffPct": -0.2
+    },
+    {
+      "siteId": "artemis3-nobile-rim-1",
+      "terrain": {
+        "pctSun": 88.3,
+        "pctEarth": 60.6,
+        "pctBoth": 51.6,
+        "longestDarkHrs": 234.0
+      },
+      "noTerrain": {
+        "pctSun": 53.5,
+        "pctEarth": 74.2,
+        "pctBoth": 40.3,
+        "longestDarkHrs": 414.0
+      },
+      "pgdaAvgSunPct": 85.8,
+      "pgdaAvgEarthPct": 60.2,
+      "sunDiffPct": 2.5,
+      "earthDiffPct": 0.4
+    },
+    {
+      "siteId": "artemis3-nobile-rim-2",
+      "terrain": {
+        "pctSun": 55.0,
+        "pctEarth": 81.6,
+        "pctBoth": 44.7,
+        "longestDarkHrs": 360.0
+      },
+      "noTerrain": {
+        "pctSun": 52.9,
+        "pctEarth": 71.7,
+        "pctBoth": 38.5,
+        "longestDarkHrs": 402.0
+      },
+      "pgdaAvgSunPct": 53.9,
+      "pgdaAvgEarthPct": 71.8,
+      "sunDiffPct": 1.1,
+      "earthDiffPct": 9.8
+    },
+    {
+      "siteId": "artemis3-peak-near-cabeus-b",
+      "terrain": {
+        "pctSun": 70.2,
+        "pctEarth": 66.8,
+        "pctBoth": 46.6,
+        "longestDarkHrs": 294.0
+      },
+      "noTerrain": {
+        "pctSun": 50.9,
+        "pctEarth": 63.6,
+        "pctBoth": 32.4,
+        "longestDarkHrs": 396.0
+      },
+      "pgdaAvgSunPct": 68.4,
+      "pgdaAvgEarthPct": 65.8,
+      "sunDiffPct": 1.8,
+      "earthDiffPct": 1.0
+    },
+    {
+      "siteId": "artemis3-slater-plain",
+      "terrain": {
+        "pctSun": 68.2,
+        "pctEarth": 49.2,
+        "pctBoth": 37.4,
+        "longestDarkHrs": 336.0
+      },
+      "noTerrain": {
+        "pctSun": 54.9,
+        "pctEarth": 44.7,
+        "pctBoth": 25.1,
+        "longestDarkHrs": 456.0
+      },
+      "pgdaAvgSunPct": 65.6,
+      "pgdaAvgEarthPct": 49.9,
+      "sunDiffPct": 2.6,
+      "earthDiffPct": -0.7
+    },
+    {
+      "siteId": "artemis3-de-gerlache-rim-2",
+      "terrain": {
+        "pctSun": 75.0,
+        "pctEarth": 60.1,
+        "pctBoth": 47.5,
+        "longestDarkHrs": 168.0
+      },
+      "noTerrain": {
+        "pctSun": 59.7,
+        "pctEarth": 55.3,
+        "pctBoth": 32.2,
+        "longestDarkHrs": 606.0
+      },
+      "pgdaAvgSunPct": 78.6,
+      "pgdaAvgEarthPct": 61.3,
+      "sunDiffPct": -3.6,
+      "earthDiffPct": -1.2
+    }
+  ],
+  "reference30d": [
+    {
+      "siteId": "lola-site01-reference",
+      "terrain": {
+        "pctSun": 80.1,
+        "pctEarth": 39.6,
+        "pctBoth": 24.9,
+        "longestDarkHrs": 143.0
+      },
+      "noTerrain": {
+        "pctSun": 100.0,
+        "pctEarth": 43.3,
+        "pctBoth": 43.3,
+        "longestDarkHrs": 0.0
+      }
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "terrain": {
+        "pctSun": 29.9,
+        "pctEarth": 0.0,
+        "pctBoth": 0.0,
+        "longestDarkHrs": 505.0
+      },
+      "noTerrain": {
+        "pctSun": 100.0,
+        "pctEarth": 44.2,
+        "pctBoth": 44.2,
+        "longestDarkHrs": 0.0
+      }
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "terrain": {
+        "pctSun": 56.4,
+        "pctEarth": 44.4,
+        "pctBoth": 26.9,
+        "longestDarkHrs": 159.0
+      },
+      "noTerrain": {
+        "pctSun": 63.8,
+        "pctEarth": 75.7,
+        "pctBoth": 62.4,
+        "longestDarkHrs": 241.0
+      }
+    }
+  ]
+}

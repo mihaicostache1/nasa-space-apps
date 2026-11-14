@@ -40,7 +40,7 @@ python -m unittest discover -s backend/tests -v
 python scripts/validate_quickmap.py
 ```
 
-On Windows, activate with `.venv\Scripts\Activate.ps1`. Ruff is included in the `dev` extra; Matplotlib is in `analysis`; `gis` adds Rasterio for `scripts/prepare_reference_sites.py`.
+On Windows, activate with `.venv\Scripts\Activate.ps1`. Ruff is included in the `dev` extra; Matplotlib is in `analysis`; `gis` adds Rasterio and pyshp for `scripts/prepare_reference_sites.py` and the `lunarwindow-terrain` CLI. The terrain algorithm itself needs only numpy (a core dependency). See the [terrain work package](../docs/terrain-gis-lead.md) for horizon profiles, the site catalog, and `HorizonService`.
 
 ## Contract v2
 

@@ -1,6 +1,6 @@
 # Data sources and conventions
 
-The Python module queries Horizons and preserves real source responses. The versioned sample fixture and a 30-day, three-point reference bundle are committed. Three NASA regional DEMs were downloaded into ignored storage to derive reference coordinates and surface heights; terrain horizon masks are not integrated. The React UI does not yet consume these exports.
+The Python module queries Horizons and preserves real source responses. The versioned sample fixture and a 30-day, three-point reference bundle are committed. Three NASA regional DEMs were downloaded into ignored storage to derive reference coordinates and surface heights. Terrain horizon masks are now computed from the PGDA 20 m and 120 m south polar DEMs; see [the terrain work package](terrain-gis-lead.md). The React UI does not yet consume these exports.
 
 | Resource                                                                                                 | Intended role                                                                    |
 | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -19,7 +19,8 @@ The Python module queries Horizons and preserves real source responses. The vers
 - Time: ISO 8601 UTC strings ending in `Z`. The starter date controls select midnight UTC. Domain types allow times as well.
 - Azimuth: degrees clockwise from local north, 0 through less than 360.
 - Elevation: degrees above the local horizontal plane, -90 through +90.
-- Terrain model: explicitly `none` until a DEM-derived horizon profile is actually applied.
+- Terrain model: `lola-dem` for DEM-derived horizon profiles, explicitly `none` for bare-sphere sites outside the polar DEMs (Apollo 11, Chang'e-6). The ephemeris export itself always reports `none`; terrain enters through the horizon join.
+- Observer altitude for terrain-aware sites: LOLA ground height + mast height (default 2 m) above the 1737.4 km sphere, identical in the horizon profile and the Horizons request.
 
 The TypeScript UI scenario schema limits a comparison to 31 days and 10,000 samples. The separate Python batch exporter allows at most 200,000 samples per site and splits queries into bounded chunks. These are application defaults, not NASA API limits.
 
@@ -36,6 +37,8 @@ These checks are implemented in `backend/src/lunarwindow/ephemeris/horizons.py`.
 ## Terrain and accuracy
 
 LOLA products on the linked GSFC page use a 1737.4 km reference sphere and polar stereographic projections. Inspect each product's label and metadata for resolution, units, scaling, coverage, and no-data values. Convert reference conventions explicitly before mixing them with Horizons coordinates.
+
+The terrain pipeline uses `LDEM_80S_20MPP_ADJ`, `LDEM_60S_120MPP_ADJ`, and the `AVGVISIB_75S_120M_201608` Sun/Earth maps ([PGDA products 90](https://pgda.gsfc.nasa.gov/products/90) and [69](https://pgda.gsfc.nasa.gov/products/69)); heights are float metres with NaN gaps, visibility maps are int16 × 4e-5 fractions with −32768 gaps, all in DE421 MOON_ME. Artemis III region polygons come from USGS ([doi:10.5066/P1MEQ6UK](https://doi.org/10.5066/P1MEQ6UK)).
 
 Long-term average illumination or Earth visibility maps cannot replace predictions for a particular mission date. Terrain obstructions and body-disc visibility rules must be specified when deriving a horizon model. Ground-station visibility and electrical power output need additional models.
 

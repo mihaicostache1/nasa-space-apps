@@ -2,7 +2,7 @@
 
 `lunarwindow.terrain-mask.v1` defines the GIS-to-backend handoff for a static lunar terrain horizon. The Python contract is `TerrainMask` in `backend/src/lunarwindow/terrain/models.py`. It records one observer, one reference frame, a complete azimuth/elevation profile, and the evidence needed to trace its DEM sources and generation method.
 
-This step defines and validates the contract. Loading a verified mask, checking compatibility with ephemerides, extending the HTTP API, and evaluating terrain visibility are separate steps. No verified terrain-mask artifact is included yet. Reference evaluations currently support only `horizonMode: "geometric"`.
+This step defines and validates the contract. Loading a verified mask, checking compatibility with ephemerides, extending the HTTP API, and evaluating terrain visibility are separate steps. The first verified artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it); the backend does not load it yet. Reference evaluations currently support only `horizonMode: "geometric"`.
 
 ## Required fields
 

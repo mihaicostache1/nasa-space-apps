@@ -10,7 +10,7 @@ Implemented: Python Horizons retrieval, chunking, cache/provenance, JSON/CSV exp
 
 Next:
 
-1. Agree verified GIS inputs, mast/altitude conventions, and the extended JSON contract.
+1. A validated terrain mask is available for Site01 (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`), matching the archived ephemeris observer (ground + 0 m mast above the 1737.4 km sphere).
 2. Review the completed reference-point/camera-observer evidence, then add surface/terrain cases after that integration is available.
 3. Run the agreed curated-site precompute after a `--dry-run` request estimate.
 4. Backend/data integrates the ephemeris and GIS masks with the FastAPI visibility engine; frontend connects to that service.
@@ -28,13 +28,16 @@ The backend serves synthetic scenarios and verified reference-data geometric eva
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 
-## 3. Terrain and site catalog
+## 3. Terrain and site catalog — P2 milestone complete
 
-1. Add a small, sourced catalog of historic or candidate sites.
-2. Download a bounded LOLA region; preserve source metadata and reference-surface conventions.
-3. Generate and validate azimuth-dependent horizon profiles.
-4. Add an explicit choice between geometric and terrain-aware visibility; show resolution and missing-data limits.
-5. Add contextual mapping or 3D views once the science path is reliable.
+Implemented: checksummed LOLA 5 m/20 m/120 m downloads, exact ray-cast horizons, one validated demo mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, `lunarwindow.terrain-mask.v1`), a sourced 17-site catalog with preliminary horizons that agree with PGDA long-term sunlight maps, and cached custom-coordinate horizons. See `docs/terrain-gis-lead.md`.
+
+Next:
+
+1. Backend/data loads the Site01 mask through `TerrainMask` and checks it against the archived ephemeris observer and frame.
+2. Later, if time allows: ephemerides and horizons for further curated sites, and `HorizonService` for custom coordinates.
+3. Add an explicit choice between geometric and terrain-aware visibility; show resolution, truncated-azimuth, and `terrainModel: "none"` limits.
+4. Add contextual mapping or 3D views using `rays.el` and `rays.horizonDistanceKm`.
 
 ## 4. Presentation and delivery
 

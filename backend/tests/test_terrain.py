@@ -158,6 +158,34 @@ class HorizonTests(unittest.TestCase):
         self.assertTrue(any("DEM edge" in warning for warning in profile.quality.warnings))
         self.assertEqual(len(profile.sources), 2)
 
+    def test_fine_tier_takes_precedence_and_completeness_is_enforced(self):
+        from lunarwindow.terrain.horizon import IncompleteTerrain
+
+        # The 5 m tile sees a 100 m wall at 2 km that the coarse grid does not contain.
+        fine = synthetic_grid(
+            SITE.lat, SITE.lon, 2500, 5, lambda d, a: np.where((d > 2000) & (d < 2100), 100.0, 0)
+        )
+        coarse = synthetic_grid(SITE.lat, SITE.lon, 13_000, 20, lambda d, a: np.zeros_like(d))
+        params = default_parameters(
+            maxRangeKm=12, nearFieldKm=12, raysPerDegree=2, stepGrowth=0.0, minDistanceM=60
+        )
+        profile = compute_horizon(
+            SITE, coarse, None, params, fine=fine, fine_field_m=2400, require_complete=True
+        )
+        self.assertAlmostEqual(
+            min(p.el for p in profile.horizon), plateau_angle(2000, 100, 2), delta=0.1
+        )
+        self.assertEqual([s.resolutionM for s in profile.sources], [5.0, 20.0])
+        self.assertTrue(profile.quality.nearFieldAvailable)
+        with self.assertRaises(IncompleteTerrain):
+            compute_horizon(
+                SITE,
+                coarse,
+                None,
+                default_parameters(maxRangeKm=20, nearFieldKm=20, raysPerDegree=2),
+                require_complete=True,
+            )
+
     def test_outside_coverage_and_flat_fallback(self):
         grid = synthetic_grid(SITE.lat, SITE.lon, 2000, 20, lambda d, a: np.zeros_like(d))
         elsewhere = SiteSpec("far", "Far away", 0.67416, 23.47314, "test")

@@ -12,7 +12,9 @@ REFERENCE_RADIUS_M = 1_737_400.0
 LOLA_20MPP_PAGE = "https://pgda.gsfc.nasa.gov/products/90"
 ILLUMINATION_PAGE = "https://pgda.gsfc.nasa.gov/products/69"
 
-Role = Literal["near-field", "far-field", "validation-sun", "validation-earth"]
+LOLA_5MPP_PAGE = "https://pgda.gsfc.nasa.gov/products/78"
+
+Role = Literal["site-tile", "near-field", "far-field", "validation-sun", "validation-earth"]
 
 
 @dataclass(frozen=True)
@@ -23,7 +25,7 @@ class Product:
     role: Role
     resolution_m: float
     half_width_m: float
-    """Grid extent from the pole along each axis; the grid is a square of 2 × this."""
+    """Extent: half the side of the (square) grid. Polar products are centred on the pole."""
     size_bytes: int
     description: str
 
@@ -35,6 +37,17 @@ class Product:
 PRODUCTS: dict[str, Product] = {
     product.product_id: product
     for product in (
+        Product(
+            "Site01_final_adj_5mpp_surf",
+            "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif",
+            LOLA_5MPP_PAGE,
+            "site-tile",
+            5.0,
+            8_000.0,
+            40_980_810,
+            "LOLA 5 m/px Site01 (connecting ridge) tile, 16 x 16 km; source of the Site01 "
+            "reference point and its archived ephemeris altitude",
+        ),
         Product(
             "LDEM_80S_20MPP_ADJ",
             "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF",

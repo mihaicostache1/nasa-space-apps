@@ -13,6 +13,7 @@ The package manifest overrides the TypeScript ESLint parser's `minimatch` depend
 - `backend/src/lunarwindow/ephemeris`: P1 coordinate/time validation, Horizons query construction, strict parsing, source archives, and JSON/CSV export.
 - `backend/src/lunarwindow/api`: P3 FastAPI routes, contracts, errors, CORS, synthetic demos, and the reference-data evaluation adapter.
 - `backend/src/lunarwindow/reference.py`: verified offline bundle/catalog loading and contained sampling-grid selection.
+- `backend/src/lunarwindow/terrain`: the `TerrainMask` (`lunarwindow.terrain-mask.v1`) handoff contract, plus P2 LOLA downloads, DEM access with projection checks, ray-cast horizon profiles, curated catalog and region-point selection, verified run bundles, and a cached custom-coordinate service. Rasterio/pyshp are needed only for reading files (`gis` extra); the algorithm needs only numpy.
 - `backend/src/lunarwindow/visibility`: input validation, circular horizon interpolation, disc states, duration-weighted metrics, merged windows, and event brackets; no HTTP, storage, or retrieval dependency.
 - `backend/tests`: offline Python tests and small archived NASA response fixtures.
 - `src/app`: UI entry points, layouts, metadata, and the frontend health endpoint. Keep scientific calculations out of page and route files.
@@ -29,7 +30,7 @@ The page runs independently of NASA services. Scenario fields are kept in React 
 
 FastAPI runs separately on port 8000. `POST /api/evaluations` supplies synthetic scenarios (`lunarwindow.evaluation.v2`). The reference catalog and ephemeris endpoints expose the verified archive, and `POST /api/reference/evaluations` calculates geometric visibility from selected real samples (`lunarwindow.reference-evaluation.v1`). Responses include source labels, a horizon, pointing series, metrics, windows, and setting brackets. Reference evaluations require `horizonMode: "geometric"` and retain original NASA evidence plus full archive coverage. The React workspace is not connected yet. See [the backend contract](backend-data.md) and [calculation model](visibility.md).
 
-The CLI retrieves real Sun/Earth angles, caches provider responses, and exports flat series plus provenance. The committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. The reference adapter validates that bundle, selects its requested grid, and supplies a zero-degree horizon to the engine. QuickMap camera-observer comparisons are documented in `docs/validation/report.md`. Team-approved mission coordinates, terrain masks, and the full multi-year dataset remain pending.
+The CLI retrieves real Sun/Earth angles, caches provider responses, and exports flat series plus provenance. The committed 30-day dataset covers three sourced NASA LOLA reference grid cells, including surface heights. The reference adapter validates that bundle, selects its requested grid, and supplies a zero-degree horizon to the engine. QuickMap camera-observer comparisons are documented in `docs/validation/report.md`; they validate displayed angles for observers about 100–144 km up, not ground-level terrain shadows. One validated terrain mask (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`, contract `lunarwindow.terrain-mask.v1`) matches the archived Site01 ephemeris observer; the API does not load it yet. Horizons for the other curated sites are preliminary (see `docs/terrain-gis-lead.md`). Team-approved mission coordinates and the full multi-year dataset remain pending.
 
 ## Current data flow
 
@@ -46,7 +47,7 @@ flowchart LR
   Provider --> Horizons[JPL Horizons]
   Provider --> Data[Normalized samples and provenance]
   Data --> Archive
-  GIS[GIS horizon masks] -. pending .-> Domain
+  Mask[Validated Site01 terrain mask] -. integration pending .-> Domain
   Domain -. pending .-> Views[Horizon, timeline, comparison]
 ```
 
