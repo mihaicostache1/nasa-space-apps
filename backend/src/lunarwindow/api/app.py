@@ -1,6 +1,7 @@
-"""P3 API: synthetic source data with calculated visibility, metrics, and windows."""
+"""Synthetic demos and geometric evaluations of verified reference ephemerides."""
 
 import os
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Query, Request
@@ -10,6 +11,13 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
+from lunarwindow.ephemeris.contract import dataset_schema
+from lunarwindow.reference import (
+    ReferenceSelectionError,
+    load_reference_catalog,
+    load_reference_dataset,
+    select_reference_dataset,
+)
 from lunarwindow.visibility.models import VisibilityRule
 
 from .demo import DemoProvider
@@ -22,12 +30,19 @@ from .models import (
     EvaluationRequest,
     Health,
     Location,
+    ReferenceSiteCatalog,
     SiteCatalog,
 )
+from .reference_models import ReferenceEvaluation, ReferenceEvaluationRequest
+from .reference_provider import evaluate_reference
 
 
 def get_provider() -> DemoProvider:
     return DemoProvider()
+
+
+def get_reference_directory() -> Path:
+    return Path(os.environ.get("LUNARWINDOW_REFERENCE_DIR", "data/reference")) / "validation-30d"
 
 
 def query_period(
@@ -55,11 +70,12 @@ def create_app() -> FastAPI:
         title="LunarWindow backend",
         version="0.2.0",
         description=(
-            "Synthetic ephemeris/horizon data with calculated visibility metrics and windows. "
+            "Synthetic scenario demos and geometric evaluations of archived NASA ephemerides. "
             "Choose any-disc (default), body-center, or full-disc visibility. "
             "Durations use sample-and-hold; setting times include observation brackets. "
             "Times are whole-minute UTC; ranges include start and exclude end. "
-            "Real Horizons/LOLA integration remains pending."
+            "Reference evaluations require an explicit geometric, flat 0-degree horizon. "
+            "Terrain-mask integration remains pending."
         ),
         responses={422: {"model": ErrorResponse}},
     )
@@ -110,6 +126,109 @@ def create_app() -> FastAPI:
     @app.get("/api/sites", response_model=SiteCatalog, tags=["sites"])
     def sites(provider: Annotated[DemoProvider, Depends(get_provider)]) -> SiteCatalog:
         return SiteCatalog(sites=provider.list_sites())
+
+    @app.get(
+        "/api/reference/sites",
+        response_model=ReferenceSiteCatalog,
+        responses={503: {"model": ErrorResponse}},
+        tags=["reference"],
+        summary="List verified reference points and their archive coverage",
+        description="Sourced DEM reference points with available UTC dates and sampling intervals.",
+    )
+    def reference_sites(
+        directory: Annotated[Path, Depends(get_reference_directory)],
+    ) -> ReferenceSiteCatalog:
+        try:
+            return ReferenceSiteCatalog(sites=load_reference_catalog(directory))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
+
+    @app.post(
+        "/api/reference/evaluations",
+        response_model=ReferenceEvaluation,
+        responses={404: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
+        tags=["reference"],
+        summary="Calculate geometric visibility for a verified reference site",
+        description=(
+            "Uses verified archived samples and an explicit flat 0-degree horizon. "
+            "Returns visibility, metrics, windows, and setting brackets with original "
+            "NASA source evidence and archive coverage. No terrain masking is applied."
+        ),
+    )
+    def reference_evaluation(
+        scenario: ReferenceEvaluationRequest,
+        directory: Annotated[Path, Depends(get_reference_directory)],
+    ) -> ReferenceEvaluation:
+        try:
+            return evaluate_reference(scenario, directory)
+        except ReferenceSelectionError as exc:
+            raise RequestValidationError(
+                [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]
+            ) from exc
+        except LookupError as exc:
+            raise HTTPException(
+                status_code=404, detail=f"Unknown reference site: {scenario.siteId}"
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
+
+    @app.get(
+        "/api/reference/sites/{site_id}/ephemeris",
+        response_model=None,
+        responses={
+            200: {
+                "description": "Verified full or selected ephemeris with original source evidence",
+                "content": {"application/json": {"schema": dataset_schema()}},
+            },
+            404: {"model": ErrorResponse},
+            503: {"model": ErrorResponse},
+        },
+        tags=["reference"],
+        summary="Read one verified site's archived Sun/Earth ephemeris",
+        description=(
+            "Optional UTC bounds and a sampling step select existing archive samples. "
+            "Start must align with the archive grid; step must be a whole-number multiple "
+            "of the archive interval. Omitted values use archive defaults. "
+            "Range metadata describes the selection; original request evidence is retained."
+        ),
+    )
+    def reference_ephemeris(
+        site_id: str,
+        directory: Annotated[Path, Depends(get_reference_directory)],
+        startUtc: Annotated[
+            str | None, Query(description="Inclusive UTC start; on archive grid")
+        ] = None,
+        endUtc: Annotated[
+            str | None, Query(description="Exclusive UTC end; within archive")
+        ] = None,
+        stepMinutes: Annotated[
+            int | None,
+            Query(ge=1, le=1440, description="Whole-number multiple of archive interval"),
+        ] = None,
+    ) -> dict:
+        try:
+            dataset = load_reference_dataset(directory, site_id)
+            if startUtc is None and endUtc is None and stepMinutes is None:
+                return dataset
+            return select_reference_dataset(
+                dataset, start_utc=startUtc, end_utc=endUtc, step_minutes=stepMinutes
+            )
+        except ReferenceSelectionError as exc:
+            raise RequestValidationError(
+                [{"loc": ("query",), "msg": str(exc), "type": "value_error"}]
+            ) from exc
+        except LookupError as exc:
+            raise HTTPException(
+                status_code=404, detail=f"Unknown reference site: {site_id}"
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
 
     @app.get(
         "/api/sites/{site_id}",

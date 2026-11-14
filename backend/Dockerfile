@@ -49,6 +49,8 @@ ENTRYPOINT ["lunarwindow-report"]
 CMD ["--help"]
 
 FROM runtime AS api
+COPY --chown=lunarwindow:lunarwindow data/reference/validation-30d /app/data/reference/validation-30d
+ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
     CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
