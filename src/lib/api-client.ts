@@ -50,7 +50,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       throw cause;
     }
     throw new ApiError(
-      `Cannot reach the LunarWindow API at ${API_BASE_URL}. Start it with "docker compose up -d --wait api" or uvicorn, then retry.`,
+      `Cannot reach the LunarWindow API at ${API_BASE_URL}. A hosted API may be waking up (up to a minute); locally, start it with "docker compose up -d --wait api". Then retry.`,
       0,
     );
   }

@@ -59,6 +59,9 @@ USER lunarwindow
 ENTRYPOINT ["lunarwindow-terrain"]
 CMD ["--help"]
 
+FROM runtime AS ephemeris
+
+# Last stage on purpose: hosts that cannot select a target (e.g. Render) build the API.
 FROM runtime AS api
 COPY --chown=lunarwindow:lunarwindow data/reference/validation-30d /app/data/reference/validation-30d
 ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference
@@ -67,5 +70,3 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
     CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
 ENTRYPOINT ["python", "-m", "uvicorn", "lunarwindow.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 CMD []
-
-FROM runtime AS ephemeris
