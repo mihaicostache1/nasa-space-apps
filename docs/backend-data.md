@@ -1,6 +1,6 @@
-# Backend/data — task 1
+# Backend/data — tasks 1 and 2
 
-The first P3 task in the team plan (hours 3–12) is **API skeleton with fake data**. This milestone provides a FastAPI service and the shared horizon/series contract so the frontend can build against HTTP. Real Horizons/LOLA integration, metrics, windows, caching, and precomputation belong to later tasks.
+The first P3 task (hours 3–12), **API skeleton with fake data**, and the second (hours 12–20), **visibility metrics, windows, and countdowns**, are implemented. FastAPI serves calculated results from synthetic source angles and horizons. Real Horizons/LOLA integration, caching, and precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
 ## Run
 
@@ -30,38 +30,43 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 | GET    | `/api/sites/{site_id}` | One demo point's horizon and time series                       |
 | POST   | `/api/evaluations`     | Synthetic data for the existing frontend `Scenario` request    |
 
-The site-data route accepts `startUtc`, `endUtc`, and `stepMinutes` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
+The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
 
 ```sh
 curl http://localhost:8000/api/sites
 curl 'http://localhost:8000/api/sites/demo-polar-a?startUtc=2026-11-14T00:00:00Z&endUtc=2026-11-15T00:00:00Z&stepMinutes=60'
 curl http://localhost:8000/api/evaluations \
   -H 'Content-Type: application/json' \
-  -d '{"name":"Scenario A","location":{"latitudeDeg":-89,"longitudeDeg":0,"altitudeKm":0},"startUtc":"2026-11-14T00:00:00Z","endUtc":"2026-11-15T00:00:00Z","stepMinutes":60}'
+  -d '{"name":"Scenario A","location":{"latitudeDeg":-89,"longitudeDeg":0,"altitudeKm":0},"startUtc":"2026-11-14T00:00:00Z","endUtc":"2026-12-14T00:00:00Z","stepMinutes":60,"visibilityRule":"any-disc","asOfUtc":"2026-11-14T12:00:00Z"}'
 ```
 
 ## Frontend contract
 
 `POST /api/evaluations` accepts the fields already defined in `src/domain/scenario.ts`. Python validates latitude [-90, 90], east-positive longitude [-180, 180], finite altitude in kilometers above the reference surface, a nonblank name up to 80 characters, and integer steps from 1 to 1440 minutes. Times must be whole-minute ISO UTC strings ending in `Z`, from 1962 onward, consistent with the ephemeris package. End must follow start; requests are limited to 31 days and 10,000 samples. Extra JSON fields and numeric strings/booleans are rejected.
 
-Responses use `lunarwindow.evaluation.v1`, with matching TypeScript types in `src/domain/evaluation.ts`:
+Existing frontend `Scenario` request bodies remain valid. The optional `visibilityRule` is `any-disc` (default), `body-center`, or `full-disc`. The optional `asOfUtc` is a whole-minute UTC timestamp within `[startUtc, endUtc)`, defaulting to the start, and affects only countdowns. These calculation options are included in the TypeScript `EvaluationRequest` type.
+
+Responses use `lunarwindow.evaluation.v2`, with matching TypeScript types in `src/domain/evaluation.ts`:
 
 - `siteId`, `site`, `lat`, `lon`, `altitudeKm`, `coordinateSource`: echo the chosen demo point or custom scenario. Custom scenarios use `siteId: "custom"`; no scenario is saved.
 - `dataMode: "synthetic"`: always present on evaluation and catalog responses.
 - `horizon`: exactly 360 `{ az, el }` entries, ordered from azimuth 0 through 359 degrees, clockwise from north.
-- `series`: UTC `t`, `sunAz`, `sunEl`, `earthAz`, `earthEl`, `sunAngularRadiusDeg`, `earthAngularRadiusDeg`, `sunLit`, and `earthVis`. Start is included, end is excluded. A nonaligned end still includes every on-grid sample before end.
-- `metrics`: `pctSun`, `pctEarth`, `pctBoth`, `longestDarkHrs`, `nextSunset`, and `nextEarthset` are all `null` until task 2. Display an unavailable state for these fields.
+- `series`: UTC `t`, the existing Sun/Earth angles and angular radii, interpolated `sunHorizonEl`/`earthHorizonEl`, `hidden`/`partial`/`full` disc states, and flags `sunLit`/`earthVis` following the chosen rule. Start is included, end is excluded. A nonaligned end still includes every on-grid sample before end.
+- `metrics`: duration-weighted `pctSun`, `pctEarth`, `pctBoth`, visibility hours, longest darkness/Earth-blackout/combined intervals, selected-time countdowns, and next-setting observation brackets. Durations and percentages are numbers; event-related values are null if no qualifying transition is observed in the range.
+- `windows`: merged `sunlit`, `earthVisible`, `both`, `darkness`, and `earthBlackout` intervals, with durations and flags indicating unknown extents outside the requested range.
+- `calculation`: the selected visibility rule, circular linear horizon interpolation, local horizontal-disc approximation, sample-and-hold time model, event bracketing, and sampling step.
 - `provenance`: the generator name, requested period, UTC/end conventions, synthetic model labels, and an explicit warning.
 
-Values repeat for identical requests, and overlapping date ranges share identical samples. Longitude and latitude vary the demo curves; altitude is echoed but has no effect. Visibility flags compare the fake body center with the synthetic horizon's lower integer azimuth bin. Angular radii are illustrative constants. This is a UI fixture, not the final terrain or partial-disc visibility algorithm. It does not read the real ephemeris cache or reference bundles, and it does not represent power availability or a validated radio link.
+Values repeat for identical requests, and overlapping date ranges share identical samples. Longitude and latitude vary the demo curves; altitude is echoed but has no effect. Angular radii are illustrative constants in the demo provider; the calculation engine accepts each sample's supplied radius. The engine computes metrics and partial-disc states, while the demo source remains synthetic. It does not read the real ephemeris cache or reference bundles, and it does not represent power availability or a validated radio link. Read [the visibility model](visibility.md) before interpreting sampling precision or partial visibility.
 
 The existing React workspace remains independent. A frontend integration can submit its scenario directly:
 
 ```ts
-import type { EvaluationDataset } from '@/domain/evaluation';
-import type { Scenario } from '@/domain/scenario';
+import type { EvaluationDataset, EvaluationRequest } from '@/domain/evaluation';
 
-async function evaluate(scenario: Scenario): Promise<EvaluationDataset> {
+async function evaluate(
+  scenario: EvaluationRequest,
+): Promise<EvaluationDataset> {
   const response = await fetch('http://localhost:8000/api/evaluations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,4 +109,4 @@ python -m ruff format --check backend scripts
 docker compose run --build --rm ephemeris-test
 ```
 
-The HTTP tests cover the catalog, response contract, time grid, repeatability, bounds, malformed inputs, errors, CORS, and OpenAPI. `get_provider` in `lunarwindow.api.app` is the dependency boundary for later real-data integration; the demo generator is never a fallback for failed NASA requests.
+The tests cover analytical visibility/metrics cases, the catalog, response contract, time grid, repeatability, calculation options, bounds, malformed inputs, errors, CORS, and OpenAPI. `get_provider` in `lunarwindow.api.app` is the dependency boundary for later real-data integration; the demo generator is never a fallback for failed NASA requests.
