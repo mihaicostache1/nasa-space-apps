@@ -1,4 +1,6 @@
-# LunarWindow ephemeris tools
+# LunarWindow backend and ephemeris tools
+
+Backend/data task 1 adds a FastAPI skeleton serving synthetic horizon/series data. Run `python -m uvicorn lunarwindow.api.app:app --reload --port 8000` after installation, or `docker compose up --build -d --wait api` from the repo root. Open [localhost:8000/docs](http://localhost:8000/docs). See the [backend API work package](../docs/backend-data.md) for routes, requests, frontend response types, and the limits of the fake data. The real ephemeris tools below remain separate from the demo API.
 
 P1 supplies traceable Sun/Earth pointing data to the team's Python/FastAPI backend. Python 3.11+ is supported. The package uses JSON Schema for the handoff contract; plotting and GIS acquisition are optional extras. The React UI is not yet connected to the Python pipeline.
 

@@ -5,12 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lunarwindow-ephemeris"
 version = "0.2.0"
-description = "Traceable Sun/Earth ephemerides for LunarWindow"
+description = "LunarWindow API and traceable Sun/Earth ephemeris tools"
 requires-python = ">=3.11"
-dependencies = ["jsonschema>=4.23,<5"]
+dependencies = [
+    "fastapi>=0.115,<1",
+    "jsonschema>=4.23,<5",
+    "pydantic>=2.10,<3",
+    "uvicorn>=0.34,<1",
+]
 
 [project.optional-dependencies]
-dev = ["ruff>=0.14,<1"]
+dev = ["httpx>=0.28,<1", "ruff>=0.14,<1"]
 analysis = ["matplotlib>=3.10,<4"]
 gis = ["rasterio>=1.4,<2"]
 

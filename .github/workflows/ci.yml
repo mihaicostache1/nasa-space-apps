@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build container images
         run: docker compose --profile tools --profile test build
-      - name: Run offline ephemeris tests in Docker
+      - name: Run offline backend tests in Docker
         run: docker compose run --rm ephemeris-test
       - name: Validate the reference dataset handoff
         run: docker compose run --rm validate data/reference/validation-30d
@@ -25,9 +25,10 @@ jobs:
         run: |
           docker compose run --rm ephemeris --sites data/sites.example.json --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z --dry-run > /tmp/lunarwindow-requests.json
           python3 -c "import json; d=json.load(open('/tmp/lunarwindow-requests.json')); assert d['samplesPerSite'] == 24 and d['requests'] == 2"
-      - name: Start and verify the web image
+      - name: Start and verify the web and API images
         run: |
-          docker compose up -d --wait --wait-timeout 90 web
+          docker compose up -d --wait --wait-timeout 90 web api
+          curl --fail --silent --show-error http://127.0.0.1:8000/api/health | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status'] == 'ok' and d['dataMode'] == 'synthetic'"
           curl --fail --silent --show-error http://127.0.0.1:3000/api/health | python3 -c "import json,sys; assert json.load(sys.stdin)['status'] == 'ok'"
           curl --fail --silent --show-error http://127.0.0.1:3000/ -o /tmp/lunarwindow-page.html
           python3 -c "from pathlib import Path; assert 'Comparison workspace' in Path('/tmp/lunarwindow-page.html').read_text()"

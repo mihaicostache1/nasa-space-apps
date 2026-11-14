@@ -8,7 +8,7 @@ Install Docker Desktop (Windows/macOS) or Docker Engine with the Compose v2 plug
 docker compose up --build -d --wait
 ```
 
-Open [localhost:3000](http://localhost:3000). The first run downloads base images, installs dependencies, and creates a production build; later starts reuse the built image. To change the host port, set `WEB_PORT` in `.env`, for example `WEB_PORT=3100`. No `.env` file is required for the default setup.
+Open [localhost:3000](http://localhost:3000) for the UI and [localhost:8000/docs](http://localhost:8000/docs) for the FastAPI demo API. The first run downloads base images, installs dependencies, and creates a production build; later starts reuse the built image. To change host ports, set `WEB_PORT` or `API_PORT` in `.env`, for example `WEB_PORT=3100` and `API_PORT=8100`. Update `LUNARWINDOW_CORS_ORIGINS` to match a changed web origin. No `.env` file is required for the default setup.
 
 ```sh
 docker compose ps
@@ -16,7 +16,9 @@ docker compose logs -f web
 docker compose down
 ```
 
-The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. Port binding is local to your computer. The current UI remains the scenario starter: Docker does not add the pending FastAPI API, terrain models, or UI/data integration.
+The web image uses Next.js standalone output, runs as a non-root user, includes static assets, and has an HTTP health check. The API image also runs as a non-root user and checks `/api/health`. Both ports bind locally. The current UI remains the scenario starter; the separate FastAPI API serves explicitly synthetic data. See the [backend work package](backend-data.md). Real terrain models and UI/data integration remain pending.
+
+Start the API alone with `docker compose up --build -d --wait api`; inspect it with `docker compose logs -f api`. No source-data mount or NASA access is needed for the demo API.
 
 ## Run ephemeris exports
 
@@ -54,7 +56,7 @@ docker compose run --build --rm --user "$(id -u):$(id -g)" ephemeris --help
 docker compose run --build --rm ephemeris-test
 ```
 
-Tests use the archived real NASA fixtures and 30-day reference bundle in the separate test target. No network calls are made by the test process.
+Tests cover the FastAPI HTTP contract and use the archived real NASA fixtures and 30-day reference bundle in the separate test target. No network calls are made by the test process.
 
 Validate the shipped handoff bundle and regenerate the pointing report:
 
@@ -86,4 +88,4 @@ After pulling code changes, rerun `docker compose up --build -d --wait`. This is
 
 Use commit subjects in the requested form: `feat:[description]`, `fix:[description]`, `docs:[description]`, `test:[description]`, or `chore:[description]`. Keep each commit focused on a reviewable change.
 
-The Docker CI job builds the web, ephemeris, test, and analysis targets, runs offline regression/handoff checks, regenerates the reference plot, and verifies the web health endpoint and page. It does not publish images or run a long NASA export.
+The Docker CI job builds the web, API, ephemeris, test, and analysis targets, runs offline HTTP/regression/handoff checks, regenerates the reference plot, and verifies both service health endpoints and the web page. It does not publish images or run a long NASA export.
