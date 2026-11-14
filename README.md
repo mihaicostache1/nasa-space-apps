@@ -24,7 +24,7 @@ Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md
 
 ## Native setup: Backend/data
 
-The first backend task, **API skeleton with fake data**, is implemented:
+The first two backend tasks, **API skeleton with fake data** and **visibility metrics, windows, and countdowns**, are implemented:
 
 ```sh
 python3 -m venv .venv
@@ -33,7 +33,7 @@ python -m pip install -e './backend[dev]'
 python -m uvicorn lunarwindow.api.app:app --reload --port 8000
 ```
 
-Open [localhost:8000/docs](http://localhost:8000/docs). Routes: `GET /api/health`, `GET /api/sites`, `GET /api/sites/{site_id}`, and `POST /api/evaluations`. Responses include a synthetic horizon, Sun/Earth series, flags, and provenance; metrics remain `null` for the next task. See the [backend work package and API contract](docs/backend-data.md) for examples, limits, and frontend types.
+Open [localhost:8000/docs](http://localhost:8000/docs). Routes: `GET /api/health`, `GET /api/sites`, `GET /api/sites/{site_id}`, and `POST /api/evaluations`. Responses include a synthetic horizon, Sun/Earth series, calculated disc visibility, duration-weighted metrics, operating windows, and bracketed setting times. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for examples, precision limits, and the v2 response migration.
 
 ## Native setup: Ephemeris lead
 
@@ -68,6 +68,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - Next.js App Router, React, and strict TypeScript.
 - Responsive two-scenario workspace with editable coordinates, UTC dates, sample intervals, and validation.
 - FastAPI skeleton with deterministic synthetic site/scenario data, HTTP validation, CORS, OpenAPI, and Docker startup.
+- Reusable visibility engine with partial-disc rules, circular horizon interpolation, metrics, merged windows, clipped-range flags, and countdown brackets.
 - Python Horizons client/CLI with sequential chunked requests, caching, JSON/CSV export, observer checks, and source provenance.
 - Flat Sun/Earth series matching the team's JSON field names, with corresponding TypeScript types.
 - Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
@@ -76,7 +77,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. The real terrain join, charts, maps, scientific visibility calculations, metrics, and verified site presets remain to be implemented. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
+The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. The real ephemeris/GIS integration, charts, maps, and verified site presets remain to be implemented. Visibility and metrics calculations are implemented and currently run on synthetic API inputs; they retain sampling and disc-model limitations. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -86,6 +87,7 @@ backend/
   pyproject.toml              Installable Python package and CLI
   src/lunarwindow/api/        FastAPI app, HTTP contracts, synthetic provider
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
+  src/lunarwindow/visibility/ Visibility engine, metrics, windows, and contracts
   tests/                     Offline tests and archived NASA fixtures
 data/
   sites.example.json          Illustrative input catalog
@@ -132,4 +134,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-Backend/data task 1 is complete; next implement metrics, visibility windows, and countdowns, then integrate the versioned reference dataset and GIS masks. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See the [backend work package](docs/backend-data.md) and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+Backend/data tasks 1 and 2 are complete; next integrate the versioned reference dataset and GIS masks, then add caching and curated-site precomputation. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.

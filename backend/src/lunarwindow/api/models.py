@@ -6,6 +6,14 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from lunarwindow.ephemeris.models import TimeRange, parse_utc
+from lunarwindow.visibility.models import (
+    CalculationInfo,
+    HorizonPoint,
+    VisibilityMetrics,
+    VisibilityRule,
+    VisibilitySample,
+    VisibilityWindows,
+)
 
 
 class ApiModel(BaseModel):
@@ -44,7 +52,23 @@ class Period(ApiModel):
         return TimeRange(self.startUtc, self.endUtc, self.stepMinutes)
 
 
-class EvaluationRequest(Period):
+class EvaluationOptions(Period):
+    visibilityRule: VisibilityRule = "any-disc"
+    asOfUtc: str | None = Field(
+        default=None, description="Countdown reference time within the range; defaults to startUtc"
+    )
+
+    @model_validator(mode="after")
+    def validate_as_of(self) -> Self:
+        if self.asOfUtc is not None:
+            instant = parse_utc(self.asOfUtc)
+            period = self.to_time_range()
+            if not period.start <= instant < period.end:
+                raise ValueError("asOfUtc must be within [startUtc, endUtc).")
+        return self
+
+
+class EvaluationRequest(EvaluationOptions):
     name: str = Field(min_length=1, max_length=80, examples=["Scenario A"])
     location: Location
 
@@ -68,34 +92,6 @@ class SiteCatalog(ApiModel):
     sites: list[DemoSite]
 
 
-class HorizonPoint(ApiModel):
-    az: int = Field(ge=0, lt=360)
-    el: float = Field(ge=-90, le=90)
-
-
-class EvaluationSample(ApiModel):
-    t: str
-    sunAz: float = Field(ge=0, lt=360)
-    sunEl: float = Field(ge=-90, le=90)
-    earthAz: float = Field(ge=0, lt=360)
-    earthEl: float = Field(ge=-90, le=90)
-    sunAngularRadiusDeg: float
-    earthAngularRadiusDeg: float
-    sunLit: bool
-    earthVis: bool
-
-
-class Metrics(ApiModel):
-    """Reserved for P3's next task; null never implies zero visibility."""
-
-    pctSun: float | None = None
-    pctEarth: float | None = None
-    pctBoth: float | None = None
-    longestDarkHrs: float | None = None
-    nextSunset: str | None = None
-    nextEarthset: str | None = None
-
-
 class DemoProvenance(ApiModel):
     provider: Literal["LunarWindow deterministic demo generator"] = (
         "LunarWindow deterministic demo generator"
@@ -106,18 +102,17 @@ class DemoProvenance(ApiModel):
     stepMinutes: int
     timeScale: Literal["UTC"] = "UTC"
     terrainModel: Literal["synthetic"] = "synthetic"
-    visibilityRule: Literal["body-center-above-synthetic-horizon"] = (
-        "body-center-above-synthetic-horizon"
-    )
     warning: str = (
-        "Synthetic angles, horizon, angular radii, and flags for UI development only. "
+        "Calculated visibility metrics use synthetic angles, horizon, and angular radii. "
         "No Horizons or LOLA data is used. Altitude is echoed but not modeled. "
-        "Metrics, partial-disc visibility, and event times are not computed."
+        "Disc states approximate the horizon as horizontal across each body. "
+        "Durations use held sample states; event timestamps are bracket upper bounds. "
+        "Power generation, radio-link performance, and eclipses are not modeled."
     )
 
 
 class Evaluation(ApiModel):
-    schemaVersion: Literal["lunarwindow.evaluation.v1"] = "lunarwindow.evaluation.v1"
+    schemaVersion: Literal["lunarwindow.evaluation.v2"] = "lunarwindow.evaluation.v2"
     dataMode: Literal["synthetic"] = "synthetic"
     siteId: str
     site: str
@@ -126,8 +121,10 @@ class Evaluation(ApiModel):
     altitudeKm: float
     coordinateSource: str
     horizon: list[HorizonPoint] = Field(min_length=360, max_length=360)
-    series: list[EvaluationSample]
-    metrics: Metrics = Field(default_factory=Metrics)
+    series: list[VisibilitySample]
+    metrics: VisibilityMetrics
+    windows: VisibilityWindows
+    calculation: CalculationInfo
     provenance: DemoProvenance
 
 

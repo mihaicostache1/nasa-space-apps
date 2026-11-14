@@ -4,13 +4,14 @@ import math
 from datetime import datetime, timezone
 
 from lunarwindow.ephemeris.models import iso_utc
+from lunarwindow.visibility import calculate_visibility
+from lunarwindow.visibility.models import EphemerisSample
 
 from .models import (
     DemoProvenance,
     DemoSite,
     Evaluation,
     EvaluationRequest,
-    EvaluationSample,
     HorizonPoint,
 )
 
@@ -46,7 +47,7 @@ class DemoProvider:
             sun_el = max(-90, min(90, sun_el))
             earth_el = round(4 * math.cos(phase / 2) + 2, 6)
             series.append(
-                EvaluationSample(
+                EphemerisSample(
                     t=iso_utc(instant),
                     sunAz=sun_az,
                     sunEl=sun_el,
@@ -54,10 +55,15 @@ class DemoProvider:
                     earthEl=earth_el,
                     sunAngularRadiusDeg=0.27,
                     earthAngularRadiusDeg=0.95,
-                    sunLit=sun_el > horizon[int(sun_az)].el,
-                    earthVis=earth_el > horizon[int(earth_az)].el,
                 )
             )
+        visibility = calculate_visibility(
+            series,
+            horizon,
+            period,
+            rule=request.visibilityRule,
+            as_of_utc=request.asOfUtc,
+        )
         return Evaluation(
             siteId=site_id,
             site=request.name,
@@ -66,7 +72,10 @@ class DemoProvider:
             altitudeKm=location.altitudeKm,
             coordinateSource="Illustrative coordinates for UI development; not a verified site.",
             horizon=horizon,
-            series=series,
+            series=visibility.series,
+            metrics=visibility.metrics,
+            windows=visibility.windows,
+            calculation=visibility.calculation,
             provenance=DemoProvenance(
                 startUtc=iso_utc(period.start),
                 endUtc=iso_utc(period.end),

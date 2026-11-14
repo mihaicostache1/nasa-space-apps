@@ -1,4 +1,4 @@
-"""Offline HTTP contract tests for the first backend/data milestone."""
+"""Offline HTTP contract tests for synthetic sources and calculated visibility."""
 
 import json
 import unittest
@@ -48,7 +48,7 @@ class ApiTests(unittest.TestCase):
             response = self.client.post("/api/evaluations", json=SCENARIO)
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data["schemaVersion"], "lunarwindow.evaluation.v1")
+        self.assertEqual(data["schemaVersion"], "lunarwindow.evaluation.v2")
         self.assertEqual(data["dataMode"], "synthetic")
         self.assertEqual(data["site"], SCENARIO["name"])
         self.assertEqual(data["horizon"][0]["az"], 0)
@@ -58,14 +58,26 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(data["series"][-1]["t"], "2026-11-14T23:00:00Z")
         self.assertTrue(data["provenance"]["endExclusive"])
         self.assertEqual(data["provenance"]["terrainModel"], "synthetic")
-        self.assertTrue(all(value is None for value in data["metrics"].values()))
+        self.assertEqual(data["metrics"]["evaluatedHrs"], 24)
+        self.assertIsInstance(data["metrics"]["pctSun"], (int, float))
+        self.assertIsInstance(data["metrics"]["longestDarkHrs"], (int, float))
+        self.assertEqual(data["calculation"]["visibilityRule"], "any-disc")
+        self.assertEqual(data["calculation"]["timeModel"], "sample-and-hold")
+        self.assertEqual(
+            set(data["windows"]), {"sunlit", "earthVisible", "both", "darkness", "earthBlackout"}
+        )
         for row in data["series"]:
             self.assertIsInstance(row["sunLit"], bool)
             self.assertIsInstance(row["earthVis"], bool)
-            self.assertEqual(row["sunLit"], row["sunEl"] > data["horizon"][int(row["sunAz"])]["el"])
             self.assertEqual(
-                row["earthVis"], row["earthEl"] > data["horizon"][int(row["earthAz"])]["el"]
+                row["sunLit"], row["sunEl"] + row["sunAngularRadiusDeg"] > row["sunHorizonEl"]
             )
+            self.assertEqual(
+                row["earthVis"],
+                row["earthEl"] + row["earthAngularRadiusDeg"] > row["earthHorizonEl"],
+            )
+            self.assertIn(row["sunVisibility"], ("hidden", "partial", "full"))
+            self.assertIn(row["earthVisibility"], ("hidden", "partial", "full"))
 
     def test_catalog_get_and_scenario_post_share_the_contract(self):
         site = self.client.get("/api/sites").json()["sites"][0]
@@ -89,6 +101,77 @@ class ApiTests(unittest.TestCase):
             json=SCENARIO | {"location": SCENARIO["location"] | {"longitudeDeg": 30}},
         ).json()
         self.assertNotEqual(first["series"], moved["series"])
+
+    def test_site_query_accepts_the_same_calculation_options_as_post(self):
+        scenario = SCENARIO | {"visibilityRule": "full-disc", "asOfUtc": "2026-11-14T01:30:00Z"}
+        site = self.client.get("/api/sites").json()["sites"][0]
+        params = {key: value for key, value in scenario.items() if key not in ("name", "location")}
+        saved = self.client.get(f"/api/sites/{site['id']}", params=params)
+        custom = self.client.post("/api/evaluations", json=scenario | {"name": site["name"]})
+        self.assertEqual(saved.status_code, 200)
+        self.assertEqual(custom.status_code, 200)
+        self.assertEqual(saved.json() | {"siteId": "custom"}, custom.json())
+        self.assertEqual(saved.json()["metrics"]["asOfUtc"], scenario["asOfUtc"])
+        self.assertEqual(saved.json()["calculation"]["visibilityRule"], "full-disc")
+
+    def test_visibility_rule_and_selected_time_reach_the_engine(self):
+        scenario = SCENARIO | {"endUtc": "2026-12-14T00:00:00Z"}
+        results = [
+            self.client.post("/api/evaluations", json=scenario | {"visibilityRule": rule}).json()
+            for rule in ("any-disc", "body-center", "full-disc")
+        ]
+        any_disc, center, full = [result["metrics"] for result in results]
+        self.assertGreater(any_disc["pctSun"], center["pctSun"])
+        self.assertGreater(center["pctSun"], full["pctSun"])
+        self.assertIsNotNone(any_disc["nextSunset"])
+        response = self.client.post(
+            "/api/evaluations", json=scenario | {"asOfUtc": any_disc["nextSunset"]}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["metrics"]["hoursToSunset"], 0)
+        self.assertEqual(data["windows"], results[0]["windows"])
+        self.assertEqual(data["metrics"]["pctSun"], any_disc["pctSun"])
+        self.assertEqual(data["metrics"]["nextSunsetBracket"]["byUtc"], any_disc["nextSunset"])
+
+    def test_windows_and_metrics_account_for_the_entire_requested_range(self):
+        data = self.client.get("/api/sites/demo-polar-a").json()
+        metrics, windows = data["metrics"], data["windows"]
+        self.assertEqual(metrics["evaluatedHrs"], 720)
+        self.assertEqual(metrics["asOfUtc"], "2026-11-14T00:00:00Z")
+        for lane, hours, percentage in (
+            ("sunlit", "sunlitHrs", "pctSun"),
+            ("earthVisible", "earthVisibleHrs", "pctEarth"),
+            ("both", "bothHrs", "pctBoth"),
+        ):
+            self.assertAlmostEqual(
+                sum(window["durationHrs"] for window in windows[lane]), metrics[hours]
+            )
+            self.assertAlmostEqual(metrics[percentage], 100 * metrics[hours] / 720)
+        self.assertAlmostEqual(
+            metrics["sunlitHrs"] + sum(window["durationHrs"] for window in windows["darkness"]),
+            720,
+        )
+        self.assertLessEqual(metrics["pctBoth"], min(metrics["pctSun"], metrics["pctEarth"]))
+
+    def test_calculation_options_are_validated_for_body_and_query_requests(self):
+        invalid = [
+            {"visibilityRule": "unknown"},
+            {"asOfUtc": "2026-11-13T23:59:00Z"},
+            {"asOfUtc": SCENARIO["endUtc"]},
+            {"asOfUtc": "2026-11-14T00:00:01Z"},
+            {"asOfUtc": "2026-11-14T00:00:00+02:00"},
+            {"asOfUtc": "not-a-date"},
+        ]
+        for options in invalid:
+            with self.subTest(options=options):
+                response = self.client.post("/api/evaluations", json=SCENARIO | options)
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.json()["error"]["code"], "validation_error")
+                params = {key: SCENARIO[key] for key in ("startUtc", "endUtc", "stepMinutes")}
+                response = self.client.get("/api/sites/demo-polar-a", params=params | options)
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.json()["error"]["details"][0]["location"][0], "query")
 
     def test_non_aligned_end_includes_last_on_grid_sample(self):
         response = self.client.post(

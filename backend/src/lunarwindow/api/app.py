@@ -1,4 +1,4 @@
-"""First P3 milestone: a FastAPI skeleton serving explicit synthetic data."""
+"""P3 API: synthetic source data with calculated visibility, metrics, and windows."""
 
 import os
 from typing import Annotated
@@ -10,16 +10,18 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
+from lunarwindow.visibility.models import VisibilityRule
+
 from .demo import DemoProvider
 from .models import (
     ApiError,
     ErrorDetail,
     ErrorResponse,
     Evaluation,
+    EvaluationOptions,
     EvaluationRequest,
     Health,
     Location,
-    Period,
     SiteCatalog,
 )
 
@@ -32,9 +34,17 @@ def query_period(
     startUtc: str = "2026-11-14T00:00:00Z",
     endUtc: str = "2026-12-14T00:00:00Z",
     stepMinutes: Annotated[int, Query(ge=1, le=1440)] = 60,
-) -> Period:
+    visibilityRule: VisibilityRule = "any-disc",
+    asOfUtc: str | None = None,
+) -> EvaluationOptions:
     try:
-        return Period(startUtc=startUtc, endUtc=endUtc, stepMinutes=stepMinutes)
+        return EvaluationOptions(
+            startUtc=startUtc,
+            endUtc=endUtc,
+            stepMinutes=stepMinutes,
+            visibilityRule=visibilityRule,
+            asOfUtc=asOfUtc,
+        )
     except ValidationError as exc:
         errors = [dict(error, loc=("query", *error["loc"])) for error in exc.errors()]
         raise RequestValidationError(errors) from exc
@@ -43,11 +53,13 @@ def query_period(
 def create_app() -> FastAPI:
     app = FastAPI(
         title="LunarWindow backend",
-        version="0.1.0",
+        version="0.2.0",
         description=(
-            "Backend/data task 1: synthetic data for frontend development. "
-            "No Horizons/LOLA integration or scientific metrics yet. "
-            "Times are whole-minute UTC; ranges include start and exclude end."
+            "Synthetic ephemeris/horizon data with calculated visibility metrics and windows. "
+            "Choose any-disc (default), body-center, or full-disc visibility. "
+            "Durations use sample-and-hold; setting times include observation brackets. "
+            "Times are whole-minute UTC; ranges include start and exclude end. "
+            "Real Horizons/LOLA integration remains pending."
         ),
         responses={422: {"model": ErrorResponse}},
     )
@@ -108,7 +120,7 @@ def create_app() -> FastAPI:
     )
     def site_data(
         site_id: str,
-        period: Annotated[Period, Depends(query_period)],
+        period: Annotated[EvaluationOptions, Depends(query_period)],
         provider: Annotated[DemoProvider, Depends(get_provider)],
     ) -> Evaluation:
         site = next((site for site in provider.list_sites() if site.id == site_id), None)

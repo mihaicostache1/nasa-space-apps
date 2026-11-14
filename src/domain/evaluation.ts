@@ -1,6 +1,17 @@
 import type { EphemerisSample } from './ephemeris';
+import type { Scenario } from './scenario';
 
-/** Backend/data task 1 uses illustrative sites and synthetic results throughout. */
+export type VisibilityRule = 'any-disc' | 'body-center' | 'full-disc';
+export type DiscVisibility = 'hidden' | 'partial' | 'full';
+
+/** Existing scenarios remain valid; calculation options are optional. */
+export type EvaluationRequest = Scenario & {
+  visibilityRule?: VisibilityRule;
+  /** Within [startUtc, endUtc); defaults to startUtc. */
+  asOfUtc?: string | null;
+};
+
+/** Demo coordinates and source data remain illustrative. */
 export type DemoSite = {
   id: string;
   name: string;
@@ -15,8 +26,69 @@ export type SiteCatalog = {
   sites: DemoSite[];
 };
 
+export type VisibilitySample = EphemerisSample & {
+  sunHorizonEl: number;
+  earthHorizonEl: number;
+  sunVisibility: DiscVisibility;
+  earthVisibility: DiscVisibility;
+  /** Flags follow the chosen visibilityRule. */
+  sunLit: boolean;
+  earthVis: boolean;
+};
+
+export type VisibilityWindow = {
+  startUtc: string;
+  /** Exclusive end; a range boundary does not imply an actual event. */
+  endUtc: string;
+  durationHrs: number;
+  startTruncated: boolean;
+  endTruncated: boolean;
+};
+
+export type VisibilityWindows = {
+  sunlit: VisibilityWindow[];
+  earthVisible: VisibilityWindow[];
+  both: VisibilityWindow[];
+  darkness: VisibilityWindow[];
+  earthBlackout: VisibilityWindow[];
+};
+
+/** The setting transition is bracketed by two observations: (afterUtc, byUtc]. */
+export type EventBracket = { afterUtc: string; byUtc: string };
+
+export type VisibilityMetrics = {
+  evaluatedHrs: number;
+  sunlitHrs: number;
+  earthVisibleHrs: number;
+  bothHrs: number;
+  pctSun: number;
+  pctEarth: number;
+  pctBoth: number;
+  longestDarkHrs: number;
+  longestEarthBlackoutHrs: number;
+  longestBothHrs: number;
+  asOfUtc: string;
+  /** Upper bracket endpoints; null means no subsequent setting was observed. */
+  nextSunset: string | null;
+  nextEarthset: string | null;
+  /** Hours to the upper bracket endpoint, relative to asOfUtc. */
+  hoursToSunset: number | null;
+  hoursToEarthset: number | null;
+  nextSunsetBracket: EventBracket | null;
+  nextEarthsetBracket: EventBracket | null;
+};
+
+export type CalculationInfo = {
+  visibilityRule: VisibilityRule;
+  horizonInterpolation: 'circular-linear';
+  discModel: 'local-horizontal-limb';
+  timeModel: 'sample-and-hold';
+  eventTiming: 'sample-transition-brackets';
+  stepMinutes: number;
+};
+
 export type EvaluationDataset = {
-  schemaVersion: 'lunarwindow.evaluation.v1';
+  schemaVersion: 'lunarwindow.evaluation.v2';
   dataMode: 'synthetic';
   siteId: string;
   site: string;
@@ -26,16 +98,10 @@ export type EvaluationDataset = {
   coordinateSource: string;
   /** Exactly 360 points, indexed by azimuth in whole degrees. */
   horizon: { az: number; el: number }[];
-  series: (EphemerisSample & { sunLit: boolean; earthVis: boolean })[];
-  /** Reserved fields; all null until the next backend task implements metrics. */
-  metrics: {
-    pctSun: number | null;
-    pctEarth: number | null;
-    pctBoth: number | null;
-    longestDarkHrs: number | null;
-    nextSunset: string | null;
-    nextEarthset: string | null;
-  };
+  series: VisibilitySample[];
+  metrics: VisibilityMetrics;
+  windows: VisibilityWindows;
+  calculation: CalculationInfo;
   provenance: {
     provider: 'LunarWindow deterministic demo generator';
     startUtc: string;
@@ -44,7 +110,6 @@ export type EvaluationDataset = {
     stepMinutes: number;
     timeScale: 'UTC';
     terrainModel: 'synthetic';
-    visibilityRule: 'body-center-above-synthetic-horizon';
     warning: string;
   };
 };
