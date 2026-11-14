@@ -5,6 +5,11 @@
   --line: #2a3744;
   --muted: #a8b6c6;
   --accent: #d0f28c;
+  --sun: #f5c451;
+  --earth: #6cb4ff;
+  --both: #d0f28c;
+  --track: #1a2633;
+  --danger: #ff9b8a;
 }
 * {
   box-sizing: border-box;
@@ -107,6 +112,9 @@ legend {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
+.fields-1-2 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
 label {
   display: block;
   font-size: 12px;
@@ -155,19 +163,347 @@ button span {
   font-size: 13px;
   color: var(--muted);
 }
-.result-grid {
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.workspace {
+  padding-bottom: 8px;
+}
+.status-line {
+  color: var(--muted);
+  font-size: 14px;
+}
+.error-panel h2 {
+  margin-bottom: 8px;
+}
+.error-panel p {
+  color: var(--danger);
+  font-size: 14px;
+}
+.issue {
+  margin: 4px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+.source-banner {
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  border: 1px solid #3a4a2a;
+  border-radius: 12px;
+  background: #121a12;
+  font-size: 13px;
+}
+.source-banner dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px;
+  margin: 0;
 }
-.placeholder h3 {
+.source-banner dt,
+.stats dt {
+  color: var(--muted);
+  font: 10px monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.source-banner dd,
+.stats dd {
+  margin: 4px 0 0;
+}
+.source-banner > p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.analysis {
+  margin-top: 40px;
+}
+.analysis h3 {
   font-size: 16px;
   font-weight: 500;
-  margin: 30px 0 8px;
+  margin: 0;
 }
-.placeholder > p:last-child {
+.slot {
+  display: inline-block;
+  min-width: 22px;
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #192510;
+  font: 600 12px monospace;
+  text-align: center;
+}
+.is-stale {
+  opacity: 0.55;
+}
+.cursor-control {
+  max-width: 420px;
+}
+.cursor-control input {
+  padding: 0;
+  accent-color: var(--accent);
+}
+.timeline {
+  margin-top: 16px;
+}
+.timeline header .hint {
+  margin: 4px 0 16px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.stats dd {
+  font-size: 16px;
+}
+.stats .accent dd {
+  color: var(--accent);
+}
+.lanes {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 12px;
+}
+.lane-labels {
+  display: grid;
+  grid-auto-rows: 22px;
+  row-gap: 8px;
+  align-items: center;
   font-size: 12px;
   color: var(--muted);
+}
+.lane-tracks {
+  position: relative;
+  display: grid;
+  grid-auto-rows: 22px;
+  row-gap: 8px;
+  padding-bottom: 22px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.lane {
+  position: relative;
+  border-radius: 4px;
+  background: var(--track);
+  overflow: hidden;
+}
+.segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.segment.sun {
+  background: var(--sun);
+}
+.segment.earth {
+  background: var(--earth);
+}
+.segment.both {
+  background: var(--both);
+}
+.segment.cut-start {
+  border-left: 3px dashed var(--background);
+}
+.segment.cut-end {
+  border-right: 3px dashed var(--background);
+}
+.cursor {
+  position: absolute;
+  top: -4px;
+  bottom: 18px;
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--background);
+  pointer-events: none;
+}
+.ticks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  font: 10px monospace;
+  color: var(--muted);
+}
+.ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+}
+.swatch.sun {
+  background: var(--sun);
+}
+.swatch.earth {
+  background: var(--earth);
+}
+.swatch.both {
+  background: var(--both);
+}
+.swatch.truncated {
+  border: 2px dashed var(--muted);
+}
+.finder-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 16px;
+}
+.finder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.finder-grid .hint {
+  margin: 6px 0 12px;
+}
+.analysis > .hint {
+  margin-top: 12px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  color: var(--muted);
+  font: 10px monospace;
+  letter-spacing: 1px;
+  text-align: left;
+  text-transform: uppercase;
+}
+th,
+td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+td small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+tr.longest td:nth-child(3) {
+  color: var(--accent);
+}
+.link-button {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #51613a;
+  color: var(--accent);
+  font-size: 12px;
+}
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.toggle {
+  display: flex;
+  gap: 6px;
+}
+.toggle button {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.toggle button[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.sky-scroll {
+  overflow-x: auto;
+}
+.sky svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.sky text {
+  fill: var(--muted);
+  font: 11px monospace;
+}
+.sky .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.sky .zero {
+  stroke: #4a5a6a;
+  stroke-width: 1;
+}
+.sky .ground {
+  fill: #1c1712;
+}
+.sky .horizon {
+  fill: none;
+  stroke: #c9a979;
+  stroke-width: 1.5;
+}
+.sky .track {
+  fill: none;
+  stroke-width: 2;
+}
+.sky .track.sun {
+  stroke: var(--sun);
+}
+.sky .track.earth {
+  stroke: var(--earth);
+}
+.sky .track.hidden-run {
+  stroke-dasharray: 3 4;
+  opacity: 0.45;
+}
+.sky .marker {
+  stroke: var(--background);
+  stroke-width: 2;
+}
+.sky .marker.sun {
+  fill: var(--sun);
+}
+.sky .marker.earth {
+  fill: var(--earth);
+}
+.sky figcaption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+footer p {
+  max-width: 900px;
 }
 footer {
   margin-top: 48px;
@@ -184,8 +520,18 @@ footer {
     padding-top: 40px;
   }
   .scenarios,
-  .result-grid {
+  .finder-grid,
+  .source-banner dl {
     grid-template-columns: 1fr;
+  }
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lanes {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+  .ticks .minor {
+    display: none;
   }
   .actions {
     align-items: flex-start;
