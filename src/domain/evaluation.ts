@@ -114,7 +114,7 @@ export type EvaluationDataset = {
   };
 };
 
-/** Contract for the next reference-evaluation endpoint; not yet served by the API. */
+/** POST /api/reference/evaluations: verified archived data with a geometric horizon. */
 export type ReferenceEvaluationRequest = {
   siteId: string;
   horizonMode: 'geometric';

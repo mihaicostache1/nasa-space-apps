@@ -1,4 +1,4 @@
-"""Contracts for the next reference-evaluation endpoint; no retrieval or calculation."""
+"""Validated contracts for geometric reference evaluations."""
 
 from typing import Literal, Self
 

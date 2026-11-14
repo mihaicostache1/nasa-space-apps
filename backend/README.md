@@ -1,6 +1,6 @@
 # LunarWindow backend and ephemeris tools
 
-Backend/data tasks 1 and 2 provide a FastAPI service and a reusable visibility/metrics engine. The API calculates disc visibility, percentages, windows, and countdown brackets from synthetic horizon/series data. Run `python -m uvicorn lunarwindow.api.app:app --reload --port 8000` after installation, or `docker compose up --build -d --wait api` from the repo root. Open [localhost:8000/docs](http://localhost:8000/docs). See the [API work package](../docs/backend-data.md) and [visibility model](../docs/visibility.md) for contracts, assumptions, and v2 migration. The real ephemeris tools below remain separate from the demo API.
+The backend provides synthetic demos and geometric evaluations of verified archived NASA ephemerides. `POST /api/reference/evaluations` connects the validated loader and range selector to the visibility engine, preserving source evidence and full archive coverage. Run `python -m uvicorn lunarwindow.api.app:app --reload --port 8000` after installation, or `docker compose up --build -d --wait api` from the repo root. Open [localhost:8000/docs](http://localhost:8000/docs). See the [API work package](../docs/backend-data.md) and [visibility model](../docs/visibility.md) for contracts, assumptions, and precision limits.
 
 P1 supplies traceable Sun/Earth pointing data to the team's Python/FastAPI backend. Python 3.11+ is supported. The package uses JSON Schema for the handoff contract; plotting and GIS acquisition are optional extras. The React UI is not yet connected to the Python pipeline.
 

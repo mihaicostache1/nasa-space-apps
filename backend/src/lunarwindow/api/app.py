@@ -1,4 +1,4 @@
-"""Synthetic evaluations and verified offline reference ephemerides."""
+"""Synthetic demos and geometric evaluations of verified reference ephemerides."""
 
 import os
 from pathlib import Path
@@ -33,6 +33,8 @@ from .models import (
     ReferenceSiteCatalog,
     SiteCatalog,
 )
+from .reference_models import ReferenceEvaluation, ReferenceEvaluationRequest
+from .reference_provider import evaluate_reference
 
 
 def get_provider() -> DemoProvider:
@@ -68,12 +70,12 @@ def create_app() -> FastAPI:
         title="LunarWindow backend",
         version="0.2.0",
         description=(
-            "Synthetic ephemeris/horizon data with calculated visibility metrics and windows. "
+            "Synthetic scenario demos and geometric evaluations of archived NASA ephemerides. "
             "Choose any-disc (default), body-center, or full-disc visibility. "
             "Durations use sample-and-hold; setting times include observation brackets. "
             "Times are whole-minute UTC; ranges include start and exclude end. "
-            "Verified offline ephemerides are available through the reference endpoint. "
-            "Real Horizons/LOLA evaluation integration remains pending."
+            "Reference evaluations require an explicit geometric, flat 0-degree horizon. "
+            "Terrain-mask integration remains pending."
         ),
         responses={422: {"model": ErrorResponse}},
     )
@@ -138,6 +140,37 @@ def create_app() -> FastAPI:
     ) -> ReferenceSiteCatalog:
         try:
             return ReferenceSiteCatalog(sites=load_reference_catalog(directory))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
+
+    @app.post(
+        "/api/reference/evaluations",
+        response_model=ReferenceEvaluation,
+        responses={404: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
+        tags=["reference"],
+        summary="Calculate geometric visibility for a verified reference site",
+        description=(
+            "Uses verified archived samples and an explicit flat 0-degree horizon. "
+            "Returns visibility, metrics, windows, and setting brackets with original "
+            "NASA source evidence and archive coverage. No terrain masking is applied."
+        ),
+    )
+    def reference_evaluation(
+        scenario: ReferenceEvaluationRequest,
+        directory: Annotated[Path, Depends(get_reference_directory)],
+    ) -> ReferenceEvaluation:
+        try:
+            return evaluate_reference(scenario, directory)
+        except ReferenceSelectionError as exc:
+            raise RequestValidationError(
+                [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]
+            ) from exc
+        except LookupError as exc:
+            raise HTTPException(
+                status_code=404, detail=f"Unknown reference site: {scenario.siteId}"
+            ) from exc
         except ValueError as exc:
             raise HTTPException(
                 status_code=503, detail="Reference data is unavailable or failed validation."
