@@ -1,12 +1,13 @@
 [
   {
     "id": "lola-site04-reference",
-    "name": "Shackleton rim (LOLA Site04 reference point)",
+    "name": "Shackleton inner wall (LOLA Site04 reference point)",
     "kind": "dem-reference",
     "lat": -89.76674147712977,
     "lon": -171.89280908299654,
     "terrain": "lola-dem",
-    "coordinateSource": "Centre pixel of NASA PGDA LOLA 5 m/px Site04 DEM (https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif), DE421 MOON_ME; see data/reference/site-provenance.json. Reference point, not a landing target."
+    "coordinateSource": "Centre pixel of NASA PGDA LOLA 5 m/px Site04 DEM (https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif), DE421 MOON_ME; see data/reference/site-provenance.json. Reference point, not a landing target.",
+    "notes": "Despite the Site04 product being labelled Shackleton rim, this centre pixel lies on the crater's inner wall (~32 deg slope; PGDA long-term sunlight ~11%). Use shackleton-rim for the rim."
   },
   {
     "id": "lola-site01-reference",
