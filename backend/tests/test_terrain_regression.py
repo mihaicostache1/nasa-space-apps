@@ -177,7 +177,17 @@ class Site01TerrainRegressionTests(unittest.TestCase):
         client = TestClient(app)
         cls.addClassCleanup(client.close)
         cls.responses = {}
-        with patch("socket.socket.connect", side_effect=AssertionError("No network")):
+        # Block source retrieval without blocking Windows asyncio's socketpair.
+        with (
+            patch(
+                "lunarwindow.ephemeris.horizons.urlopen",
+                side_effect=AssertionError("No NASA request"),
+            ),
+            patch(
+                "lunarwindow.terrain.download.urlopen",
+                side_effect=AssertionError("No DEM download"),
+            ),
+        ):
             for mode, cases in cls.expected["modes"].items():
                 for rule in cases:
                     request = {

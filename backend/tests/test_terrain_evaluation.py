@@ -66,7 +66,15 @@ class TerrainEvaluationTests(unittest.TestCase):
     def test_real_mask_and_ephemerides_reach_the_engine_with_complete_provenance(self):
         original = self.mask_path.read_bytes()
         with (
-            patch("socket.socket.connect", side_effect=AssertionError("No network")),
+            # Windows asyncio needs an internal loopback socket to start.
+            patch(
+                "lunarwindow.ephemeris.horizons.urlopen",
+                side_effect=AssertionError("No NASA request"),
+            ),
+            patch(
+                "lunarwindow.terrain.download.urlopen",
+                side_effect=AssertionError("No DEM download"),
+            ),
             patch(
                 "lunarwindow.api.demo.DemoProvider.evaluate", side_effect=AssertionError("No demo")
             ),
