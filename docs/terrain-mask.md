@@ -2,7 +2,7 @@
 
 `lunarwindow.terrain-mask.v1` defines the GIS-to-backend handoff for a static lunar terrain horizon. The Python contract is `TerrainMask` in `backend/src/lunarwindow/terrain/models.py`. It records one observer, one reference frame, a complete azimuth/elevation profile, and the evidence needed to trace its DEM sources and generation method.
 
-The contract and offline loader are implemented. The first reviewed artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it). Checking compatibility with ephemerides, extending the HTTP API, and evaluating terrain visibility are subsequent steps. Reference evaluations currently support only `horizonMode: "geometric"`.
+The contract, offline loader, and observer/frame compatibility checks are implemented. The first reviewed artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it). Extending the HTTP API and evaluating terrain visibility are subsequent steps. Reference evaluations currently support only `horizonMode: "geometric"`.
 
 ## Required fields
 
@@ -102,7 +102,7 @@ The loader reads the file once, checks the SHA-256 of those exact bytes, then va
 
 Invalid expected checksums raise `ValueError` before reading. Missing/unreadable files, checksum mismatches, malformed JSON/encoding, unsupported schema versions, and invalid mask contracts also raise `ValueError` with the `Cannot load terrain mask` prefix and the underlying cause. An artifact whose checksum matches must still satisfy the full contract.
 
-This verifies artifact integrity and contract validity. It does not re-hash the original DEMs, recompute terrain rays, authenticate scientific claims, or approve the mask/ephemeris frame relationship. Those source checks remain in the GIS handoff evidence; observer and frame compatibility are a separate backend task. Preserve the declared `MOON_ME` / DE421 metadata when loading this mask.
+This verifies artifact integrity and contract validity. It does not re-hash the original DEMs, recompute terrain rays, authenticate scientific claims, or approve the mask/ephemeris frame relationship. Those source checks remain in the GIS handoff evidence; use the separate compatibility helper below before joining artifacts. Preserve the declared `MOON_ME` / DE421 metadata when loading this mask.
 
 The reviewed mask is for ground + 0 m mast. Its README records sensitivity to near terrain, exclusion of terrain within 60 m, and a horizon change of up to 1.9 degrees for a 2 m mast. A new observer height requires a separately reviewed mask and matching ephemerides. Loading this reference artifact does not make it a prediction for a real lander antenna.
 
@@ -113,6 +113,59 @@ python -m unittest discover -s backend/tests -p test_terrain_loader.py -v
 ```
 
 They load the committed artifact with the pinned handoff checksum, validate the exported JSON Schema, preserve all values and provenance, reject damaged files and invalid contracts even with recomputed checksums, and ensure hashing and validation use the same file snapshot. Docker tests use the existing `LUNARWINDOW_REFERENCE_DIR` configuration to find the committed artifact.
+
+## Check observer and frame compatibility
+
+`check_terrain_compatibility(mask, dataset, *, allow_mean_earth_approximation=False)` in `backend/src/lunarwindow/terrain/compatibility.py` validates the two loaded contracts before comparing them. Supply a checksummed mask from `load_terrain_mask` and verified ephemerides from `load_reference_dataset`; range-selected datasets are supported too. The check performs no downloads, writes, coordinate transformations, mast corrections, or visibility calculations.
+
+The helper rejects:
+
+- Different site IDs, latitudes, longitudes, or total observer altitudes. Longitude comparison wraps at 360 degrees, so +180 and -180 represent the same longitude.
+- Reference spheres whose radius does not match all three Horizons center radii, including ellipsoidal or wrongly declared units. Header radii must be finite, positive numbers in kilometres.
+- Unknown mask frames or realizations, unsupported or missing lunar-center/orientation evidence, inconsistent dynamical sources across requests, and positions without an explicit airless declaration.
+- Invalid input contracts, including malformed horizons and inconsistent ephemeris sampling/provenance.
+
+Latitude/longitude comparisons allow only `1e-9` degree absolute roundoff. Total altitude and reference-radius comparisons allow `1e-6` km (1 mm), with no relative tolerance. These limits check declared numeric inputs; they are not DEM accuracy estimates or allowances for frame offsets. The existing ephemeris validator separately checks rounded provider-header coordinates against the dataset. A 2 m mast change is rejected against the archived 0 m observer even when the frame approximation below is enabled.
+
+### Decision for the reviewed Site01 pairing
+
+Strict behavior rejects the untransformed Site01 mask/ephemeris pairing by default. Matching numeric coordinates and a common reference sphere do not establish identical physical observers across different frame implementations.
+
+The scientific basis for the limited alternative is:
+
+- [NASA PGDA product 78](https://pgda.gsfc.nasa.gov/products/78) declares its terrain coordinates in DE421 `MOON_ME`.
+- The [JPL Horizons manual](https://ssd.jpl.nasa.gov/horizons/manual.html), under “Lunar Mean-Earth Frame of DE421,” documents its high-precision lunar cartographic convention through an alignment from DE440 principal axes. The archive's `{source: DE441}` body header identifies the dynamical ephemeris source; it does not itself define a `DE441 MEAN_ME` coordinate realization.
+- [NAIF's lunar frame kernel dated 2025-04-16](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf) describes DE440's Mean Earth implementation as closely aligned with DE421, with nonzero residual orientation differences. This supports a documented approximation, rather than asserting exact frame identity.
+
+The project therefore permits an explicit **reference-demo approximation** via `allow_mean_earth_approximation=True`. It is limited to the documented DE421 mask declarations (`MOON_ME` or `MOON_ME_DE421`, with realization `DE421` or the exact reviewed artifact's longer DE421 declaration) and recognized Horizons center-frame headers (`MEAN_ME (high precision)` or `MOON_ME`, each declaring east-positive longitude). Every request must report lunar center 301, the same DE440 or DE441 dynamical source, the same orientation, a matching sphere, and airless positions. Other combinations require a separate policy review; the opt-in does not override them.
+
+This version of the reference policy accepts periods contained in `[2000-01-01T00:00:00Z, 2040-01-01T00:00:00Z)`, permitting an exclusive end exactly at 2040-01-01. This is a project scope limit informed by NAIF's modern-epoch comparison, not a computed error bound for this mask or an epoch-by-epoch transformation check. Do not use the acceptance to claim exact observer equivalence or mission accuracy.
+
+```python
+from dataclasses import asdict
+from pathlib import Path
+
+from lunarwindow.reference import load_reference_dataset
+from lunarwindow.terrain import check_terrain_compatibility
+
+dataset = load_reference_dataset(Path("data/reference/validation-30d"), mask.siteId)
+
+# Explicitly accept the documented approximation for a labeled reference demo.
+assessment = check_terrain_compatibility(
+    mask, dataset, allow_mean_earth_approximation=True
+)
+print(asdict(assessment))
+```
+
+Successful checks return a frozen `TerrainCompatibility` record. It carries the mask/site IDs, both original frame declarations, the dynamical source, reference radius, `frame_policy: "mean-earth-reference-v1"`, `frame_status: "approximate"`, `transformation_applied: False`, a limitation, and the documentation URLs. Preserve this assessment alongside the original mask and ephemeris provenance when integrating evaluations. Neither artifact is modified or relabeled.
+
+Rejected pairings raise `TerrainCompatibilityError`, a `ValueError` subclass, with the reason. Omitting the approximation opt-in rejects the current real pair. The HTTP API does not use this helper yet, and its response contract is unchanged.
+
+Run the focused offline tests with:
+
+```sh
+python -m unittest discover -s backend/tests -p test_terrain_compatibility.py -v
+```
 
 ## Validate or export the schema
 

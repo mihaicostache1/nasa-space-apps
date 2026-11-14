@@ -2,7 +2,7 @@
 
 The FastAPI backend provides synthetic scenario demos and geometric evaluations of verified archived NASA ephemerides. The reference-data integration includes a validated loader, site catalog, date-range selection, request/response contracts, and the calculation-engine adapter. Terrain-mask integration, caching, and extended precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
-The [terrain-mask v1 handoff contract and offline loader](terrain-mask.md) define validated observer coordinates/heights, reference frames, complete horizon profiles, and DEM/algorithm provenance. `load_terrain_mask(path, expected_sha256=...)` verifies the reviewed artifact's exact bytes and returns a validated `TerrainMask`. Observer/frame compatibility and terrain-aware API evaluations are subsequent tasks.
+The [terrain-mask v1 handoff contract, offline loader, and compatibility helper](terrain-mask.md) define validated observer coordinates/heights, reference frames, complete horizon profiles, and DEM/algorithm provenance. `load_terrain_mask(path, expected_sha256=...)` verifies the artifact's exact bytes. `check_terrain_compatibility(mask, dataset)` checks observer geometry and frame evidence, rejecting the untransformed DE421/Horizons pairing by default. Explicit reference-demo acceptance records an approximation and its scientific sources. Terrain-aware API evaluations remain a subsequent task.
 
 ## Run
 
