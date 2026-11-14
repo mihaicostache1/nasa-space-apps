@@ -1,8 +1,8 @@
 # Backend/data — tasks 1 and 2
 
-The FastAPI backend provides synthetic scenario demos and geometric evaluations of verified archived NASA ephemerides. The reference-data integration includes a validated loader, site catalog, date-range selection, request/response contracts, and the calculation-engine adapter. Terrain-mask integration, caching, and extended precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
+The FastAPI backend provides synthetic scenario demos and geometric or reviewed-terrain evaluations of verified archived NASA ephemerides. Reference-data integration includes validated loaders, a site catalog, date-range selection, request/response contracts, observer/frame compatibility checks, calculation-engine adapters, and dedicated terrain-blocking regressions. Caching and extended precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
-The [terrain-mask v1 handoff contract](terrain-mask.md) now defines validated observer coordinates/heights, reference frames, complete horizon profiles, and DEM/algorithm provenance. It is independent of the HTTP API; loading verified masks and using them for terrain-aware evaluations are subsequent tasks.
+The [terrain-mask v1 handoff contract, offline loader, and compatibility helper](terrain-mask.md) define validated observer coordinates/heights, reference frames, complete horizon profiles, and DEM/algorithm provenance. `load_terrain_mask(path, expected_sha256=...)` verifies the artifact's exact bytes. `check_terrain_compatibility(mask, dataset)` checks observer geometry and frame evidence, rejecting the untransformed DE421/Horizons pairing by default. The [terrain-aware evaluation endpoint](#terrain-aware-evaluation-contract) requires explicit reference-demo acceptance and records the approximation and scientific sources.
 
 ## Run
 
@@ -25,15 +25,15 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 
 ## Routes
 
-| Method | Route                                      | Response                                                          |
-| ------ | ------------------------------------------ | ----------------------------------------------------------------- |
-| GET    | `/api/health`                              | Backend process health and `dataMode: "synthetic"`                |
-| GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels    |
-| GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                          |
-| POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request       |
-| POST   | `/api/reference/evaluations`               | Geometric visibility, metrics, and windows from verified archives |
-| GET    | `/api/reference/sites`                     | Verified reference coordinates and archive availability           |
-| GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance       |
+| Method | Route                                      | Response                                                        |
+| ------ | ------------------------------------------ | --------------------------------------------------------------- |
+| GET    | `/api/health`                              | Backend process health and `dataMode: "synthetic"`              |
+| GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels  |
+| GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                        |
+| POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request     |
+| POST   | `/api/reference/evaluations`               | Geometric or reviewed-terrain metrics and windows from archives |
+| GET    | `/api/reference/sites`                     | Verified reference coordinates and archive availability         |
+| GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance     |
 
 The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
 
@@ -83,7 +83,7 @@ Native startup from the repository root reads `data/reference/validation-30d`. S
 
 ## Evaluate a verified reference site
 
-`POST /api/reference/evaluations` validates the complete reference bundle, selects the requested site's archived samples, and runs the visibility engine against a flat zero-degree horizon. The adapter is in `backend/src/lunarwindow/api/reference_provider.py`; request/response models are in `reference_models.py`, with matching TypeScript types in `src/domain/evaluation.ts`. The operation performs no downloads or writes.
+With `horizonMode: "geometric"`, `POST /api/reference/evaluations` validates the complete reference bundle, selects the requested site's archived samples, and runs the visibility engine against a flat zero-degree horizon. The adapter is in `backend/src/lunarwindow/api/reference_provider.py`; geometric request/response models are in `reference_models.py`, with matching TypeScript types in `src/domain/evaluation.ts`. The operation performs no downloads or writes. Terrain mode is described below.
 
 `ReferenceEvaluationRequest` selects a catalog entry by `siteId` and requires an explicit `horizonMode: "geometric"`, plus `startUtc` and `endUtc`. Optional fields are `stepMinutes` (default 60), `visibilityRule` (default `any-disc`), and `asOfUtc` (default to the selected start during calculation). It uses the existing UTC, range-length, sample-count, countdown-reference, and archive-grid validation. Custom coordinates and unsupported horizon modes are rejected.
 
@@ -105,6 +105,73 @@ The `ReferenceEvaluation` response declares `schemaVersion: "lunarwindow.referen
 `provenance.ephemeris` retains the selected dataset's complete P1 provenance, including the original NASA request URLs, response hashes, retrieval times, model headers, and coordinate/time conventions. Its period and step describe the selected samples. `provenance.archive` records the original archive's start/end, end-exclusive convention, native step, and sample count. The response also supplies a model-limitation message explaining the flat horizon and the absence of terrain, eclipse, electrical-power, and radio-link models.
 
 Contract validation reuses the P1 provenance schema and dataset checks, including observer-coordinate consistency and the selected sampling grid. It also checks archive coverage/counts, archive/selection grid alignment, calculation step, countdown reference, and evaluated duration. The loader verifies source checksums before the adapter calls the engine. The models validate contract coherence without fetching data or computing visibility. Their schemas are published in OpenAPI, and can also be obtained with `ReferenceEvaluationRequest.model_json_schema()` and `ReferenceEvaluation.model_json_schema()`.
+
+## Terrain-aware evaluation contract
+
+`POST /api/reference/evaluations` accepts both modes through unions discriminated by `horizonMode`, published in OpenAPI. Geometric requests retain the v1 contract above. Terrain requests use `backend/src/lunarwindow/api/terrain_models.py` and return v2 with full mask/compatibility provenance. The server never substitutes a geometric or synthetic horizon for a failed terrain request.
+
+`TerrainReferenceEvaluationRequest` shares the reference site's UTC, period, sampling, visibility-rule, and countdown options. It adds:
+
+| Field                         | Meaning                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `horizonMode`                 | Required `"terrain"`                                                                              |
+| `maskId`                      | Required lowercase slug identifying a server-reviewed mask                                        |
+| `allowMeanEarthApproximation` | Boolean, default `false`; the reviewed DE421/Horizons pairing requires explicit `true` acceptance |
+
+Callers select an identifier, rather than a file path, custom profile, checksum, coordinates, or observer-height override. The server resolves it through the reviewed registration in `backend/src/lunarwindow/terrain/registry.py`. Currently the only registered ID is `lola-site01-reference-mast-0m`, for `lola-site01-reference`. Its pinned SHA-256 is `4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d`. The registration uses a fixed filename and validates the artifact's mask/site identity; neither requests nor mutable sidecars select trusted hashes. Adding an artifact requires a reviewed registration change.
+
+```json
+{
+  "siteId": "lola-site01-reference",
+  "horizonMode": "terrain",
+  "maskId": "lola-site01-reference-mast-0m",
+  "allowMeanEarthApproximation": true,
+  "startUtc": "2026-11-15T00:00:00Z",
+  "endUtc": "2026-11-16T00:00:00Z",
+  "stepMinutes": 60,
+  "visibilityRule": "any-disc"
+}
+```
+
+Submit this JSON to the endpoint, or use the interactive API docs. The provider verifies the complete ephemeris bundle, selects the requested grid, loads and hashes the registered mask, and checks observer/frame compatibility before passing the selected samples and exact mask profile to the existing visibility engine. `visibilityRule` and `asOfUtc` are forwarded unchanged. No terrain is regenerated and no source DEM files or GIS extras are needed to evaluate the precomputed mask.
+
+`TerrainReferenceEvaluation` uses `schemaVersion: "lunarwindow.reference-evaluation.v2"`, `dataMode: "reference"`, and `horizonMode: "terrain"`. It retains the existing identity, horizon, augmented samples, metrics, windows, and calculation fields, and adds required `maskId` and `allowMeanEarthApproximation: true`. The current supported frame policy produces an approximate result only after that explicit acceptance; strict requests return HTTP 422 for this pairing.
+
+The response's `provenance` retains the complete selected `ephemeris` evidence and native `archive` coverage. Its required `terrain` object contains:
+
+| Field            | Meaning                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `artifactSha256` | SHA-256 of the reviewed mask's exact file bytes, supplied after loader verification                                            |
+| `mask`           | Complete `lunarwindow.terrain-mask.v1` artifact: identity, observer, frame, conventions, horizon, and DEM/algorithm provenance |
+| `compatibility`  | Assessment with IDs, original frame declarations, dynamical source, radius, policy, status, limitation, and source references  |
+
+`TerrainCompatibilityProvenance` maps the domain assessment to camelCase API fields through `from_assessment()`. It requires `framePolicy: "mean-earth-reference-v1"`, `frameStatus: "approximate"`, and boolean `transformationApplied: false`. The full response reruns compatibility checks against its selected ephemeris data and requires the assessment to match, including the limitation and documentation URLs. It rejects claims of exact compatibility, unperformed transformations, or assessment fields that disagree with the source declarations.
+
+The response horizon must exactly equal the provenance mask's ordered profile, preserving negative values. Each sample's horizon elevations must agree with circular linear interpolation at its Sun/Earth azimuths within `1e-9` degree absolute roundoff. Both response modes share the existing ephemeris, observer, selected-grid, archive-coverage, calculation-step, countdown-reference, and duration checks. Contract validation does not calculate visibility states, metrics, or windows, and performs no source downloads or artifact writes. A syntactically valid checksum in a response does not verify file bytes: that remains the loader's responsibility.
+
+`ReferenceEvaluationRequestContract` and `ReferenceEvaluationContract` are unions discriminated by `horizonMode`. Their geometric members preserve `ReferenceEvaluationRequest` and `ReferenceEvaluation` v1 unchanged. Matching transport types are in `src/domain/terrain-evaluation.ts`; `src/domain/terrain-mask.ts` describes the reviewed mask, separately from the GIS `HorizonProfile` format. No frontend UI behavior changes in this step.
+
+Export the same schemas without a running API:
+
+```python
+from pydantic import TypeAdapter
+
+from lunarwindow.api.terrain_models import (
+    ReferenceEvaluationRequestContract,
+    TerrainReferenceEvaluation,
+)
+
+request_schema = TypeAdapter(ReferenceEvaluationRequestContract).json_schema()
+response_schema = TerrainReferenceEvaluation.model_json_schema()
+```
+
+Errors use the existing structured envelope: HTTP 422 for invalid selections, incompatible site/mask pairings, or a rejected compatibility policy; HTTP 404 for unknown registered site/mask IDs; HTTP 503 for unavailable or invalid server artifacts. Missing, corrupted, or identity-inconsistent registered masks produce no result and do not expose filesystem paths. Geometric requests do not load masks and continue working if the terrain directory is unavailable.
+
+Native startup reads masks from `data/reference/terrain-masks`. `LUNARWINDOW_REFERENCE_DIR` selects the reference root for both `validation-30d` ephemerides and `terrain-masks`. The Docker API image includes the reviewed mask at `/app/data/reference/terrain-masks`; no downloads or bind mounts are required. The current mask is a ground + 0 m reference observer, not a configurable antenna height; preserve the frame and near-field limitations described in its provenance and README.
+
+Contract tests in `backend/tests/test_terrain_evaluation_contract.py` validate schemas, round trips, strict defaults, complete provenance, mask/profile agreement, frame-assessment consistency, and shared archive checks. HTTP integration tests in `backend/tests/test_terrain_evaluation.py` compare returned results with the engine on the exact archived samples and reviewed mask, test selection/options/errors, and verify geometric independence. CI also requests a terrain evaluation from the packaged API image. The geometric v1 regression suite remains active.
+
+Dedicated [terrain regression evidence](validation/terrain-regression.md) adds hand-computed blocking/boundary cases and independently derived, pinned Site01 API expectations for all six mode/rule combinations. These protect metrics, all operating-window boundaries, partial-disc behavior, negative horizons, and original source/compatibility provenance. The expectations verify the software model; validation against terrain observations remains separate.
 
 ## Synthetic scenario evaluation contract
 

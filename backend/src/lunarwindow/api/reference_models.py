@@ -21,8 +21,11 @@ from .models import ApiModel, EvaluationOptions, ReferenceAvailability
 EPHEMERIS_PROVENANCE_SCHEMA = dataset_schema()["properties"]["provenance"]
 
 
-class ReferenceEvaluationRequest(EvaluationOptions):
+class ReferenceSiteEvaluationRequest(EvaluationOptions):
     siteId: str = Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", examples=["lola-site01-reference"])
+
+
+class ReferenceEvaluationRequest(ReferenceSiteEvaluationRequest):
     horizonMode: Literal["geometric"] = Field(
         description="Explicitly select a flat 0-degree horizon without terrain masking"
     )
@@ -55,12 +58,10 @@ class ReferenceEvaluationProvenance(ApiModel):
         return value
 
 
-class ReferenceEvaluation(ApiModel):
-    schemaVersion: Literal["lunarwindow.reference-evaluation.v1"] = (
-        "lunarwindow.reference-evaluation.v1"
-    )
+class ReferenceEvaluationData(ApiModel):
+    """Shared identity, selected ephemerides, archive coverage, and calculation metadata."""
+
     dataMode: Literal["reference"] = "reference"
-    horizonMode: Literal["geometric"]
     siteId: str
     site: str
     lat: float
@@ -75,27 +76,10 @@ class ReferenceEvaluation(ApiModel):
     provenance: ReferenceEvaluationProvenance
 
     @model_validator(mode="after")
-    def validate_reference_model(self) -> Self:
-        if any(point.az != index or point.el != 0 for index, point in enumerate(self.horizon)):
-            raise ValueError(
-                "A geometric horizon must contain ordered azimuths 0..359 at 0 degrees."
-            )
-        if any(row.sunHorizonEl != 0 or row.earthHorizonEl != 0 for row in self.series):
-            raise ValueError("Geometric sample horizon elevations must be 0 degrees.")
+    def validate_reference_data(self) -> Self:
         source = self.provenance.ephemeris
         # Reuse P1's coordinate, observer, target, and sampling-grid checks.
-        validate_dataset(
-            {
-                "schemaVersion": "lunarwindow.ephemeris.v2",
-                **self.model_dump(
-                    include={"siteId", "site", "lat", "lon", "altitudeKm", "coordinateSource"}
-                ),
-                "series": [
-                    row.model_dump(include=set(EphemerisSample.model_fields)) for row in self.series
-                ],
-                "provenance": source,
-            }
-        )
+        validate_dataset(self.to_ephemeris_dataset())
         period = TimeRange(source["startUtc"], source["endUtc"], source["stepMinutes"])
         coverage = self.provenance.archive
         archive = TimeRange(coverage.startUtc, coverage.endUtc, coverage.stepMinutes)
@@ -113,4 +97,34 @@ class ReferenceEvaluation(ApiModel):
             raise ValueError("Metrics asOfUtc must be within the selected period.")
         if self.metrics.evaluatedHrs != (period.end - period.start).total_seconds() / 3600:
             raise ValueError("Metrics evaluatedHrs must match the selected period.")
+        return self
+
+    def to_ephemeris_dataset(self) -> dict:
+        """Reconstruct the selected P1 contract without derived visibility fields."""
+        return {
+            "schemaVersion": "lunarwindow.ephemeris.v2",
+            **self.model_dump(
+                include={"siteId", "site", "lat", "lon", "altitudeKm", "coordinateSource"}
+            ),
+            "series": [
+                row.model_dump(include=set(EphemerisSample.model_fields)) for row in self.series
+            ],
+            "provenance": self.provenance.ephemeris,
+        }
+
+
+class ReferenceEvaluation(ReferenceEvaluationData):
+    schemaVersion: Literal["lunarwindow.reference-evaluation.v1"] = (
+        "lunarwindow.reference-evaluation.v1"
+    )
+    horizonMode: Literal["geometric"]
+
+    @model_validator(mode="after")
+    def validate_reference_model(self) -> Self:
+        if any(point.az != index or point.el != 0 for index, point in enumerate(self.horizon)):
+            raise ValueError(
+                "A geometric horizon must contain ordered azimuths 0..359 at 0 degrees."
+            )
+        if any(row.sunHorizonEl != 0 or row.earthHorizonEl != 0 for row in self.series):
+            raise ValueError("Geometric sample horizon elevations must be 0 degrees.")
         return self

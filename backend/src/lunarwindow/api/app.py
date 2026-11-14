@@ -1,4 +1,4 @@
-"""Synthetic demos and geometric evaluations of verified reference ephemerides."""
+"""Synthetic demos and geometric/terrain evaluations of verified reference ephemerides."""
 
 import os
 from pathlib import Path
@@ -18,6 +18,8 @@ from lunarwindow.reference import (
     load_reference_dataset,
     select_reference_dataset,
 )
+from lunarwindow.terrain.compatibility import TerrainCompatibilityError
+from lunarwindow.terrain.registry import UnknownTerrainMaskError
 from lunarwindow.visibility.models import VisibilityRule
 
 from .demo import DemoProvider
@@ -33,8 +35,8 @@ from .models import (
     ReferenceSiteCatalog,
     SiteCatalog,
 )
-from .reference_models import ReferenceEvaluation, ReferenceEvaluationRequest
 from .reference_provider import evaluate_reference
+from .terrain_models import ReferenceEvaluationContract, ReferenceEvaluationRequestContract
 
 
 def get_provider() -> DemoProvider:
@@ -43,6 +45,10 @@ def get_provider() -> DemoProvider:
 
 def get_reference_directory() -> Path:
     return Path(os.environ.get("LUNARWINDOW_REFERENCE_DIR", "data/reference")) / "validation-30d"
+
+
+def get_terrain_directory() -> Path:
+    return Path(os.environ.get("LUNARWINDOW_REFERENCE_DIR", "data/reference")) / "terrain-masks"
 
 
 def query_period(
@@ -70,12 +76,12 @@ def create_app() -> FastAPI:
         title="LunarWindow backend",
         version="0.2.0",
         description=(
-            "Synthetic scenario demos and geometric evaluations of archived NASA ephemerides. "
+            "Synthetic demos and geometric or reviewed-terrain evaluations of NASA ephemerides. "
             "Choose any-disc (default), body-center, or full-disc visibility. "
             "Durations use sample-and-hold; setting times include observation brackets. "
             "Times are whole-minute UTC; ranges include start and exclude end. "
-            "Reference evaluations require an explicit geometric, flat 0-degree horizon. "
-            "Terrain-mask integration remains pending."
+            "Reference evaluations require an explicit geometric or terrain horizon mode. "
+            "Terrain requests select a reviewed mask and explicitly accept its frame approximation."
         ),
         responses={422: {"model": ErrorResponse}},
     )
@@ -147,26 +153,31 @@ def create_app() -> FastAPI:
 
     @app.post(
         "/api/reference/evaluations",
-        response_model=ReferenceEvaluation,
+        response_model=ReferenceEvaluationContract,
         responses={404: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
         tags=["reference"],
-        summary="Calculate geometric visibility for a verified reference site",
+        summary="Calculate geometric or terrain visibility for a verified reference site",
         description=(
-            "Uses verified archived samples and an explicit flat 0-degree horizon. "
+            "Uses verified archived samples and either a flat 0-degree horizon or a "
+            "checksummed, server-reviewed terrain mask. Terrain mode requires maskId and "
+            "explicit acceptance of the documented Mean Earth reference approximation. "
             "Returns visibility, metrics, windows, and setting brackets with original "
-            "NASA source evidence and archive coverage. No terrain masking is applied."
+            "NASA evidence, archive coverage, and terrain/compatibility provenance when selected."
         ),
     )
     def reference_evaluation(
-        scenario: ReferenceEvaluationRequest,
+        scenario: ReferenceEvaluationRequestContract,
         directory: Annotated[Path, Depends(get_reference_directory)],
-    ) -> ReferenceEvaluation:
+        terrain_directory: Annotated[Path, Depends(get_terrain_directory)],
+    ) -> ReferenceEvaluationContract:
         try:
-            return evaluate_reference(scenario, directory)
-        except ReferenceSelectionError as exc:
+            return evaluate_reference(scenario, directory, terrain_directory)
+        except (ReferenceSelectionError, TerrainCompatibilityError) as exc:
             raise RequestValidationError(
                 [{"loc": ("body",), "msg": str(exc), "type": "value_error"}]
             ) from exc
+        except UnknownTerrainMaskError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
         except LookupError as exc:
             raise HTTPException(
                 status_code=404, detail=f"Unknown reference site: {scenario.siteId}"

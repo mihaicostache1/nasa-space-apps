@@ -1,0 +1,885 @@
+{
+  "schemaVersion": "lunarwindow.terrain-regression.v1",
+  "scope": "Software model regression only; no independent terrain-observation validation",
+  "derivation": "50-digit Decimal thresholds, NumPy periodic interpolation cross-check, grouped hourly runs and rational percentages; no production imports",
+  "siteId": "lola-site01-reference",
+  "maskId": "lola-site01-reference-mast-0m",
+  "maskSha256": "4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d",
+  "ephemerisSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+  "startUtc": "2026-11-14T00:00:00Z",
+  "endUtc": "2026-12-14T00:00:00Z",
+  "stepMinutes": 60,
+  "modes": {
+    "geometric": {
+      "any-disc": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 720,
+          "pctSun": 100.0,
+          "earthVisibleHrs": 312,
+          "pctEarth": 43.333333333333336,
+          "bothHrs": 312,
+          "pctBoth": 43.333333333333336,
+          "longestDarkHrs": 0,
+          "longestEarthBlackoutHrs": 328,
+          "longestBothHrs": 312,
+          "nextSunset": null,
+          "hoursToSunset": null,
+          "nextSunsetBracket": null,
+          "nextEarthset": "2026-11-30T08:00:00Z",
+          "hoursToEarthset": 392.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-30T07:00:00Z",
+            "byUtc": "2026-11-30T08:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 720,
+              "startTruncated": true,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-17T08:00:00Z",
+              "endUtc": "2026-11-30T08:00:00Z",
+              "durationHrs": 312,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-17T08:00:00Z",
+              "endUtc": "2026-11-30T08:00:00Z",
+              "durationHrs": 312,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-17T08:00:00Z",
+              "durationHrs": 80,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-30T08:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 328,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 720
+          },
+          "earth": {
+            "hidden": 408,
+            "partial": 60,
+            "full": 252
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.7347740278888889,
+          "earth": 0.003236969
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          }
+        ]
+      },
+      "body-center": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 720,
+          "pctSun": 100.0,
+          "earthVisibleHrs": 283,
+          "pctEarth": 39.30555555555556,
+          "bothHrs": 283,
+          "pctBoth": 39.30555555555556,
+          "longestDarkHrs": 0,
+          "longestEarthBlackoutHrs": 342,
+          "longestBothHrs": 283,
+          "nextSunset": null,
+          "hoursToSunset": null,
+          "nextSunsetBracket": null,
+          "nextEarthset": "2026-11-29T18:00:00Z",
+          "hoursToEarthset": 378.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-29T17:00:00Z",
+            "byUtc": "2026-11-29T18:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 720,
+              "startTruncated": true,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-17T23:00:00Z",
+              "endUtc": "2026-11-29T18:00:00Z",
+              "durationHrs": 283,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-17T23:00:00Z",
+              "endUtc": "2026-11-29T18:00:00Z",
+              "durationHrs": 283,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-17T23:00:00Z",
+              "durationHrs": 95,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-29T18:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 342,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 720
+          },
+          "earth": {
+            "hidden": 408,
+            "partial": 60,
+            "full": 252
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.7347740278888889,
+          "earth": 0.003236969
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          }
+        ]
+      },
+      "full-disc": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 720,
+          "pctSun": 100.0,
+          "earthVisibleHrs": 252,
+          "pctEarth": 35.0,
+          "bothHrs": 252,
+          "pctBoth": 35.0,
+          "longestDarkHrs": 0,
+          "longestEarthBlackoutHrs": 357,
+          "longestBothHrs": 252,
+          "nextSunset": null,
+          "hoursToSunset": null,
+          "nextSunsetBracket": null,
+          "nextEarthset": "2026-11-29T03:00:00Z",
+          "hoursToEarthset": 363.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-29T02:00:00Z",
+            "byUtc": "2026-11-29T03:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 720,
+              "startTruncated": true,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-18T15:00:00Z",
+              "endUtc": "2026-11-29T03:00:00Z",
+              "durationHrs": 252,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-18T15:00:00Z",
+              "endUtc": "2026-11-29T03:00:00Z",
+              "durationHrs": 252,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-18T15:00:00Z",
+              "durationHrs": 111,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-29T03:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 357,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 720
+          },
+          "earth": {
+            "hidden": 408,
+            "partial": 60,
+            "full": 252
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.7347740278888889,
+          "earth": 0.003236969
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": 0.0,
+            "earthHorizonEl": 0.0
+          }
+        ]
+      }
+    },
+    "terrain": {
+      "any-disc": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 442,
+          "pctSun": 61.388888888888886,
+          "earthVisibleHrs": 232,
+          "pctEarth": 32.22222222222222,
+          "bothHrs": 81,
+          "pctBoth": 11.25,
+          "longestDarkHrs": 278,
+          "longestEarthBlackoutHrs": 361,
+          "longestBothHrs": 81,
+          "nextSunset": "2026-11-22T16:00:00Z",
+          "hoursToSunset": 208.0,
+          "nextSunsetBracket": {
+            "afterUtc": "2026-11-22T15:00:00Z",
+            "byUtc": "2026-11-22T16:00:00Z"
+          },
+          "nextEarthset": "2026-11-28T23:00:00Z",
+          "hoursToEarthset": 359.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-28T22:00:00Z",
+            "byUtc": "2026-11-28T23:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-22T16:00:00Z",
+              "durationHrs": 208,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-12-04T06:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 234,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-19T07:00:00Z",
+              "endUtc": "2026-11-28T23:00:00Z",
+              "durationHrs": 232,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-19T07:00:00Z",
+              "endUtc": "2026-11-22T16:00:00Z",
+              "durationHrs": 81,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [
+            {
+              "startUtc": "2026-11-22T16:00:00Z",
+              "endUtc": "2026-12-04T06:00:00Z",
+              "durationHrs": 278,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-19T07:00:00Z",
+              "durationHrs": 127,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-28T23:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 361,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 394,
+            "partial": 48,
+            "hidden": 278
+          },
+          "earth": {
+            "hidden": 488,
+            "partial": 70,
+            "full": 162
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.0005345495368889,
+          "earth": 0.002375447528
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": -2.1635105192281,
+            "earthHorizonEl": 2.58896600243
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": -2.1944226482432,
+            "earthHorizonEl": 2.591344363706
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": -2.371434131958,
+            "earthHorizonEl": 2.6459231926595
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": -0.084605801569,
+            "earthHorizonEl": 2.8115389962
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 2.2353406231552,
+            "earthHorizonEl": 2.6832240303044
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 2.9070432873493,
+            "earthHorizonEl": 2.2291737179473
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 2.3103957523926,
+            "earthHorizonEl": 2.138092491289
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": -1.2859961986166,
+            "earthHorizonEl": 2.4090003525865
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": -2.4262679062356,
+            "earthHorizonEl": 2.7158390175884
+          }
+        ]
+      },
+      "body-center": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 427,
+          "pctSun": 59.30555555555556,
+          "earthVisibleHrs": 199,
+          "pctEarth": 27.63888888888889,
+          "bothHrs": 60,
+          "pctBoth": 8.333333333333334,
+          "longestDarkHrs": 293,
+          "longestEarthBlackoutHrs": 377,
+          "longestBothHrs": 60,
+          "nextSunset": "2026-11-22T12:00:00Z",
+          "hoursToSunset": 204.0,
+          "nextSunsetBracket": {
+            "afterUtc": "2026-11-22T11:00:00Z",
+            "byUtc": "2026-11-22T12:00:00Z"
+          },
+          "nextEarthset": "2026-11-28T07:00:00Z",
+          "hoursToEarthset": 343.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-28T06:00:00Z",
+            "byUtc": "2026-11-28T07:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-22T12:00:00Z",
+              "durationHrs": 204,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-12-04T17:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 223,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-20T00:00:00Z",
+              "endUtc": "2026-11-28T07:00:00Z",
+              "durationHrs": 199,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-20T00:00:00Z",
+              "endUtc": "2026-11-22T12:00:00Z",
+              "durationHrs": 60,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [
+            {
+              "startUtc": "2026-11-22T12:00:00Z",
+              "endUtc": "2026-12-04T17:00:00Z",
+              "durationHrs": 293,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-20T00:00:00Z",
+              "durationHrs": 144,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-28T07:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 377,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 394,
+            "partial": 48,
+            "hidden": 278
+          },
+          "earth": {
+            "hidden": 488,
+            "partial": 70,
+            "full": 162
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.0005345495368889,
+          "earth": 0.002375447528
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": -2.1635105192281,
+            "earthHorizonEl": 2.58896600243
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": -2.1944226482432,
+            "earthHorizonEl": 2.591344363706
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": -2.371434131958,
+            "earthHorizonEl": 2.6459231926595
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": -0.084605801569,
+            "earthHorizonEl": 2.8115389962
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 2.2353406231552,
+            "earthHorizonEl": 2.6832240303044
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 2.9070432873493,
+            "earthHorizonEl": 2.2291737179473
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 2.3103957523926,
+            "earthHorizonEl": 2.138092491289
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": -1.2859961986166,
+            "earthHorizonEl": 2.4090003525865
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": -2.4262679062356,
+            "earthHorizonEl": 2.7158390175884
+          }
+        ]
+      },
+      "full-disc": {
+        "metrics": {
+          "evaluatedHrs": 720,
+          "asOfUtc": "2026-11-14T00:00:00Z",
+          "sunlitHrs": 394,
+          "pctSun": 54.72222222222222,
+          "earthVisibleHrs": 162,
+          "pctEarth": 22.5,
+          "bothHrs": 27,
+          "pctBoth": 3.75,
+          "longestDarkHrs": 316,
+          "longestEarthBlackoutHrs": 395,
+          "longestBothHrs": 15,
+          "nextSunset": "2026-11-21T10:00:00Z",
+          "hoursToSunset": 178.0,
+          "nextSunsetBracket": {
+            "afterUtc": "2026-11-21T09:00:00Z",
+            "byUtc": "2026-11-21T10:00:00Z"
+          },
+          "nextEarthset": "2026-11-27T13:00:00Z",
+          "hoursToEarthset": 325.0,
+          "nextEarthsetBracket": {
+            "afterUtc": "2026-11-27T12:00:00Z",
+            "byUtc": "2026-11-27T13:00:00Z"
+          }
+        },
+        "windows": {
+          "sunlit": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-21T10:00:00Z",
+              "durationHrs": 178,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-21T20:00:00Z",
+              "endUtc": "2026-11-22T08:00:00Z",
+              "durationHrs": 12,
+              "startTruncated": false,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-12-05T12:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 204,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ],
+          "earthVisible": [
+            {
+              "startUtc": "2026-11-20T19:00:00Z",
+              "endUtc": "2026-11-27T13:00:00Z",
+              "durationHrs": 162,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "both": [
+            {
+              "startUtc": "2026-11-20T19:00:00Z",
+              "endUtc": "2026-11-21T10:00:00Z",
+              "durationHrs": 15,
+              "startTruncated": false,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-21T20:00:00Z",
+              "endUtc": "2026-11-22T08:00:00Z",
+              "durationHrs": 12,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "darkness": [
+            {
+              "startUtc": "2026-11-21T10:00:00Z",
+              "endUtc": "2026-11-21T20:00:00Z",
+              "durationHrs": 10,
+              "startTruncated": false,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-22T08:00:00Z",
+              "endUtc": "2026-12-05T12:00:00Z",
+              "durationHrs": 316,
+              "startTruncated": false,
+              "endTruncated": false
+            }
+          ],
+          "earthBlackout": [
+            {
+              "startUtc": "2026-11-14T00:00:00Z",
+              "endUtc": "2026-11-20T19:00:00Z",
+              "durationHrs": 163,
+              "startTruncated": true,
+              "endTruncated": false
+            },
+            {
+              "startUtc": "2026-11-27T13:00:00Z",
+              "endUtc": "2026-12-14T00:00:00Z",
+              "durationHrs": 395,
+              "startTruncated": false,
+              "endTruncated": true
+            }
+          ]
+        },
+        "discStateCounts": {
+          "sun": {
+            "full": 394,
+            "partial": 48,
+            "hidden": 278
+          },
+          "earth": {
+            "hidden": 488,
+            "partial": 70,
+            "full": 162
+          }
+        },
+        "minAbsThresholdClearanceDeg": {
+          "sun": 0.0005345495368889,
+          "earth": 0.002375447528
+        },
+        "horizonCheckpoints": [
+          {
+            "t": "2026-11-14T00:00:00Z",
+            "sunHorizonEl": -2.1635105192281,
+            "earthHorizonEl": 2.58896600243
+          },
+          {
+            "t": "2026-11-14T01:00:00Z",
+            "sunHorizonEl": -2.1944226482432,
+            "earthHorizonEl": 2.591344363706
+          },
+          {
+            "t": "2026-11-15T00:00:00Z",
+            "sunHorizonEl": -2.371434131958,
+            "earthHorizonEl": 2.6459231926595
+          },
+          {
+            "t": "2026-11-19T00:00:00Z",
+            "sunHorizonEl": -0.084605801569,
+            "earthHorizonEl": 2.8115389962
+          },
+          {
+            "t": "2026-11-24T00:00:00Z",
+            "sunHorizonEl": 2.2353406231552,
+            "earthHorizonEl": 2.6832240303044
+          },
+          {
+            "t": "2026-11-29T00:00:00Z",
+            "sunHorizonEl": 2.9070432873493,
+            "earthHorizonEl": 2.2291737179473
+          },
+          {
+            "t": "2026-12-04T00:00:00Z",
+            "sunHorizonEl": 2.3103957523926,
+            "earthHorizonEl": 2.138092491289
+          },
+          {
+            "t": "2026-12-09T00:00:00Z",
+            "sunHorizonEl": -1.2859961986166,
+            "earthHorizonEl": 2.4090003525865
+          },
+          {
+            "t": "2026-12-13T23:00:00Z",
+            "sunHorizonEl": -2.4262679062356,
+            "earthHorizonEl": 2.7158390175884
+          }
+        ]
+      }
+    }
+  }
+}

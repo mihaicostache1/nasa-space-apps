@@ -13,18 +13,22 @@ Next:
 1. A validated terrain mask is available for Site01 (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`), matching the archived ephemeris observer (ground + 0 m mast above the 1737.4 km sphere).
 2. Review the completed reference-point/camera-observer evidence, then add surface/terrain cases after that integration is available.
 3. Run the agreed curated-site precompute after a `--dry-run` request estimate.
-4. Backend/data integrates the ephemeris and GIS masks with the FastAPI visibility engine; frontend connects to that service.
+4. The backend now integrates the reviewed Site01 mask with archived ephemerides and the FastAPI visibility engine. Frontend integration remains pending.
 
 See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not yet independent scientific validation against QuickMap.
 
 ## 2. Usable comparison
 
-The backend serves synthetic scenarios and verified reference-data geometric evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. All four archived-data integration steps are complete: reference catalog, range selection, response/provenance contracts, and engine integration. See `docs/backend-data.md` and `docs/visibility.md`. Terrain integration, caching, and extended precomputation remain pending.
+The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. Caching, extended precomputation, and frontend integration remain pending.
 
-1. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
-2. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, mission window finder, and a 2D azimuth/elevation sky explorer.
-3. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
-4. Next: load the validated Site01 terrain mask, demo rehearsal in a clean browser, and deployment.
+1. Connect the frontend to the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states. Synthetic custom-coordinate demos remain at `POST /api/evaluations`.
+2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.
+3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
+4. Compare the two scenarios side by side and include source/model details with each result.
+5. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
+6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, mission window finder, and a 2D azimuth/elevation sky explorer.
+7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
+8. Next: load the validated Site01 terrain mask, demo rehearsal in a clean browser, and deployment.
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 
@@ -34,9 +38,9 @@ Implemented: checksummed LOLA 5 m/20 m/120 m downloads, exact ray-cast horizons,
 
 Next:
 
-1. Backend/data loads the Site01 mask through `TerrainMask` and checks it against the archived ephemeris observer and frame.
+1. Independently validate surface/terrain predictions and agree on a real antenna height before generating further matched observer datasets. The reviewed 0 m reference backend integration is complete, with explicit frame-approximation acceptance and regression coverage.
 2. Later, if time allows: ephemerides and horizons for further curated sites, and `HorizonService` for custom coordinates.
-3. Add an explicit choice between geometric and terrain-aware visibility; show resolution, truncated-azimuth, and `terrainModel: "none"` limits.
+3. The API exposes an explicit geometric/terrain choice. Add that control to the frontend and show source resolution, observer height, frame assumptions, and coverage limits; preliminary GIS horizons remain distinct from registered reference masks.
 4. Add contextual mapping or 3D views using `rays.el` and `rays.horizonDistanceKm`.
 
 ## 4. Presentation and delivery
