@@ -191,7 +191,7 @@ Dedicated [terrain regression evidence](validation/terrain-regression.md) adds h
 
 ## Reference evaluation cache-key contract
 
-The first caching step defines identity only, in `backend/src/lunarwindow/api/reference_cache_key.py`. `build_reference_evaluation_cache_key` returns an immutable `ReferenceEvaluationCacheKey` with schema `lunarwindow.reference-cache-key.v1` and a deterministic SHA-256 `digest`. Storage, eviction, and cache lookup in the evaluation endpoint are subsequent tasks; requests currently continue through the existing provider.
+The cache identity contract is in `backend/src/lunarwindow/api/reference_cache_key.py`. `build_reference_evaluation_cache_key` returns an immutable `ReferenceEvaluationCacheKey` with schema `lunarwindow.reference-cache-key.v1` and a deterministic SHA-256 `digest`. Bounded storage is implemented separately below. Cache lookup in the evaluation endpoint remains a subsequent task; requests currently continue through the existing provider.
 
 The key includes:
 
@@ -207,7 +207,17 @@ The digest encodes all key fields, including explicit nulls and defaults, using 
 
 Checksums supplied to the builder must come from verified artifacts. Syntactically valid hashes do not prove file integrity, archive availability, or mask compatibility. A future cache lookup must occur **after** full bundle verification, range selection, reviewed-mask verification, and compatibility checks. Recording a terrain request with acceptance false creates a distinct identity; it does not authorize the request or bypass the existing HTTP 422 policy. Invalid requests and source failures must never be served from a cached success or stored as successful evaluations.
 
-When implementing storage, cache complete response snapshots without exposing mutable cached objects. Bump `VISIBILITY_MODEL_VERSION` when calculation semantics change. Bump the cache-key namespace when identity, response construction/schema, or compatibility-policy semantics change, even if source files and numerical calculations stay the same. Focused tests in `backend/tests/test_reference_cache_key.py` cover canonical/default equivalence, every calculation option, both source hashes, mask identity, policy acceptance, version invalidation, strict inputs, and immutability.
+Cache complete response snapshots without exposing mutable cached objects. Bump `VISIBILITY_MODEL_VERSION` when calculation semantics change. Bump the cache-key namespace when identity, response construction/schema, or compatibility-policy semantics change, even if source files and numerical calculations stay the same. Focused tests in `backend/tests/test_reference_cache_key.py` cover canonical/default equivalence, every calculation option, both source hashes, mask identity, policy acceptance, version invalidation, strict inputs, and immutability.
+
+## Bounded reference cache storage
+
+`ReferenceEvaluationCache` in `backend/src/lunarwindow/api/reference_cache.py` provides process-local storage keyed by the validated cache-key digest. Defaults are 32 entries and 16 MiB of retained serialized response payloads, configurable per instance with `max_entries` and `max_bytes`. Both limits apply together. The byte budget counts actual payload bytes, excluding Python object/key/container overhead and temporary serialization buffers; the entry count also bounds bookkeeping. Limits must be non-negative integers, excluding booleans. Either limit being zero disables storage.
+
+`put(key, snapshot)` accepts immutable `bytes`, normally the UTF-8 JSON of a complete, validated successful response. It revalidates the key, rejects mutable payloads, and retains no caller-owned response models or dictionaries. It returns `True` after storing/replacing a snapshot, or `False` for disabled storage or a payload larger than the byte limit. A skipped put leaves existing values, byte counts, and recency unchanged. Replacing an entry updates its byte charge and marks it most recently used. Old entries are evicted from least recently used onward until both limits are satisfied; an entry exactly at the byte limit is allowed.
+
+`get(key)` returns the immutable snapshot bytes or `None` on a miss, promoting hits to most recently used. Consumers can decode a fresh response without sharing mutable cached state. `clear()` atomically removes all entries and resets byte accounting. `info()` returns a frozen snapshot of entry count, retained payload bytes, and configured limits. A lock protects reads, recency updates, replacements, eviction, clearing, and accounting; each operation is atomic across threads. The cache does not coordinate calculations across concurrent misses or share data across processes.
+
+Storage performs no source loading, downloads, filesystem writes, JSON/response validation, or visibility calculation. The caller must validate successful responses before serialization and continue performing source integrity, range, and compatibility checks before any future lookup. No cache instance is connected to the API in this step. Focused tests in `backend/tests/test_reference_cache.py` cover hits/misses, nested JSON mutation protection, entry/byte limits, replacement and oversized-entry behavior, disabled storage, clearing, invalid inputs, and concurrent reads/writes/eviction.
 
 ## Synthetic scenario evaluation contract
 
