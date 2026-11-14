@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
 from lunarwindow.ephemeris.contract import dataset_schema
-from lunarwindow.reference import load_reference_dataset
+from lunarwindow.reference import load_reference_catalog, load_reference_dataset
 from lunarwindow.visibility.models import VisibilityRule
 
 from .demo import DemoProvider
@@ -25,6 +25,7 @@ from .models import (
     EvaluationRequest,
     Health,
     Location,
+    ReferenceSiteCatalog,
     SiteCatalog,
 )
 
@@ -118,6 +119,24 @@ def create_app() -> FastAPI:
     @app.get("/api/sites", response_model=SiteCatalog, tags=["sites"])
     def sites(provider: Annotated[DemoProvider, Depends(get_provider)]) -> SiteCatalog:
         return SiteCatalog(sites=provider.list_sites())
+
+    @app.get(
+        "/api/reference/sites",
+        response_model=ReferenceSiteCatalog,
+        responses={503: {"model": ErrorResponse}},
+        tags=["reference"],
+        summary="List verified reference points and their archive coverage",
+        description="Sourced DEM reference points with available UTC dates and sampling intervals.",
+    )
+    def reference_sites(
+        directory: Annotated[Path, Depends(get_reference_directory)],
+    ) -> ReferenceSiteCatalog:
+        try:
+            return ReferenceSiteCatalog(sites=load_reference_catalog(directory))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
 
     @app.get(
         "/api/reference/sites/{site_id}/ephemeris",

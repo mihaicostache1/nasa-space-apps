@@ -92,6 +92,32 @@ class SiteCatalog(ApiModel):
     sites: list[DemoSite]
 
 
+class ReferenceAvailability(ApiModel):
+    startUtc: str
+    endUtc: str
+    endExclusive: Literal[True] = True
+    stepMinutes: int = Field(ge=1, le=1440)
+    sampleCount: int = Field(ge=1, le=200_000)
+
+
+class ReferenceSite(ApiModel):
+    id: str
+    name: str
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    altitudeKm: float
+    coordinateSource: str
+    availability: ReferenceAvailability
+
+
+class ReferenceSiteCatalog(ApiModel):
+    schemaVersion: Literal["lunarwindow.reference-catalog.v1"] = "lunarwindow.reference-catalog.v1"
+    provider: Literal["NASA/JPL Horizons"] = "NASA/JPL Horizons"
+    timeScale: Literal["UTC"] = "UTC"
+    longitudeConvention: Literal["east-positive"] = "east-positive"
+    sites: list[ReferenceSite] = Field(min_length=1)
+
+
 class DemoProvenance(ApiModel):
     provider: Literal["LunarWindow deterministic demo generator"] = (
         "LunarWindow deterministic demo generator"

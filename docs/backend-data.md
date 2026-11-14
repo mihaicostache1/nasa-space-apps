@@ -1,6 +1,6 @@
 # Backend/data — tasks 1 and 2
 
-The first P3 task (hours 3–12), **API skeleton with fake data**, and the second (hours 12–20), **visibility metrics, windows, and countdowns**, are implemented. FastAPI serves calculated evaluations from synthetic source angles and horizons, plus a separate read-only endpoint for verified reference ephemerides. Real Horizons/LOLA evaluation integration, caching, and precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
+The first P3 task (hours 3–12), **API skeleton with fake data**, and the second (hours 12–20), **visibility metrics, windows, and countdowns**, are implemented. FastAPI serves calculated evaluations from synthetic source angles and horizons, plus read-only reference endpoints for a verified site catalog and archived ephemerides. Real Horizons/LOLA evaluation integration, caching, and precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
 ## Run
 
@@ -29,6 +29,7 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 | GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels |
 | GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                       |
 | POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request    |
+| GET    | `/api/reference/sites`                     | Verified reference coordinates and archive availability        |
 | GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance    |
 
 The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
@@ -40,6 +41,18 @@ curl http://localhost:8000/api/evaluations \
   -H 'Content-Type: application/json' \
   -d '{"name":"Scenario A","location":{"latitudeDeg":-89,"longitudeDeg":0,"altitudeKm":0},"startUtc":"2026-11-14T00:00:00Z","endUtc":"2026-12-14T00:00:00Z","stepMinutes":60,"visibilityRule":"any-disc","asOfUtc":"2026-11-14T12:00:00Z"}'
 ```
+
+## Reference site catalog
+
+```sh
+curl http://localhost:8000/api/reference/sites
+```
+
+The response declares `schemaVersion: "lunarwindow.reference-catalog.v1"`, provider `NASA/JPL Horizons`, UTC time, and east-positive longitude. Each entry in `sites` contains `id`, `name`, `lat`, `lon`, `altitudeKm`, the original `coordinateSource`, and `availability` with `startUtc`, `endUtc`, `endExclusive`, `stepMinutes`, and `sampleCount`.
+
+The catalog is derived from the complete verified bundle. Currently it lists three LOLA DEM reference points, each with 720 hourly samples covering 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z (end excluded). Their source descriptions identify them as reference points rather than selected landing targets. Missing, corrupted, or invalid source data returns a structured HTTP 503; no partial catalog is published. The endpoint performs no downloads or writes.
+
+Use an entry's `id` with the reference ephemeris endpoint below. Availability describes the existing archive; date-range selection remains a separate implementation step. The OpenAPI documentation includes the catalog's typed response schema.
 
 ## Read one verified reference dataset
 
