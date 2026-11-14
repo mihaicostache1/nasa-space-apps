@@ -1,7 +1,7 @@
 {
   "schemaVersion": "lunarwindow.ephemeris.v2",
   "siteId": "lola-site04-reference",
-  "site": "Shackleton rim DEM reference point",
+  "site": "Shackleton inner wall DEM reference point",
   "lat": -89.76674147712977,
   "lon": -171.89280908299654,
   "altitudeKm": 0.7679786376953125,
