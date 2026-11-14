@@ -1,6 +1,7 @@
-"""P3 API: synthetic source data with calculated visibility, metrics, and windows."""
+"""Synthetic evaluations and verified offline reference ephemerides."""
 
 import os
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Query, Request
@@ -10,6 +11,8 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
+from lunarwindow.ephemeris.contract import dataset_schema
+from lunarwindow.reference import load_reference_dataset
 from lunarwindow.visibility.models import VisibilityRule
 
 from .demo import DemoProvider
@@ -28,6 +31,10 @@ from .models import (
 
 def get_provider() -> DemoProvider:
     return DemoProvider()
+
+
+def get_reference_directory() -> Path:
+    return Path(os.environ.get("LUNARWINDOW_REFERENCE_DIR", "data/reference")) / "validation-30d"
 
 
 def query_period(
@@ -59,7 +66,8 @@ def create_app() -> FastAPI:
             "Choose any-disc (default), body-center, or full-disc visibility. "
             "Durations use sample-and-hold; setting times include observation brackets. "
             "Times are whole-minute UTC; ranges include start and exclude end. "
-            "Real Horizons/LOLA integration remains pending."
+            "Verified offline ephemerides are available through the reference endpoint. "
+            "Real Horizons/LOLA evaluation integration remains pending."
         ),
         responses={422: {"model": ErrorResponse}},
     )
@@ -110,6 +118,36 @@ def create_app() -> FastAPI:
     @app.get("/api/sites", response_model=SiteCatalog, tags=["sites"])
     def sites(provider: Annotated[DemoProvider, Depends(get_provider)]) -> SiteCatalog:
         return SiteCatalog(sites=provider.list_sites())
+
+    @app.get(
+        "/api/reference/sites/{site_id}/ephemeris",
+        response_model=None,
+        responses={
+            200: {
+                "description": "Verified ephemeris dataset with unchanged source provenance",
+                "content": {"application/json": {"schema": dataset_schema()}},
+            },
+            404: {"model": ErrorResponse},
+            503: {"model": ErrorResponse},
+        },
+        tags=["reference"],
+        summary="Read one verified site's archived Sun/Earth ephemeris",
+        description="Returns the complete archived period without terrain or visibility calculations.",
+    )
+    def reference_ephemeris(
+        site_id: str,
+        directory: Annotated[Path, Depends(get_reference_directory)],
+    ) -> dict:
+        try:
+            return load_reference_dataset(directory, site_id)
+        except LookupError as exc:
+            raise HTTPException(
+                status_code=404, detail=f"Unknown reference site: {site_id}"
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=503, detail="Reference data is unavailable or failed validation."
+            ) from exc
 
     @app.get(
         "/api/sites/{site_id}",

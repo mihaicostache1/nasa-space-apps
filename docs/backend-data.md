@@ -1,6 +1,6 @@
 # Backend/data — tasks 1 and 2
 
-The first P3 task (hours 3–12), **API skeleton with fake data**, and the second (hours 12–20), **visibility metrics, windows, and countdowns**, are implemented. FastAPI serves calculated results from synthetic source angles and horizons. Real Horizons/LOLA integration, caching, and precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
+The first P3 task (hours 3–12), **API skeleton with fake data**, and the second (hours 12–20), **visibility metrics, windows, and countdowns**, are implemented. FastAPI serves calculated evaluations from synthetic source angles and horizons, plus a separate read-only endpoint for verified reference ephemerides. Real Horizons/LOLA evaluation integration, caching, and precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
 ## Run
 
@@ -23,12 +23,13 @@ Interactive documentation: [localhost:8000/docs](http://localhost:8000/docs). Op
 
 ## Routes
 
-| Method | Route                  | Response                                                       |
-| ------ | ---------------------- | -------------------------------------------------------------- |
-| GET    | `/api/health`          | Backend process health and `dataMode: "synthetic"`             |
-| GET    | `/api/sites`           | Three illustrative demo points, coordinates, and source labels |
-| GET    | `/api/sites/{site_id}` | One demo point's horizon and time series                       |
-| POST   | `/api/evaluations`     | Synthetic data for the existing frontend `Scenario` request    |
+| Method | Route                                      | Response                                                       |
+| ------ | ------------------------------------------ | -------------------------------------------------------------- |
+| GET    | `/api/health`                              | Backend process health and `dataMode: "synthetic"`             |
+| GET    | `/api/sites`                               | Three illustrative demo points, coordinates, and source labels |
+| GET    | `/api/sites/{site_id}`                     | One demo point's horizon and time series                       |
+| POST   | `/api/evaluations`                         | Synthetic data for the existing frontend `Scenario` request    |
+| GET    | `/api/reference/sites/{site_id}/ephemeris` | Verified archived Sun/Earth samples and original provenance    |
 
 The site-data route accepts `startUtc`, `endUtc`, `stepMinutes`, `visibilityRule`, and `asOfUtc` query parameters. Defaults are 2026-11-14T00:00:00Z through 2026-12-14T00:00:00Z, at 60-minute steps, with `any-disc` visibility and countdowns relative to the range start. These fixed dates make demos reproducible. An unknown site returns HTTP 404.
 
@@ -40,7 +41,19 @@ curl http://localhost:8000/api/evaluations \
   -d '{"name":"Scenario A","location":{"latitudeDeg":-89,"longitudeDeg":0,"altitudeKm":0},"startUtc":"2026-11-14T00:00:00Z","endUtc":"2026-12-14T00:00:00Z","stepMinutes":60,"visibilityRule":"any-disc","asOfUtc":"2026-11-14T12:00:00Z"}'
 ```
 
-## Frontend contract
+## Read one verified reference dataset
+
+```sh
+curl http://localhost:8000/api/reference/sites/lola-site01-reference/ephemeris
+```
+
+This endpoint uses the offline loader to validate the complete reference bundle and return the selected site's original `lunarwindow.ephemeris.v2` dataset. The response matches `EphemerisDataset` in `src/domain/ephemeris.ts`, including all 720 hourly samples from 2026-11-14 through 2026-12-14 UTC (end excluded), angular radii, coordinates, and NASA/JPL provenance. It returns the complete archive with no date filtering, terrain, visibility flags, or metrics.
+
+Unknown sites return a structured HTTP 404. Missing or invalid bundle data returns a structured HTTP 503 with no synthetic fallback or filesystem paths in the response. Availability is checked when the reference endpoint is called; the existing demo routes remain independent.
+
+Native startup from the repository root reads `data/reference/validation-30d`. Set the process environment variable `LUNARWINDOW_REFERENCE_DIR` to another reference-root directory containing `validation-30d` if needed. The Docker API image includes the committed bundle at `/app/data/reference/validation-30d`; no downloads or bind mounts are required.
+
+## Frontend evaluation contract
 
 `POST /api/evaluations` accepts the fields already defined in `src/domain/scenario.ts`. Python validates latitude [-90, 90], east-positive longitude [-180, 180], finite altitude in kilometers above the reference surface, a nonblank name up to 80 characters, and integer steps from 1 to 1440 minutes. Times must be whole-minute ISO UTC strings ending in `Z`, from 1962 onward, consistent with the ephemeris package. End must follow start; requests are limited to 31 days and 10,000 samples. Extra JSON fields and numeric strings/booleans are rejected.
 

@@ -30,6 +30,7 @@ jobs:
           docker compose up -d --wait --wait-timeout 90 web api
           curl --fail --silent --show-error http://127.0.0.1:8000/api/health | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status'] == 'ok' and d['dataMode'] == 'synthetic'"
           curl --fail --silent --show-error http://127.0.0.1:8000/api/sites/demo-polar-a | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['schemaVersion'] == 'lunarwindow.evaluation.v2' and d['metrics']['evaluatedHrs'] == 720 and 'both' in d['windows']"
+          curl --fail --silent --show-error http://127.0.0.1:8000/api/reference/sites/lola-site01-reference/ephemeris | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['schemaVersion'] == 'lunarwindow.ephemeris.v2' and len(d['series']) == 720 and d['provenance']['provider'] == 'NASA/JPL Horizons'"
           curl --fail --silent --show-error http://127.0.0.1:3000/api/health | python3 -c "import json,sys; assert json.load(sys.stdin)['status'] == 'ok'"
           curl --fail --silent --show-error http://127.0.0.1:3000/ -o /tmp/lunarwindow-page.html
           python3 -c "from pathlib import Path; assert 'Comparison workspace' in Path('/tmp/lunarwindow-page.html').read_text()"

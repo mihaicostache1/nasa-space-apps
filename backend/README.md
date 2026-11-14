@@ -80,7 +80,7 @@ from lunarwindow.reference import load_reference_dataset
 dataset = load_reference_dataset(Path("data/reference/validation-30d"), "lola-site01-reference")
 ```
 
-The loader checks the complete bundle with the existing checksum, schema, sampling-grid, provenance, and CSV/JSON validators, then returns the selected dataset with its original samples and provenance. It also checks the exact JSON bytes it returns against the verified manifest. The directory is explicit, so callers can use a repository or mounted-data path. It raises `LookupError` for an unknown site and `ValueError` for missing, incomplete, malformed, or corrupted bundle data. It performs no downloads or writes. API integration remains a separate step.
+The loader checks the complete bundle with the existing checksum, schema, sampling-grid, provenance, and CSV/JSON validators, then returns the selected dataset with its original samples and provenance. It also checks the exact JSON bytes it returns against the verified manifest. The directory is explicit, so callers can use a repository or mounted-data path. It raises `LookupError` for an unknown site and `ValueError` for missing, incomplete, malformed, or corrupted bundle data. It performs no downloads or writes. FastAPI exposes it through `GET /api/reference/sites/{site_id}/ephemeris`; see the [reference endpoint contract](../docs/backend-data.md#read-one-verified-reference-dataset). Connecting real inputs to visibility evaluations remains a separate step.
 
 ## Requests, caching, and concurrency
 
