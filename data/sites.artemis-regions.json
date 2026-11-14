@@ -1,0 +1,200 @@
+[
+  {
+    "id": "artemis3-haworth",
+    "name": "Haworth (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -86.367997,
+    "lon": -23.255952,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Haworth' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -86.367997,
+      "lon": -23.255952,
+      "avgSunPct": 75.2,
+      "avgEarthPct": 68.3,
+      "slopeDeg": 3.1,
+      "candidatePixels": 31934,
+      "polygonCentroidLat": -86.634982,
+      "polygonCentroidLon": -23.671806,
+      "polygonAreaKm2": 886.5,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-malapert-massif",
+    "name": "Malapert Massif (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -85.967922,
+    "lon": -2.27713,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Malapert Massif' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -85.967922,
+      "lon": -2.27713,
+      "avgSunPct": 84.5,
+      "avgEarthPct": 71.0,
+      "slopeDeg": 3.18,
+      "candidatePixels": 5373,
+      "polygonCentroidLat": -85.92475,
+      "polygonCentroidLon": -1.205073,
+      "polygonAreaKm2": 439.9,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-mons-mouton",
+    "name": "Mons Mouton (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -85.413511,
+    "lon": 31.709466,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Mons Mouton' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -85.413511,
+      "lon": 31.709466,
+      "avgSunPct": 80.0,
+      "avgEarthPct": 64.3,
+      "slopeDeg": 4.9,
+      "candidatePixels": 7792,
+      "polygonCentroidLat": -85.408919,
+      "polygonCentroidLon": 30.836778,
+      "polygonAreaKm2": 255.2,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-mons-mouton-plateau",
+    "name": "Mons Mouton Plateau (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -85.484289,
+    "lon": 29.517679,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Mons Mouton Plateau' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -85.484289,
+      "lon": 29.517679,
+      "avgSunPct": 78.4,
+      "avgEarthPct": 67.8,
+      "slopeDeg": 4.03,
+      "candidatePixels": 143425,
+      "polygonCentroidLat": -84.290799,
+      "polygonCentroidLon": 27.427478,
+      "polygonAreaKm2": 4429.8,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-nobile-rim-1",
+    "name": "Nobile Rim 1 (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -85.304048,
+    "lon": 37.0581,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Nobile Rim 1' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -85.304048,
+      "lon": 37.0581,
+      "avgSunPct": 85.8,
+      "avgEarthPct": 60.2,
+      "slopeDeg": 3.94,
+      "candidatePixels": 5860,
+      "polygonCentroidLat": -85.423063,
+      "polygonCentroidLon": 36.190322,
+      "polygonAreaKm2": 398.7,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-nobile-rim-2",
+    "name": "Nobile Rim 2 (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -83.724962,
+    "lon": 59.420067,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Nobile Rim 2' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -83.724962,
+      "lon": 59.420067,
+      "avgSunPct": 53.9,
+      "avgEarthPct": 71.8,
+      "slopeDeg": 1.05,
+      "candidatePixels": 12596,
+      "polygonCentroidLat": -83.975594,
+      "polygonCentroidLon": 57.960886,
+      "polygonAreaKm2": 397.8,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-peak-near-cabeus-b",
+    "name": "Peak Near Cabeus B (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -83.615747,
+    "lon": -68.590593,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Peak Near Cabeus B' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -83.615747,
+      "lon": -68.590593,
+      "avgSunPct": 68.4,
+      "avgEarthPct": 65.8,
+      "slopeDeg": 4.25,
+      "candidatePixels": 2096,
+      "polygonCentroidLat": -83.552261,
+      "polygonCentroidLon": -68.416113,
+      "polygonAreaKm2": 397.3,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-slater-plain",
+    "name": "Slater Plain (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -87.282505,
+    "lon": 127.962782,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'Slater Plain' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -87.282505,
+      "lon": 127.962782,
+      "avgSunPct": 65.6,
+      "avgEarthPct": 49.9,
+      "slopeDeg": 2.63,
+      "candidatePixels": 17726,
+      "polygonCentroidLat": -87.2556,
+      "polygonCentroidLon": 125.217676,
+      "polygonAreaKm2": 399.3,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  },
+  {
+    "id": "artemis3-de-gerlache-rim-2",
+    "name": "de Gerlache Rim 2 (Artemis III candidate region)",
+    "kind": "candidate-region",
+    "lat": -88.593166,
+    "lon": -67.94421,
+    "terrain": "lola-dem",
+    "coordinateSource": "Representative point inside the 'de Gerlache Rim 2' polygon from USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap; highest long-term average solar visibility (NASA PGDA AVGVISIB_75S_120M_201608, ties by Earth visibility) among 120 m pixels with LOLA LDEM_60S_120MPP_ADJ slope <= 10 deg. Not a landing target.",
+    "region": {
+      "lat": -88.593166,
+      "lon": -67.94421,
+      "avgSunPct": 78.6,
+      "avgEarthPct": 61.3,
+      "slopeDeg": 2.64,
+      "candidatePixels": 9371,
+      "polygonCentroidLat": -88.14188,
+      "polygonCentroidLon": -63.662312,
+      "polygonAreaKm2": 399.8,
+      "polygonSource": "USGS data release 'Down Selected Artemis III Candidate Landing Site Navigational Grids' (McClernan, 2024, doi:10.5066/P1MEQ6UK, CC0), file A3_9regions-lonlat-simplified.shp; regions sourced from LROC QuickMap",
+      "maxSlopeDeg": 10.0
+    }
+  }
+]
