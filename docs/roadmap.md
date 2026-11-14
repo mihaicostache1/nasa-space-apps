@@ -28,7 +28,7 @@ Reference evaluations now use the versioned cache-key contract and bounded in-me
 3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
 4. Compare the two scenarios side by side and include source/model details with each result.
 5. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
-6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, mission window finder, and a 2D azimuth/elevation sky explorer.
+6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, next sunset and Earthset countdowns (shown as the bracket between two observations), mission window finder, and a 2D azimuth/elevation sky explorer.
 7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
 8. Done: each scenario can select the reviewed Site01 LOLA terrain horizon, after explicit acceptance of its frame approximation; the badge and data banner name the model per scenario.
 9. Next: demo rehearsal in a clean browser, and deployment.

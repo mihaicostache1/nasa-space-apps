@@ -300,7 +300,12 @@ function Stat({
       <dt>{label}</dt>
       <dd>
         {value}
-        {detail && <small>{detail}</small>}
+        {detail && (
+          <>
+            {' '}
+            <small>{detail}</small>
+          </>
+        )}
       </dd>
     </div>
   );

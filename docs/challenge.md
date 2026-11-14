@@ -10,21 +10,21 @@ Changes in landing location or schedule can change the lighting and Earth visibi
 
 These are project implementation choices based on the challenge's suggested capabilities, not additional NASA requirements.
 
-| Capability                   | Proposed implementation                                                     | Scaffold status                   |
-| ---------------------------- | --------------------------------------------------------------------------- | --------------------------------- |
-| Compare locations            | Two independent scenarios; custom coordinates first, verified presets later | Editable input shell              |
-| Compare schedules            | UTC start/end dates and sampling interval per scenario                      | Input validation ready            |
-| Inspect local sky            | Sun/Earth azimuth and elevation relative to the horizon                     | Data contract ready; view pending |
-| Explore changes over time    | Timeline and elevation plots                                                | Pending                           |
-| Assess sunlight availability | Duration, next sunset, longest darkness                                     | Pending                           |
-| Assess Earth visibility      | Visibility periods, next Earthset, longest blackout                         | Pending                           |
-| Understand results           | Units, plain-language explanations, sources, model assumptions              | Documentation started             |
+| Capability                   | Proposed implementation                                                     | Status                                                        |
+| ---------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Compare locations            | Two independent scenarios; custom coordinates first, verified presets later | Done for verified reference sites; custom coordinates pending |
+| Compare schedules            | UTC start/end dates and sampling interval per scenario                      | Done                                                          |
+| Inspect local sky            | Sun/Earth azimuth and elevation relative to the horizon                     | Done: sky explorer                                            |
+| Explore changes over time    | Timeline and elevation plots                                                | Done: three-lane timeline                                     |
+| Assess sunlight availability | Duration, next sunset, longest darkness                                     | Done                                                          |
+| Assess Earth visibility      | Visibility periods, next Earthset, longest blackout                         | Done                                                          |
+| Understand results           | Units, plain-language explanations, sources, model assumptions              | Done: model and source per result                             |
 
 ## Scientific scope
 
 Start with airless Sun/Earth center positions above a mathematical local horizontal plane. Later add terrain horizon profiles from LOLA DEMs. Terrain can substantially change polar visibility, so results must always identify the model used.
 
-Sun visibility is an input to a power assessment; electrical output also depends on array orientation, efficiency, and hardware. Earth visibility is an initial geometric communication proxy; ground-station locations and antenna/link constraints require further work. The Python ephemeris module exports real apparent Sun/Earth center angles. The visibility engine calculates disc states, metrics, windows, and setting brackets; the API serves synthetic demos and geometric evaluations of verified archived samples. Real terrain integration, electrical power, and radio-link models remain pending. See [the visibility model](visibility.md).
+Sun visibility is an input to a power assessment; electrical output also depends on array orientation, efficiency, and hardware. Earth visibility is an initial geometric communication proxy; ground-station locations and antenna/link constraints require further work. The Python ephemeris module exports real apparent Sun/Earth center angles. The visibility engine calculates disc states, metrics, windows, and setting brackets; the API serves synthetic demos and geometric or reviewed-terrain (Site01) evaluations of verified archived samples. Electrical power and radio-link models remain pending. See [the visibility model](visibility.md).
 
 ## Later enhancements
 
