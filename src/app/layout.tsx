@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '@/features/mission/styles/experience.css';
 
 export const metadata: Metadata = {
-  title: 'Lunar Landing Site Navigator',
+  title: 'LunarWindow — Every landing has a window',
   description:
-    'A NASA Space Apps project for comparing lunar landing sites and dates.',
+    'Explore lunar reference sites, sunlight, Earth visibility, and the operational windows that shape a mission.',
 };
 
 export default function RootLayout({

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReferenceSite } from '@/domain/reference';
 import type { VisibilityRule } from '@/domain/evaluation';
 import {
@@ -22,11 +23,21 @@ export function ReferenceScenarioCard({
   issues,
   onChange,
 }: Props) {
+  const [query, setQuery] = useState('');
   const site = sites.find((candidate) => candidate.id === form.siteId);
   const id = `scenario-${form.slot}`;
   return (
     <fieldset className="panel" aria-describedby={`${id}-issues`}>
       <legend>Scenario {form.slot}</legend>
+      <label>
+        Search verified sites
+        <input
+          type="search"
+          placeholder="Find a reference point…"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
       <label>
         Reference site
         <select
@@ -36,19 +47,75 @@ export function ReferenceScenarioCard({
             if (next) onChange(withSite(form, next));
           }}
         >
-          {sites.map((candidate) => (
-            <option key={candidate.id} value={candidate.id}>
-              {candidate.name}
-            </option>
-          ))}
+          {sites
+            .filter(
+              (candidate) =>
+                candidate.id === form.siteId ||
+                candidate.name.toLowerCase().includes(query.toLowerCase()),
+            )
+            .map((candidate) => (
+              <option key={candidate.id} value={candidate.id}>
+                {candidate.name}{' '}
+                {candidate.terrainMasks.length
+                  ? '· terrain available'
+                  : '· geometric'}
+              </option>
+            ))}
         </select>
       </label>
       {site && (
         <p className="hint">
-          {Math.abs(site.lat).toFixed(4)}°S, {site.lon.toFixed(4)}°E ·{' '}
+          {Math.abs(site.lat).toFixed(4)}°{site.lat < 0 ? 'S' : 'N'},{' '}
+          {Math.abs(site.lon).toFixed(4)}°{site.lon < 0 ? 'W' : 'E'} ·{' '}
           {(site.altitudeKm * 1000).toFixed(0)} m above the 1737.4 km sphere ·
           LOLA DEM reference point, not a landing target
         </p>
+      )}
+      <label>
+        Horizon model
+        <select
+          value={form.horizonMode}
+          onChange={(event) =>
+            onChange({
+              ...form,
+              horizonMode: event.target.value as 'geometric' | 'terrain',
+              maskId:
+                event.target.value === 'terrain'
+                  ? (site?.terrainMasks[0]?.maskId ?? '')
+                  : '',
+              allowMeanEarthApproximation: false,
+            })
+          }
+        >
+          <option value="geometric">Geometric · flat 0° horizon</option>
+          <option value="terrain" disabled={!site?.terrainMasks.length}>
+            LOLA terrain
+            {!site?.terrainMasks.length ? ' · unavailable' : ' · reviewed mask'}
+          </option>
+        </select>
+      </label>
+      {form.horizonMode === 'terrain' && (
+        <div className="terrain-consent">
+          <p>
+            Reviewed 0 m mast. A 2 m mast can change this horizon by up to 1.9°.
+          </p>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={form.allowMeanEarthApproximation}
+              onChange={(event) =>
+                onChange({
+                  ...form,
+                  allowMeanEarthApproximation: event.target.checked,
+                })
+              }
+            />
+            <span>
+              I accept the DE421 MOON_ME / DE441 MEAN_ME approximation. No frame
+              transformation is applied.
+            </span>
+          </label>
+        </div>
       )}
       <div className="fields">
         <label>

@@ -15,6 +15,7 @@ import {
   segments,
 } from '../lib/timeline';
 import type { ScenarioResult } from '../types';
+import { MotionValue } from '@/features/mission/components/experience-motion';
 
 type Props = {
   results: ScenarioResult[];
@@ -46,7 +47,11 @@ export function ComparisonTimeline({
   const step =
     Math.min(...results.map(({ data }) => data.calculation.stepMinutes)) / 60;
   return (
-    <section className="analysis" aria-labelledby="timeline-heading">
+    <section
+      className="analysis"
+      aria-labelledby="timeline-heading"
+      data-reveal
+    >
       <div className="section-heading">
         <h2 id="timeline-heading">Visibility timeline</h2>
         <span className="hint">
@@ -284,7 +289,9 @@ function Stat({
   return (
     <div className={accent ? 'accent' : undefined}>
       <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dd>
+        <MotionValue>{value}</MotionValue>
+      </dd>
     </div>
   );
 }

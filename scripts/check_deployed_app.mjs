@@ -38,6 +38,23 @@ try {
     exact: true,
   });
   await matched.waitFor({ state: 'visible', timeout: 45_000 });
+  const palette = await page.evaluate(() => {
+    const root = getComputedStyle(document.documentElement);
+    return {
+      background: getComputedStyle(document.body).backgroundColor,
+      earth: root.getPropertyValue('--earth').trim(),
+      solar: root.getPropertyValue('--sun').trim(),
+    };
+  });
+  assert.deepEqual(palette, {
+    background: 'rgb(2, 7, 10)',
+    earth: '#0297de',
+    solar: '#fc734d',
+  });
+  await page.locator('.mission-grid').scrollIntoViewIfNeeded();
+  await page.waitForFunction(
+    () => document.querySelector('.mission-grid').dataset.revealed === 'true',
+  );
   await page
     .getByRole('heading', { name: 'Compare two scenarios', exact: true })
     .waitFor();
@@ -70,6 +87,184 @@ try {
   assert.equal(updated.status(), 200);
   assert.equal((await updated.json()).calculation.visibilityRule, 'full-disc');
   await matched.waitFor({ state: 'visible', timeout: 45_000 });
+
+  // Terrain requires a deliberate opt-in; the UI retains the returned evidence.
+  await scenario.getByLabel('Horizon model').selectOption('terrain');
+  const consent = scenario.getByRole('checkbox');
+  assert.equal(await consent.isChecked(), false);
+  await consent.check();
+  const terrainResponse = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/api/reference/evaluations' &&
+      response.request().method() === 'POST' &&
+      response.request().postDataJSON()?.horizonMode === 'terrain',
+  );
+  await page.getByRole('button', { name: /Update comparison/ }).click();
+  const terrain = await terrainResponse;
+  assert.equal(terrain.status(), 200);
+  const terrainData = await terrain.json();
+  assert.equal(terrainData.horizonMode, 'terrain');
+  assert.equal(
+    terrainData.provenance.terrain.compatibility.frameStatus,
+    'approximate',
+  );
+  assert.equal(
+    terrainData.provenance.terrain.compatibility.transformationApplied,
+    false,
+  );
+  await matched.waitFor({ state: 'visible', timeout: 45_000 });
+  await page.locator('.provenance-details summary').click();
+  assert.ok(
+    (await page.locator('.provenance-hash').innerText()).includes(
+      terrainData.provenance.terrain.artifactSha256,
+    ),
+  );
+  await page.locator('.provenance-details summary').click();
+
+  // The keyboard playhead and sample-driven playback update the dome.
+  const cursor = page.locator('.cursor-control input');
+  const markerBefore = await page
+    .locator('.dome-marker-position.sun')
+    .getAttribute('style');
+  await cursor.focus();
+  await cursor.press('Home');
+  await cursor.press('ArrowRight');
+  assert.equal(await cursor.inputValue(), '1');
+  assert.notEqual(
+    await page.locator('.dome-marker-position.sun').getAttribute('style'),
+    markerBefore,
+  );
+  assert.ok(
+    await page
+      .locator('.dome-marker-position.sun')
+      .evaluate(
+        (element) =>
+          parseFloat(getComputedStyle(element).transitionDuration) > 0,
+      ),
+  );
+  assert.ok(
+    (await page.locator('.dome-readout > strong').innerText()).includes(
+      '01:00',
+    ),
+  );
+  await page.getByRole('button', { name: 'Play archived samples' }).click();
+  await page.waitForFunction(
+    () => Number(document.querySelector('.cursor-control input').value) > 1,
+  );
+  await page.getByRole('button', { name: 'Pause archived samples' }).click();
+
+  await page.getByRole('button', { name: 'Polar map', exact: true }).click();
+  const contrast = initial.find(
+    (entry) => entry.data.siteId === 'lola-site23-reference',
+  ).data;
+  await page
+    .locator('.map-site-key')
+    .getByRole('button', { name: contrast.site })
+    .click();
+  assert.equal(
+    await scenario.getByLabel('Reference site').inputValue(),
+    contrast.siteId,
+  );
+  assert.equal(
+    await scenario.getByLabel('Horizon model').inputValue(),
+    'geometric',
+  );
+  assert.equal(
+    await scenario
+      .getByLabel('Horizon model')
+      .locator('option[value="terrain"]')
+      .isDisabled(),
+    true,
+  );
+  const mapSvg = page.locator('.polar-map svg');
+  const beforeZoom = await mapSvg.getAttribute('viewBox');
+  await page.getByRole('button', { name: 'Zoom in map' }).click();
+  assert.notEqual(await mapSvg.getAttribute('viewBox'), beforeZoom);
+  await page.getByRole('button', { name: 'Reset map', exact: true }).click();
+  assert.equal(await mapSvg.getAttribute('viewBox'), beforeZoom);
+
+  // Archive coverage is a hard boundary, including the headline six-week shift.
+  assert.equal(
+    await page
+      .getByRole('button', { name: '+6 WEEKS', exact: true })
+      .isDisabled(),
+    true,
+  );
+  const shift = page.getByRole('slider', { name: /Shift mission date/ });
+  await shift.focus();
+  await shift.press('End');
+  assert.equal(
+    await page
+      .getByRole('button', { name: /Simulate mission shift/ })
+      .isDisabled(),
+    true,
+  );
+  await page.getByRole('button', { name: '+7 DAYS', exact: true }).click();
+  const shiftedResponse = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/api/reference/evaluations' &&
+      response.request().method() === 'POST' &&
+      response.request().postDataJSON()?.startUtc === '2026-11-21T00:00:00Z',
+  );
+  await page.getByRole('button', { name: /Simulate mission shift/ }).click();
+  const shifted = await shiftedResponse;
+  assert.equal(shifted.status(), 200);
+  const shiftedData = await shifted.json();
+  assert.equal(shiftedData.series.length, 24);
+  await matched.waitFor({ state: 'visible', timeout: 45_000 });
+  await page.locator('.shift-results').waitFor();
+  const measuredResponses = await Promise.all(evaluations);
+  const originalShift = measuredResponses.find(
+    (entry) =>
+      entry.data.provenance.ephemeris.startUtc === '2026-11-14T00:00:00Z' &&
+      entry.data.series.length === 24,
+  ).data;
+  for (const [key, property] of [
+    ['sun', 'pctSun'],
+    ['earth', 'pctEarth'],
+    ['joint', 'pctBoth'],
+  ]) {
+    const metric = page.locator(`.shift-results [data-metric="${key}"]`);
+    const displayed = parseFloat(
+      await metric.locator('.metric-difference .motion-value').innerText(),
+    );
+    assert.ok(
+      Math.abs(
+        displayed -
+          (shiftedData.metrics[property] - originalShift.metrics[property]),
+      ) < 0.051,
+    );
+    assert.equal(
+      await metric.locator('.metric-after').innerText(),
+      `${shiftedData.metrics[property].toFixed(1)}%`,
+    );
+  }
+  await page.getByLabel('Mission duration').selectOption('3');
+  await page.locator('.shift-results').waitFor({ state: 'hidden' });
+  await page.getByLabel('Mission duration').selectOption('1');
+  await page.locator('.shift-results').waitFor();
+  await page.getByRole('button', { name: 'Sky dome', exact: true }).click();
+  assert.equal(await cursor.inputValue(), '0');
+  const requestCount = evaluations.length;
+  const lesson = page.getByRole('slider', {
+    name: 'Illustrative horizon elevation',
+  });
+  await lesson.focus();
+  await lesson.press('End');
+  assert.equal(
+    await page.locator('.lesson-values [role="status"]').innerText(),
+    'Occluded',
+  );
+  await lesson.press('Home');
+  assert.equal(
+    await page.locator('.lesson-values [role="status"]').innerText(),
+    'Fully visible',
+  );
+  assert.equal(
+    evaluations.length,
+    requestCount,
+    'The illustrative lesson must not submit evaluations.',
+  );
   const probe = await page.evaluate(async (origin) => {
     const ready = await fetch(`${origin}/api/ready`);
     const readiness = await ready.json();
@@ -94,6 +289,64 @@ try {
   assert.equal(probe.readiness.status, 'ready');
   assert.equal(probe.invalidStatus, 422);
   assert.equal(probe.invalid.error.code, 'validation_error');
+  const mobile = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    reducedMotion: 'reduce',
+  });
+  mobile.on('pageerror', (error) => pageErrors.push(error.message));
+  await mobile.goto(web);
+  await mobile
+    .getByText('Results match the inputs above.', { exact: true })
+    .waitFor({ timeout: 45_000 });
+  assert.equal(
+    await mobile.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    true,
+  );
+  assert.equal(
+    await mobile
+      .locator('.hero-copy')
+      .evaluate((element) => getComputedStyle(element).animationName),
+    'none',
+  );
+  await mobile.locator('.visual-stage').scrollIntoViewIfNeeded();
+  assert.equal(
+    await mobile.locator('.experience').getAttribute('data-motion'),
+    'reduced',
+  );
+  assert.equal(
+    await mobile
+      .locator('.dome-marker-position.sun')
+      .evaluate((element) => getComputedStyle(element).transitionDuration),
+    '0s',
+  );
+  assert.equal(
+    await mobile
+      .locator('.headline-line')
+      .first()
+      .evaluate((element) => getComputedStyle(element).animationName),
+    'none',
+  );
+  await mobile.emulateMedia({ reducedMotion: 'no-preference' });
+  await mobile.waitForFunction(
+    () => document.querySelector('.experience').dataset.motion === 'ready',
+  );
+  assert.equal(
+    await mobile
+      .locator('.headline-line')
+      .first()
+      .evaluate((element) => getComputedStyle(element).opacity),
+    '1',
+  );
+  assert.equal(
+    await mobile
+      .locator('.headline-line')
+      .first()
+      .evaluate((element) => getComputedStyle(element).animationName),
+    'none',
+  );
+  await mobile.close();
   assert.deepEqual(pageErrors, []);
   console.log(
     JSON.stringify({
@@ -101,6 +354,15 @@ try {
       api: apiOrigin,
       initialEvaluations: initial.length,
       updatedVisibilityRule: 'full-disc',
+      terrain: 'verified with explicit frame acceptance',
+      mapSelection: 'ok',
+      sharedCursorAndPlayback: 'ok',
+      palette: 'midnight / electric blue / cantaloupe',
+      motionAndReducedMotion: 'ok',
+      shiftPercentagePointDifferences: 'verified against API responses',
+      illustrativeHorizonLesson: 'isolated from mission results',
+      missionShift: '7 days; 6 weeks blocked by coverage',
+      mobileOverflow: false,
       readiness: 'ready',
       invalidRangeStatus: 422,
       browserErrors: 0,

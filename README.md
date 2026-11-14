@@ -1,8 +1,26 @@
 # LunarWindow - Lunar Landing Site Navigator
 
-Project scaffold for the [NASA Space Apps 2026 challenge](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/).
+Our entry for the [NASA Space Apps 2026 challenge](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/) "Lunar Landing Site Navigator".
 
-The intended application compares lunar landing locations and dates through Sun/Earth positions, sunlight duration, and direct-to-Earth visibility windows. The initial focus is the lunar south pole. The team plan separates a Python/FastAPI data backend from a React frontend; this repository now includes the Ephemeris lead's Python package alongside the existing Next.js/React UI starter.
+LunarWindow compares lunar south-pole sites and dates. For each one it shows when the Sun is up (power), when Earth is up (direct-to-Earth link), and when both are. It runs entirely on archived, checksummed NASA data: JPL Horizons ephemerides and LOLA elevation models. A Python/FastAPI backend serves the calculations, and a Next.js/React app shows a three-lane timeline with a shared cursor, a mission window finder, and a 2D sky explorer.
+
+![LunarWindow comparing two south-pole reference sites](docs/screenshots/02-timeline.png)
+
+|              |                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| Run it       | `docker compose up --build -d --wait`, then open [localhost:3000](http://localhost:3000) |
+| Deploy       | Render (API) + Vercel (web): [docs/deploy.md](docs/deploy.md)                            |
+| Demo         | [docs/demo-script.md](docs/demo-script.md), [screenshots](docs/screenshots/)             |
+| Data sources | [docs/attribution.md](docs/attribution.md)                                               |
+| License      | [MIT](LICENSE) for code; data keeps its providers' terms                                 |
+
+**Scientific limits.**
+
+- Results use a flat 0° horizon: local terrain, eclipses, power and radio-link performance are not modelled.
+- Event times are bracketed by the sampling interval.
+- Reference points are DEM grid cells, not landing recommendations.
+- A validated terrain horizon exists for one site (Site01) but is not yet applied in the app.
+- The QuickMap comparisons validate Sun/Earth angles for observers about 100–144 km up, not ground-level terrain shadows.
 
 ## Start with Docker
 

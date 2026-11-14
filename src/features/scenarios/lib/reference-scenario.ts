@@ -3,6 +3,7 @@ import type {
   VisibilityRule,
 } from '@/domain/evaluation';
 import type { ReferenceSite } from '@/domain/reference';
+import type { ReferenceEvaluationRequestContract } from '@/domain/terrain-evaluation';
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
@@ -17,6 +18,9 @@ export type ReferenceScenarioForm = {
   endDate: string;
   stepMinutes: number;
   visibilityRule: VisibilityRule;
+  horizonMode: 'geometric' | 'terrain';
+  maskId: string;
+  allowMeanEarthApproximation: boolean;
 };
 
 export const VISIBILITY_RULES: { value: VisibilityRule; label: string }[] = [
@@ -55,6 +59,9 @@ export function defaultForm(
     endDate: utcDate(site.availability.endUtc),
     stepMinutes: site.availability.stepMinutes,
     visibilityRule: 'any-disc',
+    horizonMode: 'geometric',
+    maskId: '',
+    allowMeanEarthApproximation: false,
   };
 }
 
@@ -74,13 +81,22 @@ export function withSite(
   const stepMinutes = stepOptions(site).includes(form.stepMinutes)
     ? form.stepMinutes
     : site.availability.stepMinutes;
-  return { ...form, siteId: site.id, startDate, endDate, stepMinutes };
+  return {
+    ...form,
+    siteId: site.id,
+    startDate,
+    endDate,
+    stepMinutes,
+    horizonMode: 'geometric',
+    maskId: '',
+    allowMeanEarthApproximation: false,
+  };
 }
 
 export function toRequest(
   form: ReferenceScenarioForm,
-): ReferenceEvaluationRequest {
-  return {
+): ReferenceEvaluationRequestContract {
+  const common: ReferenceEvaluationRequest = {
     siteId: form.siteId,
     horizonMode: 'geometric',
     startUtc: `${form.startDate}T00:00:00Z`,
@@ -88,6 +104,14 @@ export function toRequest(
     stepMinutes: form.stepMinutes,
     visibilityRule: form.visibilityRule,
   };
+  return form.horizonMode === 'terrain'
+    ? {
+        ...common,
+        horizonMode: 'terrain',
+        maskId: form.maskId,
+        allowMeanEarthApproximation: form.allowMeanEarthApproximation,
+      }
+    : common;
 }
 
 /** Client-side checks mirroring the API, so most mistakes never leave the page. */
@@ -97,6 +121,18 @@ export function validateForm(
 ): string[] {
   if (!site) return ['Choose a reference site.'];
   const issues: string[] = [];
+  if (form.horizonMode === 'terrain') {
+    const mask = site.terrainMasks.find((item) => item.maskId === form.maskId);
+    if (!site.supportedHorizonModes.includes('terrain') || !mask)
+      issues.push('A reviewed terrain mask is not available for this site.');
+    if (
+      mask?.requiresMeanEarthApproximation &&
+      !form.allowMeanEarthApproximation
+    )
+      issues.push(
+        'Accept the Mean Earth frame approximation before evaluating terrain.',
+      );
+  }
   const start = Date.parse(`${form.startDate}T00:00:00Z`);
   const end = Date.parse(`${form.endDate}T00:00:00Z`);
   if (Number.isNaN(start) || Number.isNaN(end)) {
@@ -119,4 +155,25 @@ export function validateForm(
     );
   }
   return issues;
+}
+
+/** Shift whole UTC days without clipping or silently extending archive coverage. */
+export function missionShift(
+  form: ReferenceScenarioForm,
+  days: number,
+  durationDays: number,
+) {
+  const shift = (offset: number) =>
+    new Date(Date.parse(`${form.startDate}T00:00:00Z`) + offset * DAY_MS)
+      .toISOString()
+      .slice(0, 10);
+  return {
+    original: { ...form, slot: 'A' as const, endDate: shift(durationDays) },
+    revised: {
+      ...form,
+      slot: 'B' as const,
+      startDate: shift(days),
+      endDate: shift(days + durationDays),
+    },
+  };
 }

@@ -18,7 +18,7 @@ export function MissionWindowFinder({ results, onJump }: Props) {
   const [minHours, setMinHours] = useState(24);
   const [sort, setSort] = useState<MissionWindowSort>('longest');
   return (
-    <section className="analysis" aria-labelledby="finder-heading">
+    <section className="analysis" aria-labelledby="finder-heading" data-reveal>
       <div className="section-heading">
         <h2 id="finder-heading">Mission window finder</h2>
         <span className="hint">

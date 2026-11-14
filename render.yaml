@@ -1,0 +1,18 @@
+# Render Blueprint for the LunarWindow FastAPI service (see docs/deploy.md).
+# Render builds the last stage of backend/Dockerfile, which is the `api` stage:
+# the archived reference data is baked into the image, so no NASA requests are made.
+services:
+  - type: web
+    name: lunarwindow-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      # The container listens on 8000; tell Render to route there.
+      - key: PORT
+        value: '8000'
+      # Comma-separated browser origins, e.g. https://lunarwindow.vercel.app
+      - key: LUNARWINDOW_CORS_ORIGINS
+        sync: false
