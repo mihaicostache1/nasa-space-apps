@@ -9,6 +9,9 @@ RUN python -m pip wheel --no-cache-dir --wheel-dir /wheels .
 FROM build AS analysis-build
 RUN python -m pip wheel --no-cache-dir --wheel-dir /analysis-wheels '.[analysis]'
 
+FROM build AS terrain-build
+RUN python -m pip wheel --no-cache-dir --wheel-dir /terrain-wheels '.[analysis,gis]'
+
 FROM build AS test-build
 RUN python -m pip wheel --no-cache-dir --wheel-dir /test-wheels 'httpx>=0.28,<1'
 
@@ -24,7 +27,7 @@ RUN python -m pip install --no-cache-dir --no-index /wheels/*.whl \
     && useradd --uid 1000 --gid lunarwindow --no-create-home lunarwindow \
     && mkdir -p /app/data/raw /app/data/processed \
     && chown -R lunarwindow:lunarwindow /app
-COPY --chown=lunarwindow:lunarwindow data/sites.example.json /app/data/sites.example.json
+COPY --chown=lunarwindow:lunarwindow data/sites.example.json data/sites.curated.json /app/data/
 USER lunarwindow
 ENTRYPOINT ["lunarwindow-ephemeris"]
 CMD ["--help"]
@@ -46,6 +49,14 @@ COPY --from=analysis-build /analysis-wheels /analysis-wheels
 RUN python -m pip install --no-cache-dir --no-index /analysis-wheels/*.whl && rm -rf /analysis-wheels
 USER lunarwindow
 ENTRYPOINT ["lunarwindow-report"]
+CMD ["--help"]
+
+FROM runtime AS terrain
+USER root
+COPY --from=terrain-build /terrain-wheels /terrain-wheels
+RUN python -m pip install --no-cache-dir --no-index /terrain-wheels/*.whl && rm -rf /terrain-wheels
+USER lunarwindow
+ENTRYPOINT ["lunarwindow-terrain"]
 CMD ["--help"]
 
 FROM runtime AS api
