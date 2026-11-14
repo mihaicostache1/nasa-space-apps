@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115,<1",
     "jsonschema>=4.23,<5",
+    "numpy>=2.0,<3",
     "pydantic>=2.10,<3",
     "uvicorn>=0.34,<1",
 ]
@@ -17,18 +18,20 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["httpx>=0.28,<1", "ruff>=0.14,<1"]
 analysis = ["matplotlib>=3.10,<4"]
-gis = ["rasterio>=1.4,<2"]
+gis = ["pyshp>=2.3,<4", "rasterio>=1.4,<2"]
 
 [project.scripts]
 lunarwindow-ephemeris = "lunarwindow.ephemeris.cli:main"
 lunarwindow-report = "lunarwindow.ephemeris.report:main"
 lunarwindow-validate = "lunarwindow.ephemeris.contract:main"
+lunarwindow-terrain = "lunarwindow.terrain.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "lunarwindow.ephemeris" = ["*.schema.json"]
+"lunarwindow.terrain" = ["*.schema.json"]
 
 [tool.ruff]
 line-length = 100

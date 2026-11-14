@@ -39,6 +39,18 @@ services:
       - ./data:/app/data
     init: true
 
+  terrain:
+    image: lunarwindow-terrain:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: terrain
+    profiles: ['tools']
+    user: '${LOCAL_UID:-1000}:${LOCAL_GID:-1000}'
+    volumes:
+      - ./data:/app/data
+    init: true
+
   validate:
     image: lunarwindow-ephemeris:local
     build:
