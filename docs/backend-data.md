@@ -1,6 +1,6 @@
 # Backend/data — tasks 1 and 2
 
-The FastAPI backend provides synthetic scenario demos and geometric or reviewed-terrain evaluations of verified archived NASA ephemerides. Reference-data integration includes validated loaders, a site catalog, date-range selection, request/response contracts, observer/frame compatibility checks, and calculation-engine adapters. Dedicated terrain-blocking regressions, caching, and extended precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
+The FastAPI backend provides synthetic scenario demos and geometric or reviewed-terrain evaluations of verified archived NASA ephemerides. Reference-data integration includes validated loaders, a site catalog, date-range selection, request/response contracts, observer/frame compatibility checks, calculation-engine adapters, and dedicated terrain-blocking regressions. Caching and extended precomputation remain later tasks. See [the calculation model and migration details](visibility.md).
 
 The [terrain-mask v1 handoff contract, offline loader, and compatibility helper](terrain-mask.md) define validated observer coordinates/heights, reference frames, complete horizon profiles, and DEM/algorithm provenance. `load_terrain_mask(path, expected_sha256=...)` verifies the artifact's exact bytes. `check_terrain_compatibility(mask, dataset)` checks observer geometry and frame evidence, rejecting the untransformed DE421/Horizons pairing by default. The [terrain-aware evaluation endpoint](#terrain-aware-evaluation-contract) requires explicit reference-demo acceptance and records the approximation and scientific sources.
 
@@ -170,6 +170,8 @@ Errors use the existing structured envelope: HTTP 422 for invalid selections, in
 Native startup reads masks from `data/reference/terrain-masks`. `LUNARWINDOW_REFERENCE_DIR` selects the reference root for both `validation-30d` ephemerides and `terrain-masks`. The Docker API image includes the reviewed mask at `/app/data/reference/terrain-masks`; no downloads or bind mounts are required. The current mask is a ground + 0 m reference observer, not a configurable antenna height; preserve the frame and near-field limitations described in its provenance and README.
 
 Contract tests in `backend/tests/test_terrain_evaluation_contract.py` validate schemas, round trips, strict defaults, complete provenance, mask/profile agreement, frame-assessment consistency, and shared archive checks. HTTP integration tests in `backend/tests/test_terrain_evaluation.py` compare returned results with the engine on the exact archived samples and reviewed mask, test selection/options/errors, and verify geometric independence. CI also requests a terrain evaluation from the packaged API image. The geometric v1 regression suite remains active.
+
+Dedicated [terrain regression evidence](validation/terrain-regression.md) adds hand-computed blocking/boundary cases and independently derived, pinned Site01 API expectations for all six mode/rule combinations. These protect metrics, all operating-window boundaries, partial-disc behavior, negative horizons, and original source/compatibility provenance. The expectations verify the software model; validation against terrain observations remains separate.
 
 ## Synthetic scenario evaluation contract
 

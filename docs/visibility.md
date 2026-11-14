@@ -132,3 +132,5 @@ docker compose run --build --rm ephemeris-test
 ```
 
 Analytical tests cover constant visibility/darkness, partial and tangent disc states, all three policies, fractional and wraparound azimuths, negative horizons, weighted partial bins, contiguous and clipped windows, countdown selections, invalid grids/masks/numbers, repeatability, input preservation, and compatibility with an archived real P1 dataset. HTTP tests verify both routes, options, response contracts, errors, and metric/window consistency.
+
+The [dedicated terrain regression suite](validation/terrain-regression.md) adds hand-calculated sector blocking and a fixed 720-hour Site01 baseline across geometric/terrain modes and every visibility rule. Its expected metrics and windows come from a separate decimal/NumPy derivation, with pinned source hashes and no production-engine imports. The API is checked against those fixed expectations and must preserve the original source evidence and frame limitations. This verifies model implementation, rather than physical terrain accuracy.
