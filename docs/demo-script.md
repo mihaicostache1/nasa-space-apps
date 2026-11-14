@@ -26,6 +26,7 @@ The archive covers 30 days, so the slip shown is about two weeks rather than six
 1. Switch scenario B to **Malapert massif**, still 1–8 Dec, and update.
    - Sun 42%, Earth 36%.
    - The **Mission window finder** lists a combined Sun + Earth window of **≥ 61 h** at the start of the week.
+   - **Next Earthset** reads **T+60–61 h** (3 Dec 12:00–13:00 UTC): that is when the window closes. Next sunset follows at T+70–71 h.
 2. Press **Show**: the shared cursor jumps to that window on the timeline.
 
 ## 4. Why: the sky (20 s)
@@ -43,6 +44,7 @@ Drag the timeline cursor and watch the markers move.
    - The badge reads **A TERRAIN · B GEOMETRIC** and the data banner names the model for each scenario.
    - Sun visible drops from 100% to **81%**, Earth from 95% to **67%**.
    - Longest simultaneous operation falls from ≥ 160 h to **81 h (3.4 d)**.
+   - **Next sunset** changes from "None observed" to **T+135–136 h** (22 Nov 15:00–16:00 UTC): the ridge-line hides the Sun.
 3. In the sky explorer, scenario A now shows the jagged LOLA skyline (about −3° to +3°) instead of the flat line.
 
 > "A flat horizon overstates this site. With the real ridge-line from NASA's LOLA elevation data, the joint power-and-link window halves."
