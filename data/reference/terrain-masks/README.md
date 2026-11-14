@@ -15,7 +15,7 @@ The observer is identical to the archived ephemerides in `data/reference/validat
 - **Position:** lat −89.46315775697248°, east lon −137.50198490762307°.
 - **Total altitude:** 1.94476708984375 km above the 1737.4 km sphere. That is the ground height of 1944.76708984375 m plus a mast of 0 m.
 - **Ground height check:** the ground height is the centre pixel (row 1600, col 1600) of the original 5 m Site01 DEM. The exporter re-reads that DEM and refuses to write the mask if the ground differs from the archived altitude by more than 1 mm.
-- **Frame:** the DEM frame is `MOON_ME`, DE421, using geodetic coordinates on the sphere with east-positive longitude. The archived Horizons responses report the Moon frame as `MEAN_ME (high precision)` from DE441, on the same 1737.4 km sphere. Both are Mean Earth/polar-axis frames, but they are different realizations. **No frame transformation is applied.** Whether to accept the pairing is the backend compatibility check's decision.
+- **Frame:** the mask declares the DEM frame, `MOON_ME` from DE421, using geodetic coordinates on the 1737.4 km sphere with east-positive longitude. The archived Horizons responses label the observer's Moon frame `MEAN_ME (high precision)` on the same sphere, and list DE441 as the source of the body positions. The header does not say which lunar orientation model realizes `MEAN_ME`, so it neither proves nor rules out a match with DE421 `MOON_ME`. **No frame transformation is applied.** The backend compatibility check must establish the frame relationship and explicitly accept or reject the pairing.
 
 ## How it was generated
 
@@ -48,6 +48,22 @@ The observer is identical to the archived ephemerides in `data/reference/validat
 | Long-term plausibility | One modelled year (6 h steps) gives Sun 43.1% and Earth 38.4%. NASA PGDA's 18.6-year averages at this 120 m pixel are 49.3% and 43.1% (`AVGVISIB_75S_120M_201608`) |
 
 The horizon ranges from −2.96° (az 303°) to +3.26° (az 113°).
+
+## Regenerating for another mast height
+
+The mask and the ephemerides must describe the same observer, so regenerating takes two steps. The 0 m mask is never overwritten: each mast height produces its own `…-mast-<height>m.json` file and checksum.
+
+```sh
+# 1. Write the ephemeris site entry: ground from the 5 m tile + mast. For 2 m, altitudeKm = 1.94676708984375.
+python scripts/export_terrain_mask.py --mast-m 2 --write-site-file data/processed/site01-mast-2m.json
+lunarwindow-ephemeris --sites data/processed/site01-mast-2m.json \
+  --start 2026-11-14T00:00:00Z --end 2026-12-14T00:00:00Z
+
+# 2. Build the mask from that ephemeris run. The exporter refuses if altitude ≠ ground + mast.
+python scripts/export_terrain_mask.py --mast-m 2 --ephemeris-dir data/processed/ephemeris/<run-id>
+```
+
+With `--mast-m 0`, step 1 reproduces the archived Site01 site entry exactly.
 
 ## Coverage and known limitations
 

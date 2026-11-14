@@ -93,6 +93,46 @@ def source_entry(dem: DemSource, record: dict) -> dict:
     }
 
 
+def write_site_file(args) -> int:
+    """Ephemeris site entry whose altitude is the 5 m tile ground plus the requested mast."""
+    reference = json.loads((args.ephemeris_dir / f"{args.site_id}.json").read_text())
+    path = args.dem_dir / PRODUCTS[args.site_tile].filename
+    with DemSource(path) as tile:
+        x, y = (
+            float(v)
+            for v in latlon_to_stereographic(reference["lat"], reference["lon"])
+        )
+        patch = tile.read_patch(x, y, 100)
+        col = (x - patch.left) / patch.resolution_m - 0.5
+        row = (patch.top - y) / patch.resolution_m - 0.5
+        if abs(col - round(col)) < 1e-6 and abs(row - round(row)) < 1e-6:
+            ground = float(
+                patch.data[round(row), round(col)]
+            )  # Exact pixel-centre value.
+        else:
+            ground = float(patch.sample(x, y))
+    altitude_km = (ground + args.mast_m) / 1000
+    row = {
+        "id": args.site_id,
+        "name": reference["site"],
+        "lat": reference["lat"],
+        "lon": reference["lon"],
+        "altitudeKm": altitude_km,
+        "coordinateSource": reference["coordinateSource"]
+        if args.mast_m == 0
+        else reference["coordinateSource"].replace(
+            "sampled surface height, 0 m mast",
+            f"sampled surface height {ground} m + {args.mast_m:g} m mast",
+        ),
+    }
+    args.write_site_file.parent.mkdir(parents=True, exist_ok=True)
+    args.write_site_file.write_text(
+        json.dumps([row], indent=2) + "\n", encoding="utf-8"
+    )
+    print(json.dumps({"path": str(args.write_site_file), "altitudeKm": altitude_km}))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--site-id", default="lola-site01-reference")
@@ -110,8 +150,17 @@ def main() -> int:
     parser.add_argument("--near-field-km", type=float, default=25.0)
     parser.add_argument("--min-distance-m", type=float, default=60.0)
     parser.add_argument("--allow-dirty", action="store_true", help="Testing only")
+    parser.add_argument(
+        "--write-site-file",
+        type=Path,
+        help="Only write the ephemeris --sites entry for this mast (ground from the 5 m tile "
+        "+ mast) and exit. Run lunarwindow-ephemeris with it, then pass that run as "
+        "--ephemeris-dir.",
+    )
     args = parser.parse_args()
 
+    if args.write_site_file:
+        return write_site_file(args)
     revision = git_revision(args.allow_dirty)
     archived = json.loads((args.ephemeris_dir / f"{args.site_id}.json").read_text())
     lat, lon, altitude_km = archived["lat"], archived["lon"], archived["altitudeKm"]
@@ -138,7 +187,11 @@ def main() -> int:
         sampled = float(fine_patch.sample(x, y))
         if abs(sampled - surface_m) > 0.001:
             raise SystemExit(
-                f"Archived altitude implies {surface_m} m ground, 5 m tile gives {sampled} m."
+                f"The ephemeris in {args.ephemeris_dir} uses altitude {altitude_km} km, which "
+                f"with a {args.mast_m:g} m mast implies {surface_m} m ground, but the 5 m tile "
+                f"gives {sampled} m. Ephemerides must use the same observer as the mask: create "
+                "them with --write-site-file and lunarwindow-ephemeris, then pass that run as "
+                "--ephemeris-dir."
             )
         # Use the 5 m tile only inside the square it fully covers around the site.
         edge = min(
