@@ -20,6 +20,8 @@ The web image uses Next.js standalone output, runs as a non-root user, includes 
 
 The API container defaults to 1 GiB memory, two CPUs, Uvicorn concurrency 16, and a five-second keep-alive timeout. The reference response cache defaults to 32 entries and 16 MiB of serialized payloads per process. See [deployment readiness](deployment-readiness.md) and `.env.example` for overrides, failure diagnostics, and the browser rehearsal.
 
+The [API load test](backend-load-test.md) runs an isolated copy of the packaged image, measures saved results, memory hits, and fresh calculations, and checks overload recovery and memory/cache bounds. Its full recorded run includes both geometric and terrain cases; CI runs a shorter functional version and uploads its measurements.
+
 The API image includes and verifies the read-only `lunarwindow-demo-v1` data release: default full-month geometric results for all three reference sites and the reviewed Site01 0 m terrain case. Docker enables persisted lookup at `/app/data/releases/lunarwindow-demo-v1/bundle`; an explicit blank `LUNARWINDOW_PRECOMPUTED_DIR` disables it. Exact matches preserve full source/model provenance, and valid misses calculate normally. See [release replay, deployment overrides, and CI checks](data-releases.md).
 
 Start the API alone with `docker compose up --build -d --wait api`; inspect it with `docker compose logs -f api`. No source-data mount or NASA access is needed for the demo API.

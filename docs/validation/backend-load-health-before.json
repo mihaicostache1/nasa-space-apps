@@ -1,0 +1,374 @@
+{
+  "schemaVersion": "lunarwindow.api-load-test.v1",
+  "startedAtUtc": "2026-11-14T19:59:25.578481+00:00",
+  "status": "failed",
+  "settings": {
+    "image": "lunarwindow-api:deployment-check",
+    "requests": 32,
+    "concurrency": [8],
+    "horizon_modes": ["geometric"],
+    "memory": "1g",
+    "cpus": 2.0,
+    "with_healthcheck": true,
+    "timeout": 60
+  },
+  "phases": [
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 23.347,
+        "successfulRequestsPerSecond": 1.371,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5574.251,
+            "p95": 6518.09,
+            "p99": 7163.092,
+            "max": 7163.092
+          }
+        },
+        "responseBytes": 7836288,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 32
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 78848000,
+            "cgroupCurrentBytes": 66117632,
+            "cgroupLifetimePeakBytes": 66117632,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 136798208,
+            "cgroupCurrentBytes": 132747264
+          },
+          "after": {
+            "rssBytes": 135720960,
+            "cgroupCurrentBytes": 131633152,
+            "cgroupLifetimePeakBytes": 138440704,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 121,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "starting",
+        "FailingStreak": 1,
+        "Log": [
+          {
+            "Start": "2026-11-14T19:59:30.691518385Z",
+            "End": "2026-11-14T19:59:34.847479512Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T19:59:35.652351096Z",
+            "End": "2026-11-14T19:59:39.816729292Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          }
+        ]
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "memory",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 23.669,
+        "successfulRequestsPerSecond": 1.352,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5564.876,
+            "p95": 6797.326,
+            "p99": 7177.47,
+            "max": 7177.47
+          }
+        },
+        "responseBytes": 7836704,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 32,
+          "memoryHits": 32
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 244897,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 135962624,
+            "cgroupCurrentBytes": 118353920,
+            "cgroupLifetimePeakBytes": 138440704,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 136404992,
+            "cgroupCurrentBytes": 132349952
+          },
+          "after": {
+            "rssBytes": 135782400,
+            "cgroupCurrentBytes": 118190080,
+            "cgroupLifetimePeakBytes": 138440704,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 119,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "healthy",
+        "FailingStreak": 1,
+        "Log": [
+          {
+            "Start": "2026-11-14T19:59:30.691518385Z",
+            "End": "2026-11-14T19:59:34.847479512Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T19:59:35.652351096Z",
+            "End": "2026-11-14T19:59:39.816729292Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T19:59:49.817785546Z",
+            "End": "2026-11-14T19:59:51.652307422Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:00:01.653161135Z",
+            "End": "2026-11-14T20:00:05.812406887Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          }
+        ]
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "fresh",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 25.778,
+        "successfulRequestsPerSecond": 1.241,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 6285.684,
+            "p95": 6883.544,
+            "p99": 7057.241,
+            "max": 7057.241
+          }
+        },
+        "responseBytes": 7836559,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 32,
+          "memoryMisses": 32,
+          "calculations": 32,
+          "cachePuts": 32
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836559,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 134909952,
+            "cgroupCurrentBytes": 117952512,
+            "cgroupLifetimePeakBytes": 138440704,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 141606912,
+            "cgroupCurrentBytes": 135909376
+          },
+          "after": {
+            "rssBytes": 141606912,
+            "cgroupCurrentBytes": 124411904,
+            "cgroupLifetimePeakBytes": 141836288,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 159,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "unhealthy",
+        "FailingStreak": 3,
+        "Log": [
+          {
+            "Start": "2026-11-14T19:59:35.652351096Z",
+            "End": "2026-11-14T19:59:39.816729292Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T19:59:49.817785546Z",
+            "End": "2026-11-14T19:59:51.652307422Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:00:01.653161135Z",
+            "End": "2026-11-14T20:00:05.812406887Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T20:00:15.813003711Z",
+            "End": "2026-11-14T20:00:19.97083863Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          },
+          {
+            "Start": "2026-11-14T20:00:29.971919926Z",
+            "End": "2026-11-14T20:00:34.133533095Z",
+            "ExitCode": 1,
+            "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1362, in http_open\n    return self.do_open(http.client.HTTPConnection, req)\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/urllib/request.py\", line 1337, in do_open\n    r = h.getresponse()\n  File \"/usr/local/lib/python3.14/http/client.py\", line 1478, in getresponse\n    response.begin()\n    ~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 343, in begin\n    version, status, reason = self._read_status()\n                              ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.14/http/client.py\", line 304, in _read_status\n    line = str(self.fp.readline(_MAXLINE + 1), \"iso-8859-1\")\n               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.14/socket.py\", line 729, in readinto\n    return self._sock.recv_into(b)\n           ~~~~~~~~~~~~~~~~~~~~^^^\nTimeoutError: timed out\n"
+          }
+        ]
+      }
+    }
+  ],
+  "readiness": {
+    "schemaVersion": "lunarwindow.readiness.v1",
+    "status": "ready",
+    "service": "lunarwindow-backend",
+    "dataMode": "reference",
+    "referenceSiteCount": 3,
+    "terrainMaskCount": 1,
+    "precomputed": "verified",
+    "precomputedJobCount": 4,
+    "cacheMaxEntries": 32,
+    "cacheMaxBytes": 16777216
+  },
+  "deployment": {
+    "image": "lunarwindow-api:deployment-check",
+    "imageId": "sha256:3250c0069fa290a51a880b7cbcc5ce579a3bd1c430d6b32f17d3064da0b9cfe9",
+    "memoryLimitBytes": 1073741824,
+    "nanoCpus": 2000000000,
+    "concurrencyLimit": 16,
+    "keepAliveSeconds": 5,
+    "healthcheckDuringMeasurement": true,
+    "clientPlatform": "macOS-26.6-arm64-arm-64bit",
+    "samplerIntervalMs": 20,
+    "releaseChecksums": "4d4083aac729fadcf684579db8582429c9b7a75dae6027cde52196c45bc5b67f  bundle/bcf756b2ccb8b8092577288ae77e0f955922228745f9a778dc1a98d69599d15f.json\ncf4da17cc77aa129bbc2dc944f0ffd4d6c01ef05dd8c79a66ccecaaf8c479bb2  bundle/c269f1768c2ce7165a4cf67b9ce3c349dca8f433ac6d437762ccb04a2aed758d.json\n9b601e15af329a1e28cba66f8a13812a3392e7ef45b83a8bb3fc17f6a0a3664a  bundle/cfd797e74c84793cecb70df8144806430336242d9a5c8cc5fbf2549251be3340.json\n1d841d3ec95e7b3eac3565dcdfb10d4dd8e957525fd337511edf82c50fb07189  bundle/eb306b1be4ca18be9e7a866eead5a6eede450744c64d0334729308cf27d4b4b1.json\n6d306ad38118492252b73e60d3825f27d4789026b60a6bcd4ef33d5d52f41e69  bundle/manifest.json\n006162e59a500b635835706649bc18782f1bff939da042f6933ba760d9578de3  plan.json"
+  },
+  "containerLogs": "INFO:     Started server process [1]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)",
+  "error": "Periodic readiness probes became unhealthy during normal load."
+}

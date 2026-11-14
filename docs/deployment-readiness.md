@@ -11,7 +11,7 @@ Readiness returns `schemaVersion: "lunarwindow.readiness.v1"`, `dataMode: "refer
 
 Every readiness request checks the files again. It does not calculate visibility, populate the result cache, download data, or accept a terrain approximation for an evaluation caller. Missing, changed, incompatible, or invalid configured data returns the existing generic HTTP 503 error envelope without exposing filesystem paths. `/api/health` remains available while data is unready. The catalog and individual geometric evaluations retain their existing validation behavior.
 
-The Docker API health check calls `/api/ready`; Compose waits for that check before starting the web service. `docker compose up --build -d --wait` therefore verifies data readiness as well as HTTP startup. After startup, an unhealthy status is visible to operators; Compose's restart policy restarts an exited process, not a merely unhealthy one.
+The Docker API health check calls `/api/ready`; Compose waits for that check before starting the web service. `docker compose up --build -d --wait` therefore verifies data readiness as well as HTTP startup. The probe allows 14 seconds inside a 15-second Docker timeout, accommodating the observed validation latency under load; three failed checks mark the container unhealthy. After startup, an unhealthy status is visible to operators; Compose's restart policy restarts an exited process, not a merely unhealthy one.
 
 ## Resource settings
 
@@ -33,7 +33,7 @@ Compose additionally configures:
 | `LUNARWINDOW_API_MAX_CONCURRENCY`    | `16`    | Uvicorn connection/task limit; excess concurrency returns HTTP 503. |
 | `LUNARWINDOW_API_KEEP_ALIVE_SECONDS` | `5`     | Idle HTTP keep-alive timeout.                                       |
 
-The API image also defaults to Uvicorn concurrency 16 and keep-alive 5 seconds when used directly. These two settings use Uvicorn's `UVICORN_LIMIT_CONCURRENCY` and `UVICORN_TIMEOUT_KEEP_ALIVE` environment variables internally; use those names when starting Uvicorn outside Compose. The image runs one worker. Existing request limits remain 31 days and 10,000 samples. These are initial demo resource bounds, not a measured throughput guarantee.
+The API image also defaults to Uvicorn concurrency 16 and keep-alive 5 seconds when used directly. These two settings use Uvicorn's `UVICORN_LIMIT_CONCURRENCY` and `UVICORN_TIMEOUT_KEEP_ALIVE` environment variables internally; use those names when starting Uvicorn outside Compose. The image runs one worker. Existing request limits remain 31 days and 10,000 samples. See [the reproducible load test](backend-load-test.md) for measurements and the limits of the initial demo resource settings.
 
 ## Failure diagnostics
 

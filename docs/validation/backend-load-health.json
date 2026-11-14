@@ -1,0 +1,502 @@
+{
+  "schemaVersion": "lunarwindow.api-load-test.v1",
+  "startedAtUtc": "2026-11-14T20:02:19.730249+00:00",
+  "status": "passed",
+  "settings": {
+    "image": "lunarwindow-api:load-test",
+    "requests": 32,
+    "concurrency": [8],
+    "horizon_modes": ["geometric"],
+    "memory": "1g",
+    "cpus": 2.0,
+    "with_healthcheck": true,
+    "timeout": 60
+  },
+  "phases": [
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 22.525,
+        "successfulRequestsPerSecond": 1.421,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5244.758,
+            "p95": 6310.117,
+            "p99": 6521.241,
+            "max": 6521.241
+          }
+        },
+        "responseBytes": 7836288,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 32
+        },
+        "cache": {
+          "entry_count": 0,
+          "stored_bytes": 0,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 78843904,
+            "cgroupCurrentBytes": 65470464,
+            "cgroupLifetimePeakBytes": 66105344,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 133296128,
+            "cgroupCurrentBytes": 128319488
+          },
+          "after": {
+            "rssBytes": 132222976,
+            "cgroupCurrentBytes": 128319488,
+            "cgroupLifetimePeakBytes": 130834432,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 113,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "healthy",
+        "FailingStreak": 0,
+        "Log": [
+          {
+            "Start": "2026-11-14T20:02:24.811574382Z",
+            "End": "2026-11-14T20:02:31.67032276Z",
+            "ExitCode": 0,
+            "Output": ""
+          }
+        ]
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "memory",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 23.236,
+        "successfulRequestsPerSecond": 1.377,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 5601.109,
+            "p95": 6607.667,
+            "p99": 6654.081,
+            "max": 6654.081
+          }
+        },
+        "responseBytes": 7836704,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 32,
+          "memoryHits": 32
+        },
+        "cache": {
+          "entry_count": 1,
+          "stored_bytes": 244897,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 131416064,
+            "cgroupCurrentBytes": 113700864,
+            "cgroupLifetimePeakBytes": 130834432,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 131657728,
+            "cgroupCurrentBytes": 127700992
+          },
+          "after": {
+            "rssBytes": 130207744,
+            "cgroupCurrentBytes": 112443392,
+            "cgroupLifetimePeakBytes": 130834432,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 116,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "healthy",
+        "FailingStreak": 0,
+        "Log": [
+          {
+            "Start": "2026-11-14T20:02:24.811574382Z",
+            "End": "2026-11-14T20:02:31.67032276Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:02:41.672709584Z",
+            "End": "2026-11-14T20:02:44.608102794Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:02:54.609351799Z",
+            "End": "2026-11-14T20:03:02.095715011Z",
+            "ExitCode": 0,
+            "Output": ""
+          }
+        ]
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "fresh",
+      "concurrency": 8,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 25.823,
+        "successfulRequestsPerSecond": 1.239,
+        "statusCounts": {
+          "200": 32
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 6264.369,
+            "p95": 6903.799,
+            "p99": 6919.918,
+            "max": 6919.918
+          }
+        },
+        "responseBytes": 7836559,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedMisses": 32,
+          "memoryMisses": 32,
+          "calculations": 32,
+          "cachePuts": 32
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836559,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 129081344,
+            "cgroupCurrentBytes": 111378432,
+            "cgroupLifetimePeakBytes": 130834432,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 138092544,
+            "cgroupCurrentBytes": 134172672
+          },
+          "after": {
+            "rssBytes": 138092544,
+            "cgroupCurrentBytes": 134172672,
+            "cgroupLifetimePeakBytes": 134172672,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 163,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      },
+      "dockerHealth": {
+        "Status": "healthy",
+        "FailingStreak": 0,
+        "Log": [
+          {
+            "Start": "2026-11-14T20:02:24.811574382Z",
+            "End": "2026-11-14T20:02:31.67032276Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:02:41.672709584Z",
+            "End": "2026-11-14T20:02:44.608102794Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:02:54.609351799Z",
+            "End": "2026-11-14T20:03:02.095715011Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:03:12.096057334Z",
+            "End": "2026-11-14T20:03:18.513299921Z",
+            "ExitCode": 0,
+            "Output": ""
+          },
+          {
+            "Start": "2026-11-14T20:03:28.514788467Z",
+            "End": "2026-11-14T20:03:34.307617428Z",
+            "ExitCode": 0,
+            "Output": ""
+          }
+        ]
+      }
+    },
+    {
+      "horizonMode": "geometric",
+      "path": "saved",
+      "concurrency": 32,
+      "http": {
+        "requests": 32,
+        "elapsedSeconds": 9.749,
+        "successfulRequestsPerSecond": 1.436,
+        "statusCounts": {
+          "200": 14,
+          "503": 18
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 9389.75,
+            "p95": 9734.128,
+            "p99": 9734.128,
+            "max": 9734.128
+          },
+          "503": {
+            "p50": 8.914,
+            "p95": 13.514,
+            "p99": 13.514,
+            "max": 13.514
+          }
+        },
+        "responseBytes": 3428718,
+        "errors": []
+      },
+      "server": {
+        "counters": {
+          "savedHits": 14
+        },
+        "cache": {
+          "entry_count": 32,
+          "stored_bytes": 7836559,
+          "max_entries": 32,
+          "max_bytes": 16777216
+        },
+        "memory": {
+          "baseline": {
+            "rssBytes": 138534912,
+            "cgroupCurrentBytes": 120668160,
+            "cgroupLifetimePeakBytes": 134434816,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 178798592,
+            "cgroupCurrentBytes": 161918976
+          },
+          "after": {
+            "rssBytes": 174616576,
+            "cgroupCurrentBytes": 157782016,
+            "cgroupLifetimePeakBytes": 162246656,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "samples": 35,
+          "cacheBoundViolations": 0
+        },
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "uvicorn": "0.54.0",
+            "fastapi": "0.162.7",
+            "pydantic": "2.14.3",
+            "numpy": "2.5.4",
+            "jsonschema": "4.26.0"
+          }
+        }
+      }
+    }
+  ],
+  "readiness": {
+    "schemaVersion": "lunarwindow.readiness.v1",
+    "status": "ready",
+    "service": "lunarwindow-backend",
+    "dataMode": "reference",
+    "referenceSiteCount": 3,
+    "terrainMaskCount": 1,
+    "precomputed": "verified",
+    "precomputedJobCount": 4,
+    "cacheMaxEntries": 32,
+    "cacheMaxBytes": 16777216
+  },
+  "deployment": {
+    "image": "lunarwindow-api:load-test",
+    "imageId": "sha256:53ddebc142078466cb7f30a3f7456d5586480ce7ff0d62542483a2973d686c80",
+    "memoryLimitBytes": 1073741824,
+    "nanoCpus": 2000000000,
+    "concurrencyLimit": 16,
+    "keepAliveSeconds": 5,
+    "healthcheckDuringMeasurement": true,
+    "imageHealthcheck": {
+      "Test": [
+        "CMD",
+        "python",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=14)"
+      ],
+      "Interval": 10000000000,
+      "Timeout": 15000000000,
+      "StartPeriod": 10000000000,
+      "Retries": 3
+    },
+    "clientPlatform": "macOS-26.6-arm64-arm-64bit",
+    "samplerIntervalMs": 20,
+    "releaseChecksums": "4d4083aac729fadcf684579db8582429c9b7a75dae6027cde52196c45bc5b67f  bundle/bcf756b2ccb8b8092577288ae77e0f955922228745f9a778dc1a98d69599d15f.json\ncf4da17cc77aa129bbc2dc944f0ffd4d6c01ef05dd8c79a66ccecaaf8c479bb2  bundle/c269f1768c2ce7165a4cf67b9ce3c349dca8f433ac6d437762ccb04a2aed758d.json\n9b601e15af329a1e28cba66f8a13812a3392e7ef45b83a8bb3fc17f6a0a3664a  bundle/cfd797e74c84793cecb70df8144806430336242d9a5c8cc5fbf2549251be3340.json\n1d841d3ec95e7b3eac3565dcdfb10d4dd8e957525fd337511edf82c50fb07189  bundle/eb306b1be4ca18be9e7a866eead5a6eede450744c64d0334729308cf27d4b4b1.json\n6d306ad38118492252b73e60d3825f27d4789026b60a6bcd4ef33d5d52f41e69  bundle/manifest.json\n006162e59a500b635835706649bc18782f1bff939da042f6933ba760d9578de3  plan.json"
+  },
+  "overloadRecovery": {
+    "heldConnections": 16,
+    "rejectedStatus": 503,
+    "readinessAfter": "ready",
+    "dockerHealthAfter": {
+      "Status": "healthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-11-14T20:02:54.609351799Z",
+          "End": "2026-11-14T20:03:02.095715011Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-11-14T20:03:12.096057334Z",
+          "End": "2026-11-14T20:03:18.513299921Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-11-14T20:03:28.514788467Z",
+          "End": "2026-11-14T20:03:34.307617428Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-11-14T20:03:44.311572335Z",
+          "End": "2026-11-14T20:03:45.890365961Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-11-14T20:03:55.894985966Z",
+          "End": "2026-11-14T20:03:56.789534216Z",
+          "ExitCode": 0,
+          "Output": ""
+        }
+      ]
+    }
+  },
+  "containerLogs": "INFO:     Started server process [1]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit.\nWARNING:  Exceeded concurrency limit."
+}

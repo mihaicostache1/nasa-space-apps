@@ -19,6 +19,14 @@ jobs:
         run: docker compose run --rm ephemeris-test
       - name: Verify the packaged data release and saved API responses
         run: docker compose run --rm -T --entrypoint python api - < scripts/check_packaged_release.py
+      - name: Smoke-test API load paths and resource bounds
+        run: python3 scripts/load_test_api.py --requests 2 --concurrency 1 2 --with-healthcheck --output /tmp/lunarwindow-load-smoke.json
+      - name: Upload API load-test measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-load-smoke
+          path: /tmp/lunarwindow-load-smoke.json
       - name: Validate the reference dataset handoff
         run: docker compose run --rm validate data/reference/validation-30d
       - name: Generate the reference pointing report
@@ -74,6 +82,7 @@ jobs:
       - run: python -m ruff check backend scripts
       - run: python -m ruff format --check backend scripts
       - run: python -m unittest discover -s backend/tests -v
+      - run: python -m unittest discover -s scripts/tests -v
       - run: python scripts/validate_quickmap.py
       - name: Rebuild and compare the pinned demo data release
         run: python -m lunarwindow.precompute.release check data/releases/lunarwindow-demo-v1 --reference-dir data/reference/validation-30d

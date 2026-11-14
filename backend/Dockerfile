@@ -74,8 +74,8 @@ ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference \
 RUN lunarwindow-data-release verify /app/data/releases/lunarwindow-demo-v1 \
     --reference-dir /app/data/reference/validation-30d
 EXPOSE 8000
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=4)"]
+HEALTHCHECK --interval=10s --timeout=15s --start-period=10s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=14)"]
 ENTRYPOINT ["python", "-m", "uvicorn", "lunarwindow.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 CMD []
 
