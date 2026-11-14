@@ -1,4 +1,4 @@
-# Demo script (about 2 minutes)
+# Demo script (about 2½ minutes)
 
 Every number below comes from the archived NASA data the app ships with. They reproduce exactly in a clean browser, locally (`docker compose up --build -d --wait`) or on the deployed site. Wake the hosted API a few minutes before recording (see `docs/deploy.md`).
 
@@ -36,6 +36,17 @@ Scroll to the **Lunar sky explorer**, scenario A.
 
 Drag the timeline cursor and watch the markers move.
 
-## 5. Honesty (10 s)
+## 5. Real terrain (25 s)
 
-> "These results use a flat horizon. We computed a validated LOLA terrain horizon for one site, and integrating it is the next step. The QuickMap cross-checks validate our Sun and Earth angles for observers about 100 km up, not ground-level shadows."
+1. Scenario A is still Connecting ridge (Site01), **17–24 Nov**.
+2. Change its **Horizon** to **LOLA terrain (reviewed mask)**, tick **Accept the frame approximation**, and press **Update comparison**.
+   - The badge reads **A TERRAIN · B GEOMETRIC** and the data banner names the model for each scenario.
+   - Sun visible drops from 100% to **81%**, Earth from 95% to **67%**.
+   - Longest simultaneous operation falls from ≥ 160 h to **81 h (3.4 d)**.
+3. In the sky explorer, scenario A now shows the jagged LOLA skyline (about −3° to +3°) instead of the flat line.
+
+> "A flat horizon overstates this site. With the real ridge-line from NASA's LOLA elevation data, the joint power-and-link window halves."
+
+## 6. Honesty (10 s)
+
+> "The terrain horizon is reviewed for one reference point, and it uses a stated frame approximation that you must accept. The QuickMap cross-checks validate our Sun and Earth angles for observers about 100 km up, not ground-level shadows."

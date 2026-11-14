@@ -1,4 +1,5 @@
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import { describeModel } from '../lib/model';
 import { formatUtc } from '../lib/timeline';
 import type { ScenarioResult } from '../types';
 
@@ -11,7 +12,25 @@ export function DataSourceBanner({ catalog, results }: Props) {
   const steps = [
     ...new Set(catalog.sites.map((s) => s.availability.stepMinutes)),
   ];
-  const warning = results[0]?.data.provenance.warning;
+  const warnings = [
+    ...new Set(results.map((result) => result.data.provenance.warning)),
+  ];
+  const perSlot = results.map((result) => ({
+    slot: result.slot,
+    ...describeModel(result.data),
+  }));
+  // One line when every scenario uses the same model; otherwise one per slot.
+  const models =
+    new Set(perSlot.map((m) => m.label)).size > 1
+      ? perSlot
+      : [
+          {
+            slot: null,
+            label: perSlot[0]?.label ?? 'Geometric',
+            detail:
+              perSlot[0]?.detail ?? 'flat 0° horizon, terrain not applied',
+          },
+        ];
   return (
     <section className="source-banner" aria-label="Data source and model">
       <dl>
@@ -32,11 +51,18 @@ export function DataSourceBanner({ catalog, results }: Props) {
         <div>
           <dt>Model</dt>
           <dd>
-            <strong>Geometric</strong>: flat 0° horizon, terrain not applied
+            {models.map(({ slot, label, detail }) => (
+              <span className="model-line" key={slot ?? 'default'}>
+                {slot && <span className="slot">{slot}</span>}
+                <strong>{label}</strong>: {detail}
+              </span>
+            ))}
           </dd>
         </div>
       </dl>
-      {warning && <p>{warning}</p>}
+      {warnings.map((warning) => (
+        <p key={warning}>{warning}</p>
+      ))}
     </section>
   );
 }

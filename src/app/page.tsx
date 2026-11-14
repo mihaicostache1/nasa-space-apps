@@ -37,13 +37,14 @@ export default function Home() {
           LOLA digital elevation models (DE421 MOON_ME, 1737.4 km sphere).
         </p>
         <p>
-          <strong>Limits.</strong> Results use a flat 0° horizon: local terrain,
-          eclipses, power generation and radio-link performance are not
-          modelled, and event times are bracketed by the sampling interval. The
-          reference points are DEM grid cells, not landing recommendations. The
-          QuickMap cross-checks validate the displayed Sun and Earth angles for
-          observers about 100–144 km above the surface; they do not validate
-          terrain shadows seen from the ground.
+          <strong>Limits.</strong> Results use a flat 0° horizon unless the
+          reviewed LOLA terrain horizon is selected, which exists for one
+          reference point. Eclipses, power generation and radio-link performance
+          are not modelled, and event times are bracketed by the sampling
+          interval. The reference points are DEM grid cells, not landing
+          recommendations. The QuickMap cross-checks validate the displayed Sun
+          and Earth angles for observers about 100–144 km above the surface;
+          they do not validate terrain shadows seen from the ground.
         </p>
       </footer>
     </main>

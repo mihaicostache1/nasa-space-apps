@@ -135,6 +135,23 @@ select {
   font: inherit;
   font-size: 14px;
 }
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.check input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  padding: 0;
+  accent-color: var(--accent);
+}
+.check strong {
+  color: #eef3f9;
+  font-weight: 600;
+}
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
@@ -210,6 +227,9 @@ button:disabled {
 .source-banner dd,
 .stats dd {
   margin: 4px 0 0;
+}
+.source-banner .model-line {
+  display: block;
 }
 .source-banner > p {
   margin: 12px 0 0;

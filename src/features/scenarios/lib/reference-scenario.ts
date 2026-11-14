@@ -2,10 +2,13 @@ import type {
   ReferenceEvaluationRequest,
   VisibilityRule,
 } from '@/domain/evaluation';
-import type { ReferenceSite } from '@/domain/reference';
+import type { ReferenceSite, ReferenceTerrainMask } from '@/domain/reference';
+import type { ReferenceEvaluationRequestContract } from '@/domain/terrain-evaluation';
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
+
+export type HorizonMode = 'geometric' | 'terrain';
 
 /** One comparison slot: a verified reference site and a whole-day UTC period. */
 export type ReferenceScenarioForm = {
@@ -17,7 +20,19 @@ export type ReferenceScenarioForm = {
   endDate: string;
   stepMinutes: number;
   visibilityRule: VisibilityRule;
+  /** Flat 0° horizon, or the site's server-reviewed LOLA terrain mask. */
+  horizonMode: HorizonMode;
+  /** Mask selected for terrain mode; empty for the geometric horizon. */
+  maskId: string;
+  /** The terrain mask's frame approximation must be accepted explicitly. */
+  acceptFrameApproximation: boolean;
 };
+
+const GEOMETRIC = {
+  horizonMode: 'geometric',
+  maskId: '',
+  acceptFrameApproximation: false,
+} as const;
 
 export const VISIBILITY_RULES: { value: VisibilityRule; label: string }[] = [
   { value: 'any-disc', label: 'Any part of the disc is up' },
@@ -44,6 +59,15 @@ export function stepOptions(site: ReferenceSite | undefined): number[] {
     .filter((minutes) => minutes <= 1440);
 }
 
+/** The reviewed terrain mask a site advertises, if any (at most one today). */
+export function terrainMask(
+  site: ReferenceSite | undefined,
+): ReferenceTerrainMask | undefined {
+  return site?.supportedHorizonModes.includes('terrain')
+    ? site.terrainMasks[0]
+    : undefined;
+}
+
 export function defaultForm(
   slot: 'A' | 'B',
   site: ReferenceSite,
@@ -55,6 +79,7 @@ export function defaultForm(
     endDate: utcDate(site.availability.endUtc),
     stepMinutes: site.availability.stepMinutes,
     visibilityRule: 'any-disc',
+    ...GEOMETRIC,
   };
 }
 
@@ -74,19 +99,52 @@ export function withSite(
   const stepMinutes = stepOptions(site).includes(form.stepMinutes)
     ? form.stepMinutes
     : site.availability.stepMinutes;
-  return { ...form, siteId: site.id, startDate, endDate, stepMinutes };
+  // A mask belongs to one site: another site starts again from the flat horizon.
+  const horizon = site.id === form.siteId ? {} : GEOMETRIC;
+  return {
+    ...form,
+    siteId: site.id,
+    startDate,
+    endDate,
+    stepMinutes,
+    ...horizon,
+  };
+}
+
+/** Switch horizon; terrain falls back to geometric when the site has no mask. */
+export function withHorizonMode(
+  form: ReferenceScenarioForm,
+  mode: HorizonMode,
+  site: ReferenceSite | undefined,
+): ReferenceScenarioForm {
+  const mask = mode === 'terrain' ? terrainMask(site) : undefined;
+  return mask
+    ? {
+        ...form,
+        horizonMode: 'terrain',
+        maskId: mask.maskId,
+        acceptFrameApproximation: false,
+      }
+    : { ...form, ...GEOMETRIC };
 }
 
 export function toRequest(
   form: ReferenceScenarioForm,
-): ReferenceEvaluationRequest {
-  return {
+): ReferenceEvaluationRequestContract {
+  const request: ReferenceEvaluationRequest = {
     siteId: form.siteId,
     horizonMode: 'geometric',
     startUtc: `${form.startDate}T00:00:00Z`,
     endUtc: `${form.endDate}T00:00:00Z`,
     stepMinutes: form.stepMinutes,
     visibilityRule: form.visibilityRule,
+  };
+  if (form.horizonMode !== 'terrain') return request;
+  return {
+    ...request,
+    horizonMode: 'terrain',
+    maskId: form.maskId,
+    allowMeanEarthApproximation: form.acceptFrameApproximation,
   };
 }
 
@@ -117,6 +175,13 @@ export function validateForm(
     issues.push(
       `The step must be a multiple of the archive's ${availability.stepMinutes}-minute interval.`,
     );
+  }
+  if (form.horizonMode === 'terrain') {
+    if (terrainMask(site)?.maskId !== form.maskId) {
+      issues.push('This site has no reviewed terrain horizon.');
+    } else if (!form.acceptFrameApproximation) {
+      issues.push('Accept the frame approximation to use the terrain horizon.');
+    }
   }
   return issues;
 }
