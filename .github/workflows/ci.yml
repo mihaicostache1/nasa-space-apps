@@ -17,6 +17,8 @@ jobs:
         run: docker compose --profile tools --profile test build
       - name: Run offline backend tests in Docker
         run: docker compose run --rm ephemeris-test
+      - name: Verify the packaged data release and saved API responses
+        run: docker compose run --rm -T --entrypoint python api - < scripts/check_packaged_release.py
       - name: Validate the reference dataset handoff
         run: docker compose run --rm validate data/reference/validation-30d
       - name: Generate the reference pointing report
@@ -61,6 +63,8 @@ jobs:
       - run: python -m ruff format --check backend scripts
       - run: python -m unittest discover -s backend/tests -v
       - run: python scripts/validate_quickmap.py
+      - name: Rebuild and compare the pinned demo data release
+        run: python -m lunarwindow.precompute.release check data/releases/lunarwindow-demo-v1 --reference-dir data/reference/validation-30d
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15

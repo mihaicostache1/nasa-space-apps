@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "lunarwindow.precompute-manifest.v1",
+  "runId": "lunarwindow-demo-v1",
+  "createdAtUtc": "2026-11-14T16:00:33.230283Z",
+  "completedAtUtc": "2026-11-14T16:00:33.866432Z",
+  "status": "complete",
+  "jobs": [
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site01-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "complete",
+      "output": {
+        "filename": "cfd797e74c84793cecb70df8144806430336242d9a5c8cc5fbf2549251be3340.json",
+        "sha256": "9b601e15af329a1e28cba66f8a13812a3392e7ef45b83a8bb3fc17f6a0a3664a",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v1"
+      },
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site04-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "fa9b4e639709be80d49274895aaff003da8233e2b5644de67d372e43e3cee470",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "complete",
+      "output": {
+        "filename": "bcf756b2ccb8b8092577288ae77e0f955922228745f9a778dc1a98d69599d15f.json",
+        "sha256": "4d4083aac729fadcf684579db8582429c9b7a75dae6027cde52196c45bc5b67f",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v1"
+      },
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site23-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "d6b6e13763f9ce645d87744f872ab754944c4fa87c2027c52b1bc0c2f28698aa",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "complete",
+      "output": {
+        "filename": "c269f1768c2ce7165a4cf67b9ce3c349dca8f433ac6d437762ccb04a2aed758d.json",
+        "sha256": "cf4da17cc77aa129bbc2dc944f0ffd4d6c01ef05dd8c79a66ccecaaf8c479bb2",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v1"
+      },
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site01-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+        "horizonMode": "terrain",
+        "maskId": "lola-site01-reference-mast-0m",
+        "terrainMaskSha256": "4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d",
+        "allowMeanEarthApproximation": true
+      },
+      "status": "complete",
+      "output": {
+        "filename": "eb306b1be4ca18be9e7a866eead5a6eede450744c64d0334729308cf27d4b4b1.json",
+        "sha256": "1d841d3ec95e7b3eac3565dcdfb10d4dd8e957525fd337511edf82c50fb07189",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v2"
+      },
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "lunarwindow.precompute-manifest.v1",
+  "runId": "lunarwindow-demo-v1",
+  "createdAtUtc": "2026-11-14T16:00:33.228676Z",
+  "completedAtUtc": null,
+  "status": "incomplete",
+  "jobs": [
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site01-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "pending",
+      "output": null,
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site04-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "fa9b4e639709be80d49274895aaff003da8233e2b5644de67d372e43e3cee470",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "pending",
+      "output": null,
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site23-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "d6b6e13763f9ce645d87744f872ab754944c4fa87c2027c52b1bc0c2f28698aa",
+        "horizonMode": "geometric",
+        "maskId": null,
+        "terrainMaskSha256": null,
+        "allowMeanEarthApproximation": false
+      },
+      "status": "pending",
+      "output": null,
+      "error": null
+    },
+    {
+      "evaluation": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "asOfUtc": "2026-11-14T00:00:00Z",
+        "siteId": "lola-site01-reference",
+        "schemaVersion": "lunarwindow.reference-cache-key.v1",
+        "calculationModelVersion": "lunarwindow.visibility.v1",
+        "ephemerisSha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+        "horizonMode": "terrain",
+        "maskId": "lola-site01-reference-mast-0m",
+        "terrainMaskSha256": "4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d",
+        "allowMeanEarthApproximation": true
+      },
+      "status": "pending",
+      "output": null,
+      "error": null
+    }
+  ]
+}

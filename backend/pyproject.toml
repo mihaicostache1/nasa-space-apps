@@ -26,6 +26,7 @@ lunarwindow-report = "lunarwindow.ephemeris.report:main"
 lunarwindow-validate = "lunarwindow.ephemeris.contract:main"
 lunarwindow-terrain = "lunarwindow.terrain.cli:main"
 lunarwindow-precompute = "lunarwindow.precompute.cli:main"
+lunarwindow-data-release = "lunarwindow.precompute.release:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

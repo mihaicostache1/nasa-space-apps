@@ -20,11 +20,11 @@ docker compose run --build --rm ephemeris \
   --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z
 ```
 
-Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric evaluations of verified archived ephemerides; the web app at port 3000 shows them, with no live NASA requests.
+Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. FastAPI serves synthetic demos and geometric or reviewed Site01 terrain evaluations of archived ephemerides. Docker ships a verified, read-only [demo data release](docs/data-releases.md) covering four default full-month jobs; valid misses calculate normally, with no live NASA requests.
 
 ## Native setup: Backend/data
 
-The first two backend tasks, **API skeleton with fake data** and **visibility metrics, windows, and countdowns**, are implemented:
+The backend serves verified reference evaluations, visibility metrics/windows, and reviewed Site01 terrain, with memory caching and versioned offline data releases:
 
 ```sh
 python3 -m venv .venv
@@ -33,7 +33,7 @@ python -m pip install -e './backend[dev]'
 python -m uvicorn lunarwindow.api.app:app --reload --port 8000
 ```
 
-Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
+Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric or reviewed Site01 terrain horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
 
 ## Native setup: Ephemeris lead
 
@@ -92,8 +92,7 @@ Start the FastAPI service as well (see Backend/data above, or `docker compose up
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume backend results yet. Charts, maps, and a site picker remain pending. The API calculates visibility and metrics from synthetic demos or verified archived ephemerides, with an explicit geometric or reviewed-terrain horizon mode. Terrain mode currently supports the Site01 0 m mask and requires acceptance of its frame approximation; sampling, disc-model, and near-field limitations remain. A sourced 17-site GIS catalog is also available (see the [terrain work package](docs/terrain-gis-lead.md)); its other horizons are preliminary and are not registered for reference API evaluations. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
-The web app evaluates the verified reference sites through `POST /api/reference/evaluations`; it does not persist inputs, and maps and custom coordinates remain pending. The API calculates visibility and metrics from either synthetic demos or verified archived ephemerides; reference evaluations explicitly use a flat zero-degree horizon and retain sampling/disc-model limitations. One validated terrain mask (Site01, `lunarwindow.terrain-mask.v1`) and a sourced 17-site catalog are ready (see the [terrain work package](docs/terrain-gis-lead.md)), but the API does not apply terrain yet. The reference catalog contains sourced DEM grid cells, not approved landing targets. Three QuickMap camera-observer comparisons pass at display precision; they validate displayed Sun/Earth angles for observers about 100–144 km above the surface, not terrain shadows seen by a lander on the ground. See [the validation report](docs/validation/report.md).
+The web app evaluates verified reference sites through `POST /api/reference/evaluations` and does not persist inputs. The API supports geometric or reviewed-terrain horizons and can serve exact verified saved results from the [versioned demo release](docs/data-releases.md). Terrain currently supports Site01 at ground + 0 m mast and requires explicit frame-approximation acceptance; sampling, disc-model, and near-field limitations remain. Other curated GIS horizons are preliminary and are not registered for reference API terrain evaluation. These DEM reference points are not approved landing targets. The recorded QuickMap camera-observer checks validate displayed angles for elevated observers, not a lander's surface illumination; see the [validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -104,12 +103,14 @@ backend/
   src/lunarwindow/api/        FastAPI app, contracts, demo and reference providers
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
   src/lunarwindow/visibility/ Visibility engine, metrics, windows, and contracts
+  src/lunarwindow/precompute/ Offline bundles, replay, release tools, and lookup
   src/lunarwindow/terrain/    LOLA downloads, horizon ray casting, site catalog, service
   tests/                     Offline tests and archived NASA fixtures
 data/
   sites.example.json          Illustrative input catalog
   raw/                        Downloaded source data (ignored)
   processed/                  Derived data (ignored)
+  releases/                   Versioned demo release, pinned plan, and checksums
   README.md                   Provenance and storage conventions
 docs/
   challenge.md                Requirements mapped from the NASA brief

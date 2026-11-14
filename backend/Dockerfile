@@ -39,6 +39,7 @@ RUN python -m pip install --no-cache-dir --no-index /test-wheels/*.whl && rm -rf
 USER lunarwindow
 COPY --chown=lunarwindow:lunarwindow backend/tests /app/tests
 COPY --chown=lunarwindow:lunarwindow data/reference /app/data/reference
+COPY --chown=lunarwindow:lunarwindow data/releases /app/data/releases
 ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference
 ENTRYPOINT ["python", "-m", "unittest", "discover", "-s", "/app/tests", "-v"]
 CMD []
@@ -62,7 +63,14 @@ CMD ["--help"]
 FROM runtime AS api
 COPY --chown=lunarwindow:lunarwindow data/reference/validation-30d /app/data/reference/validation-30d
 COPY --chown=lunarwindow:lunarwindow data/reference/terrain-masks /app/data/reference/terrain-masks
-ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference
+COPY --chown=root:root data/releases/lunarwindow-demo-v1 /app/data/releases/lunarwindow-demo-v1
+USER root
+RUN chmod -R a=rX /app/data/releases/lunarwindow-demo-v1
+USER lunarwindow
+ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference \
+    LUNARWINDOW_PRECOMPUTED_DIR=/app/data/releases/lunarwindow-demo-v1/bundle
+RUN lunarwindow-data-release verify /app/data/releases/lunarwindow-demo-v1 \
+    --reference-dir /app/data/reference/validation-30d
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
     CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
