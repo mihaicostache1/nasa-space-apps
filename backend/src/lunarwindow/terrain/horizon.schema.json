@@ -74,10 +74,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "az",
-        "el"
-      ],
+      "required": ["az", "el"],
       "title": "HorizonPoint",
       "type": "object"
     },
@@ -177,13 +174,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "productId",
-        "role",
-        "sourceUrl",
-        "sha256",
-        "resolutionM"
-      ],
+      "required": ["productId", "role", "sourceUrl", "sha256", "resolutionM"],
       "title": "HorizonSource",
       "type": "object"
     },
@@ -225,12 +216,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "stepDeg",
-        "el",
-        "horizonDistanceKm",
-        "reachKm"
-      ],
+      "required": ["stepDeg", "el", "horizonDistanceKm", "reachKm"],
       "title": "RayProfile",
       "type": "object"
     }
@@ -268,10 +254,7 @@
       "type": "string"
     },
     "terrainModel": {
-      "enum": [
-        "lola-dem",
-        "none"
-      ],
+      "enum": ["lola-dem", "none"],
       "title": "Terrainmodel",
       "type": "string"
     },

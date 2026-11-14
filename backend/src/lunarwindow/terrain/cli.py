@@ -51,7 +51,13 @@ def _regions(args) -> int:
     from .regions import build_region_catalog
 
     entries = build_region_catalog(
-        args.polygons, args.dem_dir, args.source, args.name_field, args.max_slope_deg
+        args.polygons,
+        args.dem_dir,
+        args.source,
+        args.name_field,
+        args.max_slope_deg,
+        id_prefix=args.id_prefix,
+        name_suffix=args.name_suffix,
     )
     atomic_write(args.output, json.dumps(entries, indent=2) + "\n")
     for entry in entries:
@@ -98,6 +104,8 @@ def main() -> int:
     regions.add_argument("--source", required=True, help="Citation for the polygon file")
     regions.add_argument("--name-field")
     regions.add_argument("--max-slope-deg", type=float, default=10.0)
+    regions.add_argument("--id-prefix", default="artemis3-")
+    regions.add_argument("--name-suffix", default=" (Artemis III candidate region)")
     regions.add_argument("--dem-dir", type=Path, default=DEM_DIR)
     regions.add_argument("--output", type=Path, default=Path("data/sites.artemis-regions.json"))
     regions.set_defaults(handler=_regions)

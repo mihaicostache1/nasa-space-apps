@@ -14,7 +14,12 @@ import numpy as np
 from lunarwindow.terrain.catalog import load_catalog
 from lunarwindow.terrain.dem import Grid
 from lunarwindow.terrain.geometry import latlon_to_stereographic
-from lunarwindow.terrain.regions import points_in_rings, representative_point, slugify
+from lunarwindow.terrain.regions import (
+    points_in_rings,
+    polygon_area_m2,
+    representative_point,
+    slugify,
+)
 
 try:
     import rasterio
@@ -95,6 +100,8 @@ class RegionTests(unittest.TestCase):
         x = np.array([1.0, 5.0, 11.0])
         y = np.array([1.0, 5.0, 5.0])
         self.assertEqual(points_in_rings(x, y, [outer, hole]).tolist(), [True, False, False])
+        self.assertEqual(polygon_area_m2([outer, hole]), 96.0)
+        self.assertEqual(polygon_area_m2([outer]), 100.0)
 
     def test_representative_point_prefers_sun_then_flat_ground(self):
         cx, cy = (float(v) for v in latlon_to_stereographic(-87.0, 10.0))

@@ -117,6 +117,16 @@ def ring_area_m2(ring: np.ndarray) -> float:
     return 0.5 * abs(float(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1))))
 
 
+def polygon_area_m2(rings: list[np.ndarray]) -> float:
+    """Even-odd area: rings nested at odd depth (holes) subtract, matching points_in_rings."""
+    total = 0.0
+    for index, ring in enumerate(rings):
+        others = [other for j, other in enumerate(rings) if j != index]
+        depth = int(points_in_rings(ring[:1, 0], ring[:1, 1], others)[0]) if others else 0
+        total += ring_area_m2(ring) * (-1 if depth % 2 else 1)
+    return total
+
+
 def slope_grid(dem: Grid) -> Grid:
     dy, dx = np.gradient(dem.data, dem.resolution_m)
     slope = np.degrees(np.arctan(np.hypot(dx, dy)))
@@ -162,7 +172,7 @@ def representative_point(
         "candidatePixels": int(ok.sum()),
         "polygonCentroidLat": round(clat, 6),
         "polygonCentroidLon": round(clon, 6),
-        "polygonAreaKm2": round(ring_area_m2(outer) / scale**2 / 1e6, 1),
+        "polygonAreaKm2": round(polygon_area_m2(rings) / scale**2 / 1e6, 1),
     }
 
 
