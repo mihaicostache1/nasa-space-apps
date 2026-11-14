@@ -17,6 +17,8 @@ const site = (id: string, startUtc: string, endUtc: string): ReferenceSite => ({
   lon: -137.5,
   altitudeKm: 1.94,
   coordinateSource: 'test',
+  supportedHorizonModes: ['geometric'],
+  terrainMasks: [],
   availability: {
     startUtc,
     endUtc,

@@ -41,6 +41,7 @@ Next:
 1. Independently validate surface/terrain predictions and agree on a real antenna height before generating further matched observer datasets. The reviewed 0 m reference backend integration is complete, with explicit frame-approximation acceptance and regression coverage.
 2. Later, if time allows: ephemerides and horizons for further curated sites, and `HorizonService` for custom coordinates.
 3. The API exposes an explicit geometric/terrain choice. Add that control to the frontend and show source resolution, observer height, frame assumptions, and coverage limits; preliminary GIS horizons remain distinct from registered reference masks.
+   The reference site catalog now advertises supported horizon modes and verified mask selection metadata, including observer heights, checksums, DEM sources, and the explicit frame-approximation requirement.
 4. Add contextual mapping or 3D views using `rays.el` and `rays.horizonDistanceKm`.
 
 ## 4. Presentation and delivery

@@ -6,6 +6,14 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from lunarwindow.ephemeris.models import TimeRange, parse_utc
+from lunarwindow.terrain.models import (
+    DemSource,
+    MaskObserver,
+    MaskReferenceFrame,
+    NonBlank,
+    Sha256,
+    Slug,
+)
 from lunarwindow.visibility.models import (
     CalculationInfo,
     HorizonPoint,
@@ -100,6 +108,19 @@ class ReferenceAvailability(ApiModel):
     sampleCount: int = Field(ge=1, le=200_000)
 
 
+class ReferenceTerrainMask(ApiModel):
+    """Verified mask selection metadata; excludes the full horizon and ephemeris."""
+
+    maskId: Slug
+    artifactSha256: Sha256
+    observer: MaskObserver
+    referenceFrame: MaskReferenceFrame
+    demSources: list[DemSource] = Field(min_length=1)
+    requiresMeanEarthApproximation: bool
+    framePolicy: Literal["mean-earth-reference-v1"]
+    limitation: NonBlank
+
+
 class ReferenceSite(ApiModel):
     id: str
     name: str
@@ -108,6 +129,18 @@ class ReferenceSite(ApiModel):
     altitudeKm: float
     coordinateSource: str
     availability: ReferenceAvailability
+    supportedHorizonModes: list[Literal["geometric", "terrain"]] = Field(min_length=1, max_length=2)
+    terrainMasks: list[ReferenceTerrainMask]
+
+    @model_validator(mode="after")
+    def validate_horizon_availability(self) -> Self:
+        expected = ["geometric", "terrain"] if self.terrainMasks else ["geometric"]
+        if self.supportedHorizonModes != expected:
+            raise ValueError("Supported horizon modes must match verified terrain availability.")
+        ids = [mask.maskId for mask in self.terrainMasks]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Terrain mask IDs must be unique within a site.")
+        return self
 
 
 class ReferenceSiteCatalog(ApiModel):
