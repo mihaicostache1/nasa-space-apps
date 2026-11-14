@@ -1,6 +1,19 @@
 name: lunarwindow
 
 services:
+  api:
+    image: lunarwindow-api:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: api
+    ports:
+      - '127.0.0.1:${API_PORT:-8000}:8000'
+    environment:
+      LUNARWINDOW_CORS_ORIGINS: '${LUNARWINDOW_CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}'
+    init: true
+    restart: unless-stopped
+
   web:
     image: lunarwindow-web:local
     build:

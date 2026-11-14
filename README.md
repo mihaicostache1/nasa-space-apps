@@ -12,7 +12,7 @@ With Docker running, the team can start the web app without installing Node.js o
 docker compose up --build -d --wait
 ```
 
-Open [localhost:3000](http://localhost:3000). Run the ephemeris tool separately:
+Open [localhost:3000](http://localhost:3000) for the UI and [localhost:8000/docs](http://localhost:8000/docs) for the FastAPI demo API. Run the ephemeris tool separately:
 
 ```sh
 docker compose run --build --rm ephemeris \
@@ -20,7 +20,20 @@ docker compose run --build --rm ephemeris \
   --start 2026-11-14T00:00:00Z --end 2026-11-15T00:00:00Z
 ```
 
-Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. The UI starter and Python tool are available; their planned FastAPI integration remains pending.
+Exports and caches persist in `./data`. See [Docker instructions](docs/docker.md) for tests, Linux file ownership, port configuration, and image-only commands. The FastAPI skeleton serves explicit synthetic data; the React workspace and real ephemeris pipeline are not connected to it yet.
+
+## Native setup: Backend/data
+
+The first backend task, **API skeleton with fake data**, is implemented:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e './backend[dev]'
+python -m uvicorn lunarwindow.api.app:app --reload --port 8000
+```
+
+Open [localhost:8000/docs](http://localhost:8000/docs). Routes: `GET /api/health`, `GET /api/sites`, `GET /api/sites/{site_id}`, and `POST /api/evaluations`. Responses include a synthetic horizon, Sun/Earth series, flags, and provenance; metrics remain `null` for the next task. See the [backend work package and API contract](docs/backend-data.md) for examples, limits, and frontend types.
 
 ## Native setup: Ephemeris lead
 
@@ -54,6 +67,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 
 - Next.js App Router, React, and strict TypeScript.
 - Responsive two-scenario workspace with editable coordinates, UTC dates, sample intervals, and validation.
+- FastAPI skeleton with deterministic synthetic site/scenario data, HTTP validation, CORS, OpenAPI, and Docker startup.
 - Python Horizons client/CLI with sequential chunked requests, caching, JSON/CSV export, observer checks, and source provenance.
 - Flat Sun/Earth series matching the team's JSON field names, with corresponding TypeScript types.
 - Offline Python regression tests, shared request locks, retry handling, immutable run bundles, and JSON Schema/semantic handoff checks.
@@ -62,7 +76,7 @@ Open [localhost:3000](http://localhost:3000). No API keys, database, Docker, or 
 - ESLint, Prettier, Vitest, production build, and GitHub Actions checks.
 - Challenge analysis, architecture, data-source notes, and an implementation roadmap.
 
-The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. FastAPI routes, the terrain join, charts, maps, visibility calculations, and verified site presets remain to be implemented. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
+The UI workspace validates inputs locally. It does not persist them or consume the Python exports yet. The real terrain join, charts, maps, scientific visibility calculations, metrics, and verified site presets remain to be implemented. The default locations are illustrative coordinates, not named or NASA-selected landing sites. Three QuickMap camera-observer comparisons now pass at display precision; see [the validation report](docs/validation/report.md).
 
 ## Structure
 
@@ -70,6 +84,7 @@ The UI workspace validates inputs locally. It does not persist them or consume t
 .github/workflows/ci.yml       Automated checks
 backend/
   pyproject.toml              Installable Python package and CLI
+  src/lunarwindow/api/        FastAPI app, HTTP contracts, synthetic provider
   src/lunarwindow/ephemeris/  Models, Horizons client/parser, export CLI
   tests/                     Offline tests and archived NASA fixtures
 data/
@@ -92,6 +107,7 @@ src/
   domain/
     scenario.ts               Input schemas and shared types
     ephemeris.ts              Team-aligned Python export types
+    evaluation.ts             FastAPI demo response types
   features/
     scenarios/components/     Editable comparison workspace
   server/
@@ -116,4 +132,4 @@ tests/                        Offline contract tests
 
 ## Next step
 
-Hand the versioned reference dataset and schema to Backend/data for integration. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See [the role-specific work package](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+Backend/data task 1 is complete; next implement metrics, visibility windows, and countdowns, then integrate the versioned reference dataset and GIS masks. Obtain team-approved mission coordinates and mast conventions from GIS before applying terrain masks. See the [backend work package](docs/backend-data.md) and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.

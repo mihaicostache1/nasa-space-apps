@@ -13,13 +13,15 @@ Next:
 1. Agree verified GIS inputs, mast/altitude conventions, and the extended JSON contract.
 2. Review the completed reference-point/camera-observer evidence, then add surface/terrain cases after that integration is available.
 3. Run the agreed curated-site precompute after a `--dry-run` request estimate.
-4. Backend/data adds FastAPI routes, the terrain join, and derived metrics; frontend connects to that service.
+4. Backend/data integrates the ephemeris into the FastAPI skeleton, adds the terrain join and derived metrics; frontend connects to that service.
 
 See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not yet independent scientific validation against QuickMap.
 
 ## 2. Usable comparison
 
-1. Agree the FastAPI evaluation endpoint and connect each scenario, with loading, error, and stale-result states.
+Backend/data task 1 is complete: FastAPI serves explicit synthetic catalog/scenario data with HTTP contracts, validation, CORS, tests, and Docker startup. See `docs/backend-data.md`. Metrics and real-data integration remain pending.
+
+1. Connect each scenario to `POST /api/evaluations`, with loading, error, and stale-result states; the current API data is synthetic.
 2. Add a 2D azimuth/elevation horizon view, elevation timelines, and a shared time cursor.
 3. Compute geometric sunlight/Earth visibility duration, next sunset/Earthset, and longest gaps. State the visibility rule and event-time precision. Mark intervals truncated by the selected range.
 4. Compare the two scenarios side by side and include source/model details with each result.
