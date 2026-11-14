@@ -63,6 +63,24 @@ export function DataSourceBanner({ catalog, results }: Props) {
       {warnings.map((warning) => (
         <p key={warning}>{warning}</p>
       ))}
+      {results.map(
+        ({ slot, data }) =>
+          data.horizonMode === 'terrain' && (
+            <p className="provenance-hash" key={slot}>
+              Scenario {slot} · {data.maskId} · SHA-256{' '}
+              {data.provenance.terrain.artifactSha256}
+              <br />
+              DEMs:{' '}
+              {data.provenance.terrain.mask.provenance.sources
+                .map(
+                  (source) => `${source.productId} (${source.resolutionM} m)`,
+                )
+                .join(' / ')}
+              <br />
+              {data.provenance.terrain.compatibility.limitation}
+            </p>
+          ),
+      )}
     </section>
   );
 }

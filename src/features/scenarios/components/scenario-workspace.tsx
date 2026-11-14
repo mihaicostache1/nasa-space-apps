@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ReferenceSiteCatalog } from '@/domain/reference';
 import type { ReferenceEvaluationContract } from '@/domain/terrain-evaluation';
+import type { ReferenceSiteCatalog } from '@/domain/reference';
 import {
   ApiError,
   evaluateReference,
@@ -10,16 +10,22 @@ import {
 } from '@/lib/api-client';
 import { ComparisonTimeline } from '@/features/analysis/components/comparison-timeline';
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
-import { LanderView } from '@/features/analysis/components/lander-view';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
 import { SkyExplorer } from '@/features/analysis/components/sky-explorer';
+import { LanderView } from '@/features/analysis/components/lander-view';
 import { modelBadge } from '@/features/analysis/lib/model';
+import { AzimuthElevationChart } from '@/features/analysis/components/azimuth-elevation-chart';
+import { PolarSiteMap } from '@/features/mission/components/polar-site-map';
+import { MissionInsights } from '@/features/mission/components/mission-insights';
+import { MissionShift } from '@/features/mission/components/mission-shift';
+import { PlaybackControl } from '@/features/mission/components/playback-control';
 import { domainHours, domainOf } from '@/features/analysis/lib/timeline';
 import type { ScenarioResult } from '@/features/analysis/types';
 import {
   defaultForm,
   toRequest,
   validateForm,
+  withSite,
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
 import { ReferenceScenarioCard } from './reference-scenario-card';
@@ -65,6 +71,12 @@ export function ScenarioWorkspace() {
   ]);
   const [cursorHours, setCursorHours] = useState(0);
   const [attempt, setAttempt] = useState(0);
+  const [activeSlot, setActiveSlot] = useState<'A' | 'B'>('A');
+  const [view, setView] = useState<'lander' | 'sky' | 'map'>('lander');
+  const [playbackOwner, setPlaybackOwner] = useState<
+    'lander' | 'samples' | null
+  >(null);
+  const [shiftKeys, setShiftKeys] = useState<string[] | null>(null);
   const inFlight = useRef<AbortController | null>(null);
 
   const evaluate = useCallback(
@@ -72,6 +84,7 @@ export function ScenarioWorkspace() {
       current: ReferenceScenarioForm[],
       sites: ReferenceSiteCatalog['sites'],
     ) => {
+      setPlaybackOwner(null);
       inFlight.current?.abort();
       const controller = new AbortController();
       inFlight.current = controller;
@@ -100,6 +113,7 @@ export function ScenarioWorkspace() {
               toRequest(form),
               controller.signal,
             );
+            if (controller.signal.aborted) return;
             setSlots((previous) =>
               previous.map((slot, i) =>
                 i === index
@@ -197,72 +211,241 @@ export function ScenarioWorkspace() {
     ),
   );
   const cursor = Math.min(cursorHours, Math.max(0, maxHours - 1));
+  const activeForm = forms.find((form) => form.slot === activeSlot)!;
+  const activeSite = sites.find((site) => site.id === activeForm.siteId)!;
+  const activeResult = results.find((result) => result.slot === activeSlot);
+  const step = Math.min(...forms.map((form) => form.stepMinutes)) / 60;
+  const changeForm = (next: ReferenceScenarioForm) => {
+    setPlaybackOwner(null);
+    setForms((current) =>
+      current.map((form) => (form.slot === next.slot ? next : form)),
+    );
+  };
+  const selectSlot = (slot: 'A' | 'B') => {
+    setPlaybackOwner(null);
+    setActiveSlot(slot);
+  };
+  const shiftMatches =
+    shiftKeys !== null &&
+    forms.every((form, index) => requestKey(form) === shiftKeys[index]);
+  const shiftReady =
+    shiftMatches &&
+    slots.every(
+      (slot, index) =>
+        slot.status === 'ready' && slot.requestKey === shiftKeys?.[index],
+    );
+  const shiftState = !shiftKeys
+    ? 'idle'
+    : !shiftMatches
+      ? 'stale'
+      : loading
+        ? 'loading'
+        : shiftReady
+          ? 'ready'
+          : 'error';
 
   return (
     <section className="workspace" aria-labelledby="workspace-heading">
-      <div className="section-heading">
-        <h2 id="workspace-heading">Compare two scenarios</h2>
+      <div className="section-heading workspace-heading" data-reveal>
+        <div>
+          <p className="eyebrow">01 / MISSION CONTROL</p>
+          <h2 id="workspace-heading">The view from your landing site.</h2>
+        </div>
         <span className="badge">
-          ARCHIVED NASA DATA ·{' '}
+          <i className="earth-dot" /> VERIFIED DATA ·{' '}
           {modelBadge(
-            results.map((result) => ({
-              slot: result.slot,
-              horizonMode: result.data.horizonMode,
+            results.map(({ slot, data }) => ({
+              slot,
+              horizonMode: data.horizonMode,
             })),
           )}
         </span>
       </div>
-      <DataSourceBanner catalog={catalog.data} results={results} />
-      <div className="scenarios">
-        {forms.map((form, index) => (
-          <ReferenceScenarioCard
-            key={form.slot}
-            form={form}
-            sites={sites}
-            issues={
-              slots[index]?.status === 'error' && slots[index].message
-                ? [slots[index].message]
-                : []
-            }
-            onChange={(next) =>
-              setForms((current) =>
-                current.map((f, i) => (i === index ? next : f)),
-              )
-            }
-          />
-        ))}
+      <div className="mission-bar">
+        <span>
+          <strong>{activeSite.name}</strong>
+        </span>
+        <span>
+          {Math.abs(activeSite.lat).toFixed(4)}°{activeSite.lat < 0 ? 'S' : 'N'}{' '}
+          / {Math.abs(activeSite.lon).toFixed(4)}°
+          {activeSite.lon < 0 ? 'W' : 'E'}
+        </span>
+        <span>
+          {activeForm.startDate} → {activeForm.endDate}
+        </span>
+        <a href="#compare">Compare scenarios ↗</a>
       </div>
-      <div className="actions">
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => void evaluate(forms, sites)}
-        >
-          {loading ? 'Calculating…' : 'Update comparison'}{' '}
-          <span aria-hidden="true">→</span>
-        </button>
-        <p role="status">
-          {loading
-            ? 'Evaluating archived ephemerides…'
-            : anyStale
-              ? 'Inputs changed: results below are out of date until you update.'
-              : results.length
-                ? 'Results match the inputs above.'
-                : ''}
-        </p>
+      <div className="mission-grid" data-reveal>
+        <div className="mission-controls">
+          <div className="control-heading">
+            <span className="micro-label">MISSION PARAMETERS</span>
+            <div className="toggle" role="group" aria-label="Edit scenario">
+              {(['A', 'B'] as const).map((slot) => (
+                <button
+                  type="button"
+                  key={slot}
+                  aria-pressed={activeSlot === slot}
+                  onClick={() => selectSlot(slot)}
+                >
+                  {slot}
+                </button>
+              ))}
+            </div>
+          </div>
+          {forms.map((form, index) => (
+            <div key={form.slot} hidden={activeSlot !== form.slot}>
+              <ReferenceScenarioCard
+                form={form}
+                sites={sites}
+                issues={
+                  slots[index]?.status === 'error' && slots[index].message
+                    ? [slots[index].message]
+                    : []
+                }
+                onChange={changeForm}
+              />
+            </div>
+          ))}
+          <p className="hint custom-note">
+            Custom coordinates are not available in the verified reference API.
+          </p>
+          <div className="actions">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => void evaluate(forms, sites)}
+            >
+              {loading ? 'Calculating…' : 'Update comparison'}{' '}
+              <span aria-hidden="true">→</span>
+            </button>
+            <p role="status">
+              {loading
+                ? 'Evaluating archived ephemerides…'
+                : anyStale
+                  ? 'Inputs changed: results below are out of date until you update.'
+                  : results.length
+                    ? 'Results match the inputs above.'
+                    : ''}
+            </p>
+          </div>
+        </div>
+        <div className="visual-stage">
+          <div className="stage-toolbar">
+            <span className="micro-label">OBSERVATION / {activeSlot}</span>
+            <div className="toggle" role="group" aria-label="Visualization">
+              <button
+                type="button"
+                aria-pressed={view === 'lander'}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('lander');
+                }}
+              >
+                Lander view
+              </button>
+              <button
+                type="button"
+                aria-pressed={view === 'sky'}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('sky');
+                }}
+              >
+                Sky dome
+              </button>
+              <button
+                type="button"
+                aria-pressed={view === 'map'}
+                onClick={() => {
+                  setPlaybackOwner(null);
+                  setView('map');
+                }}
+              >
+                Polar map
+              </button>
+            </div>
+          </div>
+          <div
+            className="view-transition"
+            key={`${view}-${activeSlot}-${activeResult?.data.horizonMode ?? 'loading'}-${activeResult?.data.siteId ?? ''}`}
+          >
+            {view === 'map' ? (
+              <PolarSiteMap
+                sites={sites}
+                selectedId={activeForm.siteId}
+                onSelect={(site) => changeForm(withSite(activeForm, site))}
+              />
+            ) : view === 'lander' && activeResult ? (
+              <LanderView
+                key={slots[activeSlot === 'A' ? 0 : 1].requestKey}
+                results={results}
+                selectedSlot={activeSlot}
+                onSelectSlot={selectSlot}
+                cursorHours={cursor}
+                onCursorChange={setCursorHours}
+                disabled={loading || anyStale}
+                playing={playbackOwner === 'lander'}
+                onPlayingChange={(playing) =>
+                  setPlaybackOwner(playing ? 'lander' : null)
+                }
+              />
+            ) : activeResult ? (
+              <SkyExplorer
+                key={`${activeResult.slot}-${activeResult.data.siteId}-${activeResult.data.horizonMode}`}
+                result={activeResult}
+                cursorHours={cursor}
+                onCursorChange={setCursorHours}
+              />
+            ) : (
+              <div className="visual-loading" aria-busy={loading}>
+                <span className="loading-orbit" />
+                <p>
+                  {loading
+                    ? 'Resolving your lunar sky…'
+                    : 'Apply the mission parameters to explore the sky.'}
+                </p>
+                <span className="micro-label">
+                  NASA/JPL HORIZONS · VERIFIED ARCHIVE
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        <MissionInsights result={activeResult} cursorHours={cursor} />
       </div>
+      <details className="provenance-details">
+        <summary>
+          Dataset, observer and model provenance{' '}
+          <span>NASA/JPL Horizons + NASA LOLA</span>
+        </summary>
+        <DataSourceBanner catalog={catalog.data} results={results} />
+      </details>
       {results.length > 0 && (
         <>
-          <LanderView
-            results={results}
-            cursorHours={cursor}
-            onCursorChange={setCursorHours}
-          />
-          <ComparisonTimeline
-            results={results}
-            cursorHours={cursor}
-            onCursorChange={setCursorHours}
-          />
+          <section id="compare" className="comparison-section" data-reveal>
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">02 / OPERATIONS ANALYSIS</p>
+                <h2>Compare two scenarios</h2>
+              </div>
+              <PlaybackControl
+                playing={playbackOwner === 'samples'}
+                onPlayingChange={(playing) =>
+                  setPlaybackOwner(playing ? 'samples' : null)
+                }
+                hours={cursor}
+                max={Math.max(0, maxHours - step)}
+                step={step}
+                disabled={loading || anyStale}
+                onChange={setCursorHours}
+              />
+            </div>
+            <ComparisonTimeline
+              results={results}
+              cursorHours={cursor}
+              onCursorChange={setCursorHours}
+            />
+          </section>
           <MissionWindowFinder
             results={results}
             onJump={(hours) => {
@@ -272,7 +455,25 @@ export function ScenarioWorkspace() {
                 ?.scrollIntoView({ behavior: 'smooth' });
             }}
           />
-          <SkyExplorer results={results} cursorHours={cursor} />
+          <MissionShift
+            form={forms[0]}
+            site={sites.find((site) => site.id === forms[0].siteId)!}
+            disabled={loading}
+            comparisonState={shiftState}
+            results={shiftReady ? results : []}
+            onApply={(next) => {
+              setShiftKeys(next.map(requestKey));
+              setForms(next);
+              setCursorHours(0);
+              void evaluate(next, sites);
+            }}
+          />
+          <details className="elevation-details">
+            <summary>
+              Inspect azimuth / elevation detail <span>Cartesian view ↗</span>
+            </summary>
+            <AzimuthElevationChart results={results} cursorHours={cursor} />
+          </details>
         </>
       )}
     </section>

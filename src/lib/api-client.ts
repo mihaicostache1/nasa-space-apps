@@ -1,9 +1,9 @@
 import type { ApiErrorResponse } from '@/domain/evaluation';
-import type { ReferenceSiteCatalog } from '@/domain/reference';
 import type {
   ReferenceEvaluationContract,
   ReferenceEvaluationRequestContract,
 } from '@/domain/terrain-evaluation';
+import type { ReferenceSiteCatalog } from '@/domain/reference';
 
 /** Browser-visible FastAPI origin; inlined at build time. */
 export const API_BASE_URL = (

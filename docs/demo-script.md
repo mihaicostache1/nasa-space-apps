@@ -49,12 +49,12 @@ Drag the timeline cursor and watch the markers move.
 
 ## 6. Watch it happen (25 s)
 
-Scroll up to the **Lander's view**, scenario A, **Follow Earth**, **1 day/s**, and press **Play the period**. The timeline cursor below moves with it.
+In the mission workspace, select **Lander view**, scenario A, **Follow Earth**, **1 day/s**, and press **Play the period**. The timeline cursor below moves with it. Switching the sample-playback control on pauses the continuous player, and vice versa.
 
 - At **T+55 h** (19 Nov 07:00 UTC) a 32%-lit crescent Earth clears the LOLA ridge: the combined window opens.
 - Switch to **Follow Sun**: at **T+136 h** (22 Nov 16:00 UTC) the Sun drops behind the ridge and the ground goes dark, while Earth, now a thin 6% crescent, stays up.
 
-> "Everything here is to scale and comes from the same NASA data: the Sun's half-degree disc, Earth's phase, and the real ridge-line."
+> "The body directions and angular sizes follow the archived observations, and the skyline comes from the reviewed horizon. Motion is visually interpolated between samples; visibility flags remain sample-based. Earth's phase is a geometric approximation; stars and surface lighting are illustrative."
 
 > "A flat horizon overstates this site. With the real ridge-line from NASA's LOLA elevation data, the joint power-and-link window halves."
 

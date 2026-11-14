@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import type { TerrainMask } from '@/domain/terrain-mask';
 import type { ReferenceSite, ReferenceTerrainMask } from '@/domain/reference';
 import {
   defaultForm,
@@ -8,6 +10,7 @@ import {
   validateForm,
   withHorizonMode,
   withSite,
+  missionShift,
 } from '@/features/scenarios/lib/reference-scenario';
 import { describeApiError } from '@/lib/api-client';
 
@@ -36,6 +39,87 @@ const site01 = site(
 );
 
 describe('reference scenario form', () => {
+  const mask: TerrainMask = JSON.parse(
+    readFileSync(
+      new URL(
+        '../data/reference/terrain-masks/lola-site01-reference-mast-0m.json',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  );
+  const terrainSite: ReferenceSite = {
+    ...site01,
+    supportedHorizonModes: ['geometric', 'terrain'],
+    terrainMasks: [
+      {
+        maskId: mask.maskId,
+        artifactSha256:
+          '4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d',
+        observer: mask.observer,
+        referenceFrame: mask.referenceFrame,
+        demSources: mask.provenance.sources,
+        requiresMeanEarthApproximation: true,
+        framePolicy: 'mean-earth-reference-v1',
+        limitation: 'Untransformed Mean Earth realizations.',
+      },
+    ],
+  };
+
+  it('requires explicit approximation acceptance and a registered terrain mask', () => {
+    const form = {
+      ...defaultForm('A', terrainSite),
+      horizonMode: 'terrain' as const,
+      maskId: mask.maskId,
+    };
+    expect(validateForm(form, terrainSite).join(' ')).toContain('Accept');
+    expect(
+      validateForm({ ...form, acceptFrameApproximation: true }, terrainSite),
+    ).toEqual([]);
+    expect(
+      toRequest({ ...form, acceptFrameApproximation: true }),
+    ).toMatchObject({
+      horizonMode: 'terrain',
+      maskId: mask.maskId,
+      allowMeanEarthApproximation: true,
+    });
+    expect(
+      validateForm({ ...form, acceptFrameApproximation: true }, site01).join(
+        ' ',
+      ),
+    ).toContain('no reviewed terrain horizon');
+    expect(
+      withSite(
+        { ...form, acceptFrameApproximation: true },
+        { ...site01, id: 'other-reference' },
+      ),
+    ).toMatchObject({
+      horizonMode: 'geometric',
+      acceptFrameApproximation: false,
+      maskId: '',
+    });
+  });
+
+  it('compares equal mission durations and refuses unsupported six-week shifts', () => {
+    const original = defaultForm('A', site01);
+    const { original: a, revised: b } = missionShift(original, 7, 1);
+    expect(a).toMatchObject({
+      slot: 'A',
+      startDate: '2026-11-14',
+      endDate: '2026-11-15',
+    });
+    expect(b).toMatchObject({
+      slot: 'B',
+      siteId: a.siteId,
+      startDate: '2026-11-21',
+      endDate: '2026-11-22',
+    });
+    expect(validateForm(b, site01)).toEqual([]);
+    expect(original.endDate).toBe('2026-12-14');
+    const shifted = missionShift(original, 42, 1).revised;
+    expect(shifted.startDate).toBe('2026-12-26');
+    expect(validateForm(shifted, site01).join(' ')).toContain('archive');
+  });
   it('defaults to the full archive and builds a geometric request', () => {
     const form = defaultForm('A', site01);
     expect(toRequest(form)).toEqual({

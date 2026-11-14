@@ -185,3 +185,24 @@ export function validateForm(
   }
   return issues;
 }
+
+/** Shift whole UTC days without clipping or silently extending archive coverage. */
+export function missionShift(
+  form: ReferenceScenarioForm,
+  days: number,
+  durationDays: number,
+) {
+  const shift = (offset: number) =>
+    new Date(Date.parse(`${form.startDate}T00:00:00Z`) + offset * DAY_MS)
+      .toISOString()
+      .slice(0, 10);
+  return {
+    original: { ...form, slot: 'A' as const, endDate: shift(durationDays) },
+    revised: {
+      ...form,
+      slot: 'B' as const,
+      startDate: shift(days),
+      endDate: shift(days + durationDays),
+    },
+  };
+}

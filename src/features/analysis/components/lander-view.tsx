@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent,
   type PointerEvent,
 } from 'react';
 import {
@@ -43,17 +44,22 @@ const RULER_H = 24;
 const REPORT_MS = 80;
 
 const COLORS = {
-  sun: '#f5c451',
-  earth: '#6cb4ff',
-  muted: '#a8b6c6',
-  accent: '#d0f28c',
-  danger: '#ff9b8a',
+  sun: '#fc734d',
+  earth: '#0297de',
+  muted: '#8da5b2',
+  accent: '#0297de',
+  danger: '#fc734d',
 };
 
 type Props = {
   results: ScenarioResult[];
   cursorHours: number;
   onCursorChange: (hours: number) => void;
+  selectedSlot?: Slot;
+  onSelectSlot?: (slot: Slot) => void;
+  disabled?: boolean;
+  playing?: boolean;
+  onPlayingChange?: (playing: boolean) => void;
 };
 
 type Scene = {
@@ -72,11 +78,24 @@ type Scene = {
 };
 
 /** A lander's-eye camera on the real Sun and Earth tracks, at true angular scale. */
-export function LanderView({ results, cursorHours, onCursorChange }: Props) {
-  const [selected, setSelected] = useState<Slot>('A');
-  const [playing, setPlaying] = useState(false);
+export function LanderView({
+  results,
+  cursorHours,
+  onCursorChange,
+  selectedSlot,
+  onSelectSlot,
+  disabled = false,
+  playing: controlledPlaying,
+  onPlayingChange,
+}: Props) {
+  const [localSelected, setLocalSelected] = useState<Slot>('A');
+  const [localPlaying, setLocalPlaying] = useState(false);
+  const selected = selectedSlot ?? localSelected;
+  const setSelected = onSelectSlot ?? setLocalSelected;
+  const playing = controlledPlaying ?? localPlaying;
+  const setPlaying = onPlayingChange ?? setLocalPlaying;
   const [speed, setSpeed] = useState(24);
-  const [target, setTarget] = useState<Target>('earth');
+  const [target, setTarget] = useState<Target>('sun');
 
   const result = results.find((r) => r.slot === selected) ?? results[0];
   const { data } = result;
@@ -207,7 +226,7 @@ export function LanderView({ results, cursorHours, onCursorChange }: Props) {
       step,
       target,
       speed,
-      playing,
+      playing: playing && !disabled && !result.stale,
       onCursorChange,
     };
     requestFrame();
@@ -308,12 +327,41 @@ export function LanderView({ results, cursorHours, onCursorChange }: Props) {
 
   const shown = track(startMs + cursorHours * HOUR_MS);
 
+  function onKeyDown(event: KeyboardEvent<HTMLCanvasElement>) {
+    if (event.key === 'Home') {
+      event.preventDefault();
+      setTarget('sun');
+      requestFrame();
+      return;
+    }
+    const camera = cameraRef.current;
+    const movement = {
+      ArrowLeft: [-2, 0],
+      ArrowRight: [2, 0],
+      ArrowUp: [0, 2],
+      ArrowDown: [0, -2],
+    }[event.key];
+    if (!camera || !movement) return;
+    event.preventDefault();
+    const ppd = Math.min(22, Math.max(10, sizeRef.current.width / 46));
+    const limit = Math.max(0, sizeRef.current.height / ppd / 2 - 2);
+    cameraRef.current = {
+      az: wrap360(camera.az + movement[0]),
+      el: Math.max(-limit, Math.min(limit, camera.el + movement[1])),
+    };
+    setTarget('free');
+    requestFrame();
+  }
+
   return (
-    <section className="analysis" aria-labelledby="lander-heading">
+    <section
+      className={`analysis lander-view${result.stale ? ' is-stale' : ''}`}
+      aria-labelledby="lander-heading"
+    >
       <div className="section-heading">
         <h2 id="lander-heading">Lander&apos;s view</h2>
         {results.length > 1 && (
-          <div className="toggle" role="group" aria-label="Scenario">
+          <div className="toggle" role="group" aria-label="Lander scenario">
             {results.map((r) => (
               <button
                 key={r.slot}
@@ -329,7 +377,12 @@ export function LanderView({ results, cursorHours, onCursorChange }: Props) {
       </div>
       <figure className="panel lander">
         <div className="lander-controls">
-          <button type="button" className="play" onClick={togglePlay}>
+          <button
+            type="button"
+            className="play"
+            onClick={togglePlay}
+            disabled={disabled || result.stale}
+          >
             {playing ? 'Pause' : 'Play the period'}
           </button>
           <div className="toggle" role="group" aria-label="Playback speed">
@@ -365,8 +418,11 @@ export function LanderView({ results, cursorHours, onCursorChange }: Props) {
           <canvas
             ref={canvasRef}
             role="img"
+            tabIndex={0}
+            aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home"
             aria-label="Animated view from the reference point toward the horizon, drawn from the archived Sun and Earth positions"
             aria-describedby="lander-caption"
+            onKeyDown={onKeyDown}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={() => (dragRef.current = null)}
@@ -378,7 +434,11 @@ export function LanderView({ results, cursorHours, onCursorChange }: Props) {
           {terrain ? 'reviewed LOLA terrain skyline' : 'flat 0° horizon'}.{' '}
           {describe(shown, startMs + cursorHours * HOUR_MS)} Angular sizes and
           positions are to scale; the camera follows the selected body, and the
-          strip at the top shows the whole horizon. Drag to look around.
+          strip at the top shows the whole horizon. Drag or use arrow keys to
+          look around; Home follows the Sun. Display positions interpolate
+          between observations; visibility flags and timeline readouts remain
+          sample-based. Stars and surface lighting are illustrative;
+          Earth&apos;s phase is a geometric approximation.
         </figcaption>
       </figure>
     </section>
@@ -402,7 +462,7 @@ function drawScene(
 ) {
   const { width: w, height: h, pxPerDeg: ppd } = camera;
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#020409';
+  ctx.fillStyle = '#02070a';
   ctx.fillRect(0, 0, w, h);
   if (!state) {
     ctx.fillStyle = COLORS.muted;
@@ -473,7 +533,7 @@ function drawScene(
     ctx.fill(ground);
   } else if (earth.visible) {
     // Earthshine is all that lights the ground once the Sun is gone.
-    ctx.fillStyle = 'rgba(108, 180, 255, 0.05)';
+    ctx.fillStyle = 'rgba(2, 151, 222, 0.05)';
     ctx.fill(ground);
   }
   ctx.beginPath();
@@ -547,7 +607,7 @@ function drawScene(
     narrow ? 'left' : 'right',
   );
   ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(168, 182, 198, 0.8)';
+  ctx.fillStyle = 'rgba(141, 165, 178, 0.8)';
   ctx.fillText(
     `${scene.terrain ? 'LOLA terrain skyline' : 'Flat 0° horizon'} · to scale, 1° = ${ppd.toFixed(0)} px`,
     10,
@@ -594,8 +654,8 @@ function drawEarth(
 
   // Thin atmosphere glow, then the night side.
   const rim = ctx.createRadialGradient(p.x, p.y, r * 0.9, p.x, p.y, r * 1.5);
-  rim.addColorStop(0, 'rgba(108, 180, 255, 0.25)');
-  rim.addColorStop(1, 'rgba(108, 180, 255, 0)');
+  rim.addColorStop(0, 'rgba(2, 151, 222, 0.25)');
+  rim.addColorStop(1, 'rgba(2, 151, 222, 0)');
   ctx.fillStyle = rim;
   ctx.fillRect(p.x - r * 1.5, p.y - r * 1.5, r * 3, r * 3);
   ctx.beginPath();
@@ -681,7 +741,7 @@ function drawRuler(ctx: CanvasRenderingContext2D, camera: Camera) {
     const x = (deg - left) * ppd;
     const az = wrap360(deg);
     const major = az % 5 === 0;
-    ctx.fillStyle = major ? COLORS.muted : 'rgba(168, 182, 198, 0.4)';
+    ctx.fillStyle = major ? COLORS.muted : 'rgba(141, 165, 178, 0.4)';
     ctx.fillRect(x, top, 1, major ? 7 : 4);
     if (az % 10 === 0 && x > 16 && x < w - 16) {
       const cardinal = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' }[az];
@@ -712,8 +772,8 @@ function drawMinimap(
   const half = camera.width / 2 / ppd;
   const from = wrap360(camera.az - half);
   const span = half * 2;
-  ctx.fillStyle = 'rgba(208, 242, 140, 0.12)';
-  ctx.strokeStyle = 'rgba(208, 242, 140, 0.6)';
+  ctx.fillStyle = 'rgba(2, 151, 222, 0.12)';
+  ctx.strokeStyle = 'rgba(2, 151, 222, 0.6)';
   const parts =
     from + span <= 360
       ? [[from, span]]
@@ -736,7 +796,7 @@ function drawMinimap(
     if (az) ctx.lineTo(px, y);
     else ctx.moveTo(px, y);
   }
-  ctx.strokeStyle = 'rgba(201, 169, 121, 0.7)';
+  ctx.strokeStyle = 'rgba(156, 176, 185, 0.7)';
   ctx.lineWidth = 1;
   ctx.stroke();
 

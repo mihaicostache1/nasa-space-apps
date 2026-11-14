@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReferenceSite } from '@/domain/reference';
 import type { VisibilityRule } from '@/domain/evaluation';
 import {
@@ -6,8 +7,8 @@ import {
   terrainMask,
   utcDate,
   VISIBILITY_RULES,
-  withHorizonMode,
   withSite,
+  withHorizonMode,
   type HorizonMode,
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
@@ -25,12 +26,22 @@ export function ReferenceScenarioCard({
   issues,
   onChange,
 }: Props) {
+  const [query, setQuery] = useState('');
   const site = sites.find((candidate) => candidate.id === form.siteId);
   const mask = terrainMask(site);
   const id = `scenario-${form.slot}`;
   return (
     <fieldset className="panel" aria-describedby={`${id}-issues`}>
       <legend>Scenario {form.slot}</legend>
+      <label>
+        Search verified sites
+        <input
+          type="search"
+          placeholder="Find a reference point…"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
       <label>
         Reference site
         <select
@@ -40,19 +51,73 @@ export function ReferenceScenarioCard({
             if (next) onChange(withSite(form, next));
           }}
         >
-          {sites.map((candidate) => (
-            <option key={candidate.id} value={candidate.id}>
-              {candidate.name}
-            </option>
-          ))}
+          {sites
+            .filter(
+              (candidate) =>
+                candidate.id === form.siteId ||
+                candidate.name.toLowerCase().includes(query.toLowerCase()),
+            )
+            .map((candidate) => (
+              <option key={candidate.id} value={candidate.id}>
+                {candidate.name}{' '}
+                {candidate.terrainMasks.length
+                  ? '· terrain available'
+                  : '· geometric'}
+              </option>
+            ))}
         </select>
       </label>
       {site && (
         <p className="hint">
-          {Math.abs(site.lat).toFixed(4)}°S, {site.lon.toFixed(4)}°E ·{' '}
+          {Math.abs(site.lat).toFixed(4)}°{site.lat < 0 ? 'S' : 'N'},{' '}
+          {Math.abs(site.lon).toFixed(4)}°{site.lon < 0 ? 'W' : 'E'} ·{' '}
           {(site.altitudeKm * 1000).toFixed(0)} m above the 1737.4 km sphere ·
           LOLA DEM reference point, not a landing target
         </p>
+      )}
+      <label>
+        Horizon model
+        <select
+          value={form.horizonMode}
+          onChange={(event) =>
+            onChange(
+              withHorizonMode(form, event.target.value as HorizonMode, site),
+            )
+          }
+        >
+          <option value="geometric">Geometric · flat 0° horizon</option>
+          <option value="terrain" disabled={!mask}>
+            LOLA terrain
+            {!site?.terrainMasks.length ? ' · unavailable' : ' · reviewed mask'}
+          </option>
+        </select>
+      </label>
+      {form.horizonMode === 'terrain' && mask && (
+        <div className="terrain-consent">
+          <p>
+            {mask.maskId} · {mask.observer.mastHeightM} m mast · LOLA DEMs at{' '}
+            {mask.demSources.map((source) => source.resolutionM).join(' / ')} m.
+          </p>
+          <p>
+            Reviewed 0 m mast. A 2 m mast can change this horizon by up to 1.9°.
+          </p>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={form.acceptFrameApproximation}
+              onChange={(event) =>
+                onChange({
+                  ...form,
+                  acceptFrameApproximation: event.target.checked,
+                })
+              }
+            />
+            <span>
+              I accept the DE421 MOON_ME / DE441 MEAN_ME approximation. No frame
+              transformation is applied.
+            </span>
+          </label>
+        </div>
       )}
       <div className="fields">
         <label>
@@ -115,48 +180,6 @@ export function ReferenceScenarioCard({
           </select>
         </label>
       </div>
-      <label>
-        Horizon
-        <select
-          value={form.horizonMode}
-          onChange={(event) =>
-            onChange(
-              withHorizonMode(form, event.target.value as HorizonMode, site),
-            )
-          }
-        >
-          <option value="geometric">Flat 0° (geometric)</option>
-          <option value="terrain" disabled={!mask}>
-            {mask
-              ? 'LOLA terrain (reviewed mask)'
-              : 'LOLA terrain (not available for this site)'}
-          </option>
-        </select>
-      </label>
-      {form.horizonMode === 'terrain' && mask && (
-        <>
-          <p className="hint">
-            {mask.maskId} · observer {mask.observer.mastHeightM} m above ground
-            · LOLA DEMs at{' '}
-            {mask.demSources.map((source) => source.resolutionM).join(' / ')} m
-          </p>
-          <label className="check">
-            <input
-              type="checkbox"
-              checked={form.acceptFrameApproximation}
-              onChange={(event) =>
-                onChange({
-                  ...form,
-                  acceptFrameApproximation: event.target.checked,
-                })
-              }
-            />
-            <span>
-              <strong>Accept the frame approximation.</strong> {mask.limitation}
-            </span>
-          </label>
-        </>
-      )}
       <div id={`${id}-issues`} aria-live="polite">
         {issues.map((issue) => (
           <p className="issue" key={issue}>

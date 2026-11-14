@@ -13,13 +13,13 @@ Next:
 1. A validated terrain mask is available for Site01 (`data/reference/terrain-masks/lola-site01-reference-mast-0m.json`), matching the archived ephemeris observer (ground + 0 m mast above the 1737.4 km sphere).
 2. Review the completed reference-point/camera-observer evidence, then add surface/terrain cases after that integration is available.
 3. Run the agreed curated-site precompute after a `--dry-run` request estimate.
-4. The backend now integrates the reviewed Site01 mask with archived ephemerides and the FastAPI visibility engine. Frontend integration remains pending.
+4. The backend integrates the reviewed Site01 mask with archived ephemerides and the FastAPI visibility engine. The frontend now exposes terrain selection with explicit frame acceptance and returned provenance.
 
 See `docs/ephemeris-lead.md` for handoff details. A working NASA query is not yet independent scientific validation against QuickMap.
 
 ## 2. Usable comparison
 
-The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. The frontend selects the terrain horizon per scenario. Extended precomputation remains pending.
+The backend serves synthetic scenarios and verified reference-data geometric or Site01 terrain evaluations, with HTTP contracts, validation, CORS, tests, and Docker startup. Archived-data and reviewed-terrain integration are complete, including loaders, range selection, observer/frame checks, response provenance, engine integration, and dedicated model regression baselines. See `docs/backend-data.md`, `docs/visibility.md`, and `docs/validation/terrain-regression.md`. The frontend now supports reviewed terrain. Extended curated-site precomputation remains a later task.
 
 Reference evaluations now use the versioned cache-key contract and bounded in-memory LRU storage after source integrity, date selection, and terrain compatibility checks. Repeated requests reuse validated response snapshots and skip visibility calculation while preserving source checks, provenance, and HTTP errors. Tests cover source/mask/model invalidation, isolation, bounds, and warmed-cache failure cases. Extended curated-site precomputation remains separate.
 
@@ -30,11 +30,10 @@ The [offline evaluation precompute contract, generator, verifier, loader, and CL
 3. The engine and verified geometric/terrain reference integrations are complete. Expose the visibility rule, timing precision, source provenance, frame approximation, and truncated-range markers in the UI.
 4. Compare the two scenarios side by side and include source/model details with each result.
 5. Done: the frontend uses the reference site catalog and `POST /api/reference/evaluations`, with loading, error, and stale-result states.
-6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, next sunset and Earthset countdowns (shown as the bracket between two observations), mission window finder, and a 2D azimuth/elevation sky explorer.
+6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, bracketed next sunset and Earthset countdowns, mission window finder, and sky visualizations.
 7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
-8. Done: each scenario can select the reviewed Site01 LOLA terrain horizon, after explicit acceptance of its frame approximation; the badge and data banner name the model per scenario.
-9. Done: an animated lander's-eye view plays the period on the same data: to-scale Sun and Earth discs on the flat or LOLA skyline, Earth's phase from the Sun–Earth elongation, stars turning at the sidereal rate, and playback that drives the shared cursor.
-10. Next: demo rehearsal in a clean browser, and deployment. Later: a 3D Sun–Earth–Moon scene explaining tilt and libration (schematic distances, directions from the data).
+8. Done: backend data readiness, configurable resource limits, private validation-failure diagnostics, and a Chromium rehearsal against the production web/API images. See [deployment readiness](deployment-readiness.md). The [redesigned mission experience](mission-experience.md) adds terrain controls, a polar sky dome, a selectable coordinate map, sample playback, and archive-bounded mission shifts. A six-week shift requires a longer verified archive; external deployment remains separate.
+9. Done: Mihai's animated lander-eye view is integrated as a workspace tab. Sun/Earth camera tracking, period playback, visual interpolation and the verified skyline share the selected scenario and cursor with the dome, timelines, and metrics. Stars and surface lighting are illustrative.
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 
@@ -46,7 +45,7 @@ Next:
 
 1. Independently validate surface/terrain predictions and agree on a real antenna height before generating further matched observer datasets. The reviewed 0 m reference backend integration is complete, with explicit frame-approximation acceptance and regression coverage.
 2. Later, if time allows: ephemerides and horizons for further curated sites, and `HorizonService` for custom coordinates.
-3. Done: the frontend exposes the geometric/terrain choice and shows the mask ID, DEM resolutions, observer height, and frame limitation, with explicit acceptance; only registered reference masks are offered, never preliminary GIS horizons.
+3. Done: the frontend exposes the API's geometric/terrain choice, observer-height and frame assumptions, coverage limits, mask checksum and DEM provenance. Preliminary GIS horizons remain distinct from registered reference masks.
    The reference site catalog now advertises supported horizon modes and verified mask selection metadata, including observer heights, checksums, DEM sources, and the explicit frame-approximation requirement.
 4. Add contextual mapping or 3D views using `rays.el` and `rays.horizonDistanceKm`.
 

@@ -24,6 +24,8 @@ LunarWindow compares lunar south-pole sites and dates. For each one it shows whe
 
 ## Start with Docker
 
+The [mission experience](docs/mission-experience.md) combines the cinematic interface with Mihai's animated **Lander view**, the polar sky dome, coordinate map, verified terrain controls, and mission-shift comparison. Both playback controls drive one shared timeline and pause when inputs change.
+
 With Docker running, the team can start the web app without installing Node.js or Python:
 
 ```sh
