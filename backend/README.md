@@ -71,6 +71,17 @@ for item in manifest["datasets"]:
 
 The producer is importable via `HorizonsClient`, `Site`, `TimeRange`, and `export_run`. Calls perform blocking I/O; use a worker when integrating with an async service. Backend/data owns the visibility/metrics engine and API routes. It uses the supplied angular sizes to classify partial discs; terrain-mask integration, eclipses, and power/radio models remain separate work.
 
+## Load one reference dataset offline
+
+```python
+from pathlib import Path
+from lunarwindow.reference import load_reference_dataset
+
+dataset = load_reference_dataset(Path("data/reference/validation-30d"), "lola-site01-reference")
+```
+
+The loader checks the complete bundle with the existing checksum, schema, sampling-grid, provenance, and CSV/JSON validators, then returns the selected dataset with its original samples and provenance. It also checks the exact JSON bytes it returns against the verified manifest. The directory is explicit, so callers can use a repository or mounted-data path. It raises `LookupError` for an unknown site and `ValueError` for missing, incomplete, malformed, or corrupted bundle data. It performs no downloads or writes. API integration remains a separate step.
+
 ## Requests, caching, and concurrency
 
 Requests are sequential and chunked on the original sampling grid: at most 30 days / 744 intervals per query, with at most 200,000 samples per site. Known API signatures 1.2 and 1.3 are accepted; unexpected versions fail explicitly. The live archived endpoint reports 1.2; the documentation describes 1.3.
