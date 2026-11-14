@@ -1,4 +1,4 @@
-# Demo script (about 2½ minutes)
+# Demo script (about 3 minutes)
 
 Every number below comes from the archived NASA data the app ships with. They reproduce exactly in a clean browser, locally (`docker compose up --build -d --wait`) or on the deployed site. Wake the hosted API a few minutes before recording (see `docs/deploy.md`).
 
@@ -47,8 +47,17 @@ Drag the timeline cursor and watch the markers move.
    - **Next sunset** changes from "None observed" to **T+135–136 h** (22 Nov 15:00–16:00 UTC): the ridge-line hides the Sun.
 3. In the sky explorer, scenario A now shows the jagged LOLA skyline (about −3° to +3°) instead of the flat line.
 
+## 6. Watch it happen (25 s)
+
+Scroll up to the **Lander's view**, scenario A, **Follow Earth**, **1 day/s**, and press **Play the period**. The timeline cursor below moves with it.
+
+- At **T+55 h** (19 Nov 07:00 UTC) a 32%-lit crescent Earth clears the LOLA ridge: the combined window opens.
+- Switch to **Follow Sun**: at **T+136 h** (22 Nov 16:00 UTC) the Sun drops behind the ridge and the ground goes dark, while Earth, now a thin 6% crescent, stays up.
+
+> "Everything here is to scale and comes from the same NASA data: the Sun's half-degree disc, Earth's phase, and the real ridge-line."
+
 > "A flat horizon overstates this site. With the real ridge-line from NASA's LOLA elevation data, the joint power-and-link window halves."
 
-## 6. Honesty (10 s)
+## 7. Honesty (10 s)
 
 > "The terrain horizon is reviewed for one reference point, and it uses a stated frame approximation that you must accept. The QuickMap cross-checks validate our Sun and Earth angles for observers about 100 km up, not ground-level shadows."

@@ -523,10 +523,38 @@ tr.longest td:nth-child(3) {
 .sky .marker.earth {
   fill: var(--earth);
 }
-.sky figcaption {
+.sky figcaption,
+.lander figcaption {
   margin-top: 12px;
   color: var(--muted);
   font-size: 12px;
+}
+.lander-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+}
+.lander-controls .play {
+  min-width: 150px;
+  padding: 9px 16px;
+}
+.lander-canvas {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #020409;
+}
+.lander-canvas canvas {
+  display: block;
+  width: 100%;
+  cursor: grab;
+  /* Horizontal drags pan the camera; vertical swipes still scroll the page. */
+  touch-action: pan-y;
+}
+.lander-canvas canvas:active {
+  cursor: grabbing;
 }
 footer p {
   max-width: 900px;

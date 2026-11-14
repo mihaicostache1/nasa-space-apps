@@ -31,7 +31,8 @@ Reference evaluations now use the versioned cache-key contract and bounded in-me
 6. Done: three-lane timeline with a shared cursor, longest simultaneous operation and communication outage, next sunset and Earthset countdowns (shown as the bracket between two observations), mission window finder, and a 2D azimuth/elevation sky explorer.
 7. Done: the visibility rule, timing precision, source, geometric model, and truncated-range markers are shown in the UI.
 8. Done: each scenario can select the reviewed Site01 LOLA terrain horizon, after explicit acceptance of its frame approximation; the badge and data banner name the model per scenario.
-9. Next: demo rehearsal in a clean browser, and deployment.
+9. Done: an animated lander's-eye view plays the period on the same data: to-scale Sun and Earth discs on the flat or LOLA skyline, Earth's phase from the Sun–Earth elongation, stars turning at the sidereal rate, and playback that drives the shared cursor.
+10. Next: demo rehearsal in a clean browser, and deployment. Later: a 3D Sun–Earth–Moon scene explaining tilt and libration (schematic distances, directions from the data).
 
 Done when changing a location or date yields a clear comparison using verified data, including accessible text alongside charts.
 
