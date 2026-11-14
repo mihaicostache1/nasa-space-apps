@@ -1,5 +1,6 @@
 """Focused offline tests for loading one site from the committed reference run."""
 
+import hashlib
 import json
 import os
 import shutil
@@ -8,7 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from lunarwindow.reference import load_reference_dataset
+from lunarwindow.reference import load_reference_dataset, load_verified_reference_dataset
 
 REFERENCE = (
     Path(
@@ -22,6 +23,34 @@ SITE_ID = "lola-site01-reference"
 
 
 class ReferenceLoaderTests(unittest.TestCase):
+    def test_verified_artifact_checksum_identifies_the_exact_parsed_snapshot(self):
+        original = (REFERENCE / f"{SITE_ID}.json").read_bytes()
+        manifest = json.loads((REFERENCE / "manifest.json").read_bytes())
+        read_bytes = Path.read_bytes
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            path = directory / f"{SITE_ID}.json"
+            path.write_bytes(original)
+
+            def change_after_read(source):
+                content = read_bytes(source)
+                if source == path:
+                    path.write_bytes(b"{}")
+                return content
+
+            # Simulate a file changing after verification and the final read.
+            # A second read for hashing would identify bytes other than the data.
+            with (
+                patch("lunarwindow.reference.verify_run", return_value=manifest),
+                patch.object(Path, "read_bytes", change_after_read),
+            ):
+                verified = load_verified_reference_dataset(directory, SITE_ID)
+            self.assertEqual(verified.dataset, json.loads(original))
+            self.assertEqual(verified.artifact_sha256, hashlib.sha256(original).hexdigest())
+            self.assertNotEqual(
+                verified.artifact_sha256, hashlib.sha256(path.read_bytes()).hexdigest()
+            )
+
     def test_loads_one_real_dataset_with_original_samples_and_provenance(self):
         source = REFERENCE / f"{SITE_ID}.json"
         original = source.read_bytes()

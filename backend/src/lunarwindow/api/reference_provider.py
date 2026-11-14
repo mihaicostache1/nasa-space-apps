@@ -2,13 +2,17 @@
 
 from pathlib import Path
 
-from lunarwindow.reference import load_reference_dataset, select_reference_dataset
+from pydantic import TypeAdapter, ValidationError
+
+from lunarwindow.reference import load_verified_reference_dataset, select_reference_dataset
 from lunarwindow.terrain.compatibility import check_terrain_compatibility
 from lunarwindow.terrain.registry import load_reviewed_mask
 from lunarwindow.visibility import calculate_visibility
-from lunarwindow.visibility.models import HorizonPoint
+from lunarwindow.visibility.models import VISIBILITY_MODEL_VERSION, HorizonPoint
 
 from .models import ReferenceAvailability
+from .reference_cache import ReferenceEvaluationCache
+from .reference_cache_key import build_reference_evaluation_cache_key
 from .reference_models import (
     ReferenceEvaluation,
     ReferenceEvaluationProvenance,
@@ -23,13 +27,18 @@ from .terrain_models import (
     TerrainReferenceEvaluationRequest,
 )
 
+_RESPONSE = TypeAdapter(ReferenceEvaluationContract)
+
 
 def evaluate_reference(
     request: ReferenceEvaluationRequestContract,
     directory: Path,
     terrain_directory: Path | None = None,
+    *,
+    cache: ReferenceEvaluationCache | None = None,
 ) -> ReferenceEvaluationContract:
-    archive = load_reference_dataset(directory, request.siteId)
+    verified = load_verified_reference_dataset(directory, request.siteId)
+    archive = verified.dataset
     selected = select_reference_dataset(
         archive,
         start_utc=request.startUtc,
@@ -55,6 +64,24 @@ def evaluate_reference(
         )
     else:
         horizon = [HorizonPoint(az=az, el=0.0) for az in range(360)]
+
+    # A cached success never bypasses source integrity, selection, or policy checks.
+    if cache is not None:
+        key = build_reference_evaluation_cache_key(
+            request,
+            ephemeris_sha256=verified.artifact_sha256,
+            terrain_mask_sha256=terrain.artifactSha256 if terrain is not None else None,
+            calculation_model_version=VISIBILITY_MODEL_VERSION,
+        )
+        snapshot = cache.get(key)
+        if snapshot is not None:
+            try:
+                # Deserialize a fresh validated model; callers never share cached state.
+                return _RESPONSE.validate_json(snapshot)
+            except ValidationError:
+                # An invalid internal snapshot is a miss, never a successful response.
+                pass
+
     visibility = calculate_visibility(
         selected["series"],
         horizon,
@@ -85,10 +112,16 @@ def evaluate_reference(
         ),
     }
     if terrain is not None:
-        return TerrainReferenceEvaluation(
+        result = TerrainReferenceEvaluation(
             **common,
             maskId=terrain.mask.maskId,
             allowMeanEarthApproximation=request.allowMeanEarthApproximation,
             provenance=TerrainReferenceEvaluationProvenance(**provenance, terrain=terrain),
         )
-    return ReferenceEvaluation(**common, provenance=ReferenceEvaluationProvenance(**provenance))
+    else:
+        result = ReferenceEvaluation(
+            **common, provenance=ReferenceEvaluationProvenance(**provenance)
+        )
+    if cache is not None:
+        cache.put(key, result.model_dump_json().encode("utf-8"))
+    return result
