@@ -3,11 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReferenceEvaluationContract } from '@/domain/terrain-evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
-import {
-  ApiError,
-  evaluateReference,
-  fetchReferenceSites,
-} from '@/lib/api-client';
+import { ApiError, evaluateReference } from '@/lib/api-client';
 import { ComparisonTimeline } from '@/features/analysis/components/comparison-timeline';
 import { DataSourceBanner } from '@/features/analysis/components/data-source-banner';
 import { MissionWindowFinder } from '@/features/analysis/components/mission-window-finder';
@@ -22,7 +18,6 @@ import { PlaybackControl } from '@/features/mission/components/playback-control'
 import { domainHours, domainOf } from '@/features/analysis/lib/timeline';
 import type { ScenarioResult } from '@/features/analysis/types';
 import {
-  defaultForm,
   toRequest,
   validateForm,
   withSite,
@@ -30,17 +25,17 @@ import {
 } from '../lib/reference-scenario';
 import { ReferenceScenarioCard } from './reference-scenario-card';
 import { planReferenceRequests } from '../lib/evaluation-plan';
-
-type CatalogState =
-  | { status: 'loading' }
-  | { status: 'ready'; data: ReferenceSiteCatalog }
-  | { status: 'error'; message: string };
+import {
+  bootstrapForms,
+  type ReferenceBootstrap,
+} from '../lib/reference-bootstrap';
 
 type SlotState = {
   status: 'idle' | 'loading' | 'ready' | 'error';
   data?: ReferenceEvaluationContract;
   /** The request that produced `data`, to detect stale results. */
   requestKey?: string;
+  snapshot?: ScenarioResult['snapshot'];
   message?: string;
 };
 
@@ -53,25 +48,25 @@ function message(error: unknown) {
     : 'Unexpected error.';
 }
 
-/** Scenario A is the first site; B contrasts with another site over the same period. */
-function initialForms(catalog: ReferenceSiteCatalog): ReferenceScenarioForm[] {
-  const [first, second] = catalog.sites;
-  const contrast =
-    catalog.sites.find((site) => site.id === 'lola-site23-reference') ??
-    second ??
-    first;
-  return [defaultForm('A', first), defaultForm('B', contrast)];
-}
-
-export function ScenarioWorkspace() {
-  const [catalog, setCatalog] = useState<CatalogState>({ status: 'loading' });
-  const [forms, setForms] = useState<ReferenceScenarioForm[]>([]);
-  const [slots, setSlots] = useState<SlotState[]>([
-    { status: 'idle' },
-    { status: 'idle' },
-  ]);
+export function ScenarioWorkspace({
+  bootstrap,
+}: {
+  bootstrap: ReferenceBootstrap;
+}) {
+  const catalog = bootstrap.catalog;
+  const [forms, setForms] = useState(() => bootstrapForms(bootstrap));
+  const [slots, setSlots] = useState<SlotState[]>(() =>
+    bootstrap.scenarios.map((scenario, index) => ({
+      status: 'ready',
+      data: scenario.data,
+      requestKey: requestKey(forms[index]),
+      snapshot: {
+        releaseId: bootstrap.releaseId,
+        artifactSha256: scenario.artifactSha256,
+      },
+    })),
+  );
   const [cursorHours, setCursorHours] = useState(0);
-  const [attempt, setAttempt] = useState(0);
   const [activeSlot, setActiveSlot] = useState<'A' | 'B'>('A');
   const [view, setView] = useState<'lander' | 'sky' | 'map'>('lander');
   const [playbackOwner, setPlaybackOwner] = useState<
@@ -148,55 +143,9 @@ export function ScenarioWorkspace() {
     [],
   );
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchReferenceSites(controller.signal)
-      .then((data) => {
-        if (!data.sites.length)
-          throw new Error('The reference catalog is empty.');
-        const defaults = initialForms(data);
-        setCatalog({ status: 'ready', data });
-        setForms(defaults);
-        void evaluate(defaults, data.sites);
-      })
-      .catch((error: unknown) => {
-        if (!controller.signal.aborted)
-          setCatalog({ status: 'error', message: message(error) });
-      });
-    return () => {
-      controller.abort();
-      inFlight.current?.abort();
-    };
-  }, [attempt, evaluate]);
+  useEffect(() => () => inFlight.current?.abort(), []);
 
-  if (catalog.status === 'loading') {
-    return (
-      <section className="workspace" aria-busy="true">
-        <p className="status-line">Loading verified reference sites…</p>
-      </section>
-    );
-  }
-  if (catalog.status === 'error') {
-    return (
-      <section className="workspace">
-        <div className="panel error-panel" role="alert">
-          <h2>Data unavailable</h2>
-          <p>{catalog.message}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setCatalog({ status: 'loading' });
-              setAttempt((n) => n + 1);
-            }}
-          >
-            Retry
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  const sites = catalog.data.sites;
+  const sites = catalog.sites;
   const results: ScenarioResult[] = slots.flatMap((slot, index) =>
     slot.data && forms[index]
       ? [
@@ -204,12 +153,15 @@ export function ScenarioWorkspace() {
             slot: forms[index].slot,
             data: slot.data,
             stale: slot.requestKey !== requestKey(forms[index]),
+            snapshot: slot.snapshot,
           },
         ]
       : [],
   );
   const anyStale = results.some((result) => result.stale);
   const loading = slots.some((slot) => slot.status === 'loading');
+  const failed = slots.some((slot) => slot.status === 'error');
+  const snapshots = results.filter((result) => result.snapshot);
   const maxHours = Math.max(
     0,
     ...results.map(({ data }) =>
@@ -337,12 +289,21 @@ export function ScenarioWorkspace() {
             <p role="status">
               {loading
                 ? 'Evaluating archived ephemerides…'
-                : anyStale
-                  ? 'Inputs changed: results below are out of date until you update.'
-                  : results.length
-                    ? 'Results match the inputs above.'
-                    : ''}
+                : failed
+                  ? 'Update failed. Previous results are retained; see the errors above.'
+                  : anyStale
+                    ? 'Inputs changed: results below are out of date until you update.'
+                    : results.length
+                      ? 'Results match the inputs above.'
+                      : ''}
             </p>
+            {snapshots.length > 0 && (
+              <p className="hint snapshot-note">
+                Precomputed reference snapshots ·{' '}
+                {snapshots.map((result) => result.slot).join(', ')} ·{' '}
+                {bootstrap.releaseId}. Update comparison uses the API.
+              </p>
+            )}
           </div>
         </div>
         <div className="visual-stage">
@@ -434,7 +395,7 @@ export function ScenarioWorkspace() {
           Dataset, observer and model provenance{' '}
           <span>NASA/JPL Horizons + NASA LOLA</span>
         </summary>
-        <DataSourceBanner catalog={catalog.data} results={results} />
+        <DataSourceBanner catalog={catalog} results={results} />
       </details>
       {results.length > 0 && (
         <>

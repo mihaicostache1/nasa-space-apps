@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "lunarwindow.reference-bootstrap.v1",
+  "releaseId": "lunarwindow-demo-v1",
+  "releaseManifestSha256": "6d306ad38118492252b73e60d3825f27d4789026b60a6bcd4ef33d5d52f41e69",
+  "catalog": {
+    "schemaVersion": "lunarwindow.reference-catalog.v1",
+    "provider": "NASA/JPL Horizons",
+    "timeScale": "UTC",
+    "longitudeConvention": "east-positive",
+    "sites": [
+      {
+        "id": "lola-site01-reference",
+        "name": "Connecting ridge DEM reference point",
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "altitudeKm": 1.94476708984375,
+        "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif; center pixel row=1600, col=1600; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target.",
+        "availability": {
+          "startUtc": "2026-11-14T00:00:00Z",
+          "endUtc": "2026-12-14T00:00:00Z",
+          "endExclusive": true,
+          "stepMinutes": 60,
+          "sampleCount": 720
+        },
+        "supportedHorizonModes": [
+          "geometric",
+          "terrain"
+        ],
+        "terrainMasks": [
+          {
+            "maskId": "lola-site01-reference-mast-0m",
+            "artifactSha256": "4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d",
+            "observer": {
+              "lat": -89.46315775697248,
+              "lon": -137.50198490762307,
+              "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif; center pixel row=1600, col=1600; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target.",
+              "surfaceElevationM": 1944.76708984375,
+              "mastHeightM": 0.0,
+              "altitudeKm": 1.94476708984375
+            },
+            "referenceFrame": {
+              "body": "Moon",
+              "name": "MOON_ME",
+              "realization": "DE421 (frame of the PGDA LOLA DEMs; the mask applies no frame transformation)",
+              "coordinateType": "GEODETIC",
+              "longitudeConvention": "east-positive",
+              "referenceSurface": {
+                "shape": "sphere",
+                "radiusKm": 1737.4
+              }
+            },
+            "demSources": [
+              {
+                "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+                "productId": "Site01_final_adj_5mpp_surf",
+                "productVersion": "https://pgda.gsfc.nasa.gov/products/78 file revision Last-Modified 2020-06-05T18:39:35Z, ETag W/\"271514a-17285c7fa58\"",
+                "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/Site01_final_adj_5mpp_surf.tif",
+                "sourceSha256": "3ba7b97cb00a2bcf21189c3aeb535f65afc21207154ab9f0d43c5bdc1f7e747e",
+                "retrievedAtUtc": "2026-11-14T10:15:25Z",
+                "resolutionM": 5.0,
+                "crs": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]"
+              },
+              {
+                "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+                "productId": "LDEM_80S_20MPP_ADJ",
+                "productVersion": "https://pgda.gsfc.nasa.gov/products/90 file revision Last-Modified 2023-07-07T22:28:19Z, ETag W/\"a0b2f283-189327867b8\" (header checked at export; size matches the hashed download)",
+                "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF",
+                "sourceSha256": "09b7ca80f9e6a146f970225d18af72fc02787669b3ef51b888e347d2b6845649",
+                "retrievedAtUtc": "2026-11-14T10:31:20Z",
+                "resolutionM": 20.0,
+                "crs": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]"
+              },
+              {
+                "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+                "productId": "LDEM_60S_120MPP_ADJ",
+                "productVersion": "https://pgda.gsfc.nasa.gov/products/90 file revision Last-Modified 2023-07-07T22:03:50Z, ETag W/\"30f72b7f-1893261fd70\" (header checked at export; size matches the hashed download)",
+                "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_60S_120MPP_ADJ.TIF",
+                "sourceSha256": "894f30e2a57e02a00871d5f6f45b4fef07f6a2efa68f8bfd21a246edf944e094",
+                "retrievedAtUtc": "2026-11-14T10:02:08Z",
+                "resolutionM": 120.0,
+                "crs": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]"
+              }
+            ],
+            "requiresMeanEarthApproximation": true,
+            "framePolicy": "mean-earth-reference-v1",
+            "limitation": "The DE421 terrain and Horizons high-precision Mean Earth implementations have residual frame differences. Acceptance is a reference-demo approximation, with no frame transformation applied; it does not establish exact observer equivalence or mission accuracy."
+          }
+        ]
+      },
+      {
+        "id": "lola-site04-reference",
+        "name": "Shackleton inner wall DEM reference point",
+        "lat": -89.76674147712977,
+        "lon": -171.89280908299654,
+        "altitudeKm": 0.7679786376953125,
+        "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif; center pixel row=1600, col=1600; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target.",
+        "availability": {
+          "startUtc": "2026-11-14T00:00:00Z",
+          "endUtc": "2026-12-14T00:00:00Z",
+          "endExclusive": true,
+          "stepMinutes": 60,
+          "sampleCount": 720
+        },
+        "supportedHorizonModes": [
+          "geometric"
+        ],
+        "terrainMasks": []
+      },
+      {
+        "id": "lola-site23-reference",
+        "name": "Malapert massif DEM reference point",
+        "lat": -85.99486736492491,
+        "lon": -0.23460969154338968,
+        "altitudeKm": 4.78362939453125,
+        "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif; center pixel row=2100, col=2100; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target.",
+        "availability": {
+          "startUtc": "2026-11-14T00:00:00Z",
+          "endUtc": "2026-12-14T00:00:00Z",
+          "endExclusive": true,
+          "stepMinutes": 60,
+          "sampleCount": 720
+        },
+        "supportedHorizonModes": [
+          "geometric"
+        ],
+        "terrainMasks": []
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "slot": "A",
+      "request": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "siteId": "lola-site01-reference",
+        "horizonMode": "geometric"
+      },
+      "output": {
+        "filename": "cfd797e74c84793cecb70df8144806430336242d9a5c8cc5fbf2549251be3340.json",
+        "sha256": "9b601e15af329a1e28cba66f8a13812a3392e7ef45b83a8bb3fc17f6a0a3664a",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v1"
+      }
+    },
+    {
+      "slot": "B",
+      "request": {
+        "startUtc": "2026-11-14T00:00:00Z",
+        "endUtc": "2026-12-14T00:00:00Z",
+        "stepMinutes": 60,
+        "visibilityRule": "any-disc",
+        "siteId": "lola-site23-reference",
+        "horizonMode": "geometric"
+      },
+      "output": {
+        "filename": "c269f1768c2ce7165a4cf67b9ce3c349dca8f433ac6d437762ccb04a2aed758d.json",
+        "sha256": "cf4da17cc77aa129bbc2dc944f0ffd4d6c01ef05dd8c79a66ccecaaf8c479bb2",
+        "responseSchemaVersion": "lunarwindow.reference-evaluation.v1"
+      }
+    }
+  ]
+}

@@ -8,4 +8,6 @@ export type ScenarioResult = {
   data: ReferenceEvaluationContract;
   /** True when the inputs changed after this result was calculated. */
   stale: boolean;
+  /** Present only while displaying an unchanged, bundled release response. */
+  snapshot?: { releaseId: string; artifactSha256: string };
 };

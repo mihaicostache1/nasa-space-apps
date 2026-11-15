@@ -10,6 +10,7 @@ data/raw
 data/processed
 data/reference
 data/releases
+data/frontend
 data/regions
 docs/validation/evidence
 docs/validation/quickmap-results.json

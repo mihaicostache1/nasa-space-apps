@@ -49,6 +49,19 @@ export function DataSourceBanner({ catalog, results }: Props) {
           </dd>
         </div>
         <div>
+          <dt>Result delivery</dt>
+          <dd>
+            {results.map(({ slot, snapshot }) => (
+              <span className="model-line" key={slot}>
+                Scenario {slot} ·{' '}
+                {snapshot
+                  ? `Precomputed reference snapshot · ${snapshot.releaseId} · SHA-256 ${snapshot.artifactSha256}`
+                  : 'API evaluation'}
+              </span>
+            ))}
+          </dd>
+        </div>
+        <div>
           <dt>Model</dt>
           <dd>
             {models.map(({ slot, label, detail }) => (

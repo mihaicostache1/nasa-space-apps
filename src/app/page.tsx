@@ -4,6 +4,7 @@ import { MissionNavigation } from '@/features/mission/components/mission-navigat
 import { ExperienceMotion } from '@/features/mission/components/experience-motion';
 import { HorizonLesson } from '@/features/mission/components/horizon-lesson';
 import { CustomEvaluationWorkspace } from '@/features/custom/components/custom-evaluation-workspace';
+import { referenceBootstrap } from '@/features/scenarios/lib/reference-bootstrap.server';
 
 export default function Home() {
   return (
@@ -105,7 +106,7 @@ export default function Home() {
           </article>
         </section>
         <div id="explore" className="explorer-anchor">
-          <ScenarioWorkspace />
+          <ScenarioWorkspace bootstrap={referenceBootstrap} />
         </div>
         <CustomEvaluationWorkspace />
         <section
