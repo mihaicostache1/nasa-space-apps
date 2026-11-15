@@ -1,0 +1,156 @@
+{
+  "siteId": "lola-site04-reference",
+  "sha256": "5c37c1528ee8160d80aa75bf069100f6216b54d6f95b0e0be474d78d8fe34dfa",
+  "sidecarMatches": true,
+  "roundTripIdentical": true,
+  "jsonSchema": "valid",
+  "ephemerisSha256MatchesManifest": true,
+  "observerBitIdentical": true,
+  "coordinateSourceIdentical": true,
+  "siteNameIdentical": true,
+  "compatibilityWithoutOptIn": "rejected: Frame realizations are not established as identical. Reference-demo use requires explicit allow_mean_earth_approximation=True; no transformation is applied.",
+  "compatibilityWithOptIn": {
+    "frameStatus": "approximate",
+    "ephemerisFrame": "MEAN_ME (high precision) {East-longitude positive}",
+    "ephemerisSource": "DE441",
+    "transformationApplied": false
+  },
+  "sourceRehashMatches": {
+    "Site04_final_adj_5mpp_surf": true,
+    "LDEM_80S_20MPP_ADJ": true,
+    "LDEM_60S_120MPP_ADJ": true
+  },
+  "tileSha256MatchesSiteProvenance": true,
+  "centrePixelM": 767.9786376953125,
+  "surfaceEqualsCentrePixel": true,
+  "fineFieldM": 7987.49999999968,
+  "regeneratedEqualsFile": true,
+  "quality": {
+    "truncatedAzimuths": [],
+    "minReachKm": 200.0,
+    "missingSampleFraction": 0.0,
+    "nearFieldAvailable": true,
+    "warnings": []
+  },
+  "horizonRange": {
+    "min": [
+      240,
+      0.1609
+    ],
+    "max": [
+      84,
+      32.7401
+    ],
+    "mean": 12.853
+  },
+  "horizonDistanceKm": {
+    "median": 4.945,
+    "p90": 18.700499999999998,
+    "max": 19.6,
+    "fractionRaysWithinFineTier": 0.5875,
+    "fractionRaysWithin60mTo200m": 0.27055555555555555
+  },
+  "variants": {
+    "variableStep": {
+      "maxAbsDeg": 0.0028,
+      "meanDeg": -0.0002,
+      "azOfMaxAbs": 182
+    },
+    "maxRange100km": {
+      "maxAbsDeg": 0.0,
+      "meanDeg": 0.0,
+      "azOfMaxAbs": 0
+    },
+    "minDistance20m": {
+      "maxAbsDeg": 2.1528,
+      "meanDeg": 0.2325,
+      "azOfMaxAbs": 158
+    },
+    "no5mTier": {
+      "maxAbsDeg": 0.4759,
+      "meanDeg": -0.0437,
+      "azOfMaxAbs": 142
+    },
+    "mast1m": {
+      "maxAbsDeg": 0.8708,
+      "meanDeg": -0.1585,
+      "azOfMaxAbs": 150
+    },
+    "mast2m": {
+      "maxAbsDeg": 1.6912,
+      "meanDeg": -0.2734,
+      "azOfMaxAbs": 144
+    },
+    "mast5m": {
+      "maxAbsDeg": 1.9926,
+      "meanDeg": -0.4288,
+      "azOfMaxAbs": 142
+    },
+    "mast10m": {
+      "maxAbsDeg": 2.1671,
+      "meanDeg": -0.5737,
+      "azOfMaxAbs": 142
+    }
+  },
+  "join30d": {
+    "noTerrain": {
+      "pctSun": 100.0,
+      "pctEarth": 44.2,
+      "pctBoth": 44.2,
+      "longestDarkHrs": 0.0
+    },
+    "terrain": {
+      "pctSun": 29.9,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 505.0
+    },
+    "mast2m(0 m ephemeris, approx.)": {
+      "pctSun": 29.9,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 505.0
+    },
+    "mast5m(0 m ephemeris, approx.)": {
+      "pctSun": 29.9,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 505.0
+    },
+    "mast10m(0 m ephemeris, approx.)": {
+      "pctSun": 29.9,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 505.0
+    }
+  },
+  "year6h": {
+    "ephemerisAltitudeKm(rounded, parallax <0.00015\u00b0/km)": 1,
+    "terrain": {
+      "pctSun": 12.6,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 4902.0
+    },
+    "mast2m": {
+      "pctSun": 12.7,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 4902.0
+    },
+    "no5mTier": {
+      "pctSun": 12.7,
+      "pctEarth": 0.0,
+      "pctBoth": 0.0,
+      "longestDarkHrs": 4902.0
+    },
+    "noTerrain": {
+      "pctSun": 56.2,
+      "pctEarth": 51.7,
+      "pctBoth": 29.9,
+      "longestDarkHrs": 3834.0
+    },
+    "pgdaAvgSunPct": 11.2,
+    "pgdaAvgEarthPct": 11.4
+  }
+}

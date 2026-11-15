@@ -1,0 +1,24 @@
+{
+  "maskId": "lola-site04-reference-mast-0m",
+  "groundBilinearM": 767.9786376953151,
+  "groundMinusMaskSurfaceM": 2.6147972675971687e-12,
+  "fineFieldM": 7987.5,
+  "samples": 143960400,
+  "missingSamples": 0,
+  "maxAbsDiffDeg": 4.9956376073190256e-05,
+  "meanAbsDiffDeg": 2.496128937676079e-05,
+  "independentMin": [
+    240,
+    0.16088520162129702
+  ],
+  "independentMax": [
+    84,
+    32.740111856737094
+  ],
+  "rayHorizonDistanceKm": {
+    "median": 4.945,
+    "p90": 18.7005,
+    "max": 19.6,
+    "fractionWithinFineTier": 0.5875
+  }
+}

@@ -1,0 +1,1515 @@
+{
+  "schemaVersion": "lunarwindow.terrain-mask.v1",
+  "maskId": "lola-site23-reference-mast-0m",
+  "siteId": "lola-site23-reference",
+  "site": "Malapert massif DEM reference point",
+  "terrainModel": "dem-horizon",
+  "observer": {
+    "lat": -85.99486736492491,
+    "lon": -0.23460969154338968,
+    "coordinateSource": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif; center pixel row=2100, col=2100; DE421 MOON_ME, 1737.4 km sphere; sampled surface height, 0 m mast; reference point, not a selected landing target.",
+    "surfaceElevationM": 4783.62939453125,
+    "mastHeightM": 0.0,
+    "altitudeKm": 4.78362939453125
+  },
+  "referenceFrame": {
+    "body": "Moon",
+    "name": "MOON_ME",
+    "realization": "DE421 (frame of the PGDA LOLA DEMs; the mask applies no frame transformation)",
+    "coordinateType": "GEODETIC",
+    "longitudeConvention": "east-positive",
+    "referenceSurface": {
+      "shape": "sphere",
+      "radiusKm": 1737.4
+    }
+  },
+  "angularUnits": "degrees",
+  "azimuthConvention": "clockwise-from-local-north",
+  "elevationReference": "local-horizontal",
+  "refractionModel": "none",
+  "horizon": [
+    {
+      "az": 0,
+      "el": 4.6676
+    },
+    {
+      "az": 1,
+      "el": 4.6511
+    },
+    {
+      "az": 2,
+      "el": 4.6056
+    },
+    {
+      "az": 3,
+      "el": 4.5094
+    },
+    {
+      "az": 4,
+      "el": 4.4682
+    },
+    {
+      "az": 5,
+      "el": 4.4208
+    },
+    {
+      "az": 6,
+      "el": 4.3843
+    },
+    {
+      "az": 7,
+      "el": 4.3938
+    },
+    {
+      "az": 8,
+      "el": 4.3814
+    },
+    {
+      "az": 9,
+      "el": 4.3133
+    },
+    {
+      "az": 10,
+      "el": 4.3102
+    },
+    {
+      "az": 11,
+      "el": 4.3292
+    },
+    {
+      "az": 12,
+      "el": 4.364
+    },
+    {
+      "az": 13,
+      "el": 4.4117
+    },
+    {
+      "az": 14,
+      "el": 4.5012
+    },
+    {
+      "az": 15,
+      "el": 4.5424
+    },
+    {
+      "az": 16,
+      "el": 4.5997
+    },
+    {
+      "az": 17,
+      "el": 4.6339
+    },
+    {
+      "az": 18,
+      "el": 4.6522
+    },
+    {
+      "az": 19,
+      "el": 4.6478
+    },
+    {
+      "az": 20,
+      "el": 4.6405
+    },
+    {
+      "az": 21,
+      "el": 4.6726
+    },
+    {
+      "az": 22,
+      "el": 4.712
+    },
+    {
+      "az": 23,
+      "el": 4.7336
+    },
+    {
+      "az": 24,
+      "el": 4.7572
+    },
+    {
+      "az": 25,
+      "el": 4.8223
+    },
+    {
+      "az": 26,
+      "el": 4.8835
+    },
+    {
+      "az": 27,
+      "el": 4.8952
+    },
+    {
+      "az": 28,
+      "el": 4.9356
+    },
+    {
+      "az": 29,
+      "el": 4.9207
+    },
+    {
+      "az": 30,
+      "el": 4.8666
+    },
+    {
+      "az": 31,
+      "el": 4.8419
+    },
+    {
+      "az": 32,
+      "el": 4.8659
+    },
+    {
+      "az": 33,
+      "el": 4.9092
+    },
+    {
+      "az": 34,
+      "el": 4.9053
+    },
+    {
+      "az": 35,
+      "el": 4.9385
+    },
+    {
+      "az": 36,
+      "el": 4.9941
+    },
+    {
+      "az": 37,
+      "el": 5.0263
+    },
+    {
+      "az": 38,
+      "el": 5.1227
+    },
+    {
+      "az": 39,
+      "el": 5.1789
+    },
+    {
+      "az": 40,
+      "el": 5.2252
+    },
+    {
+      "az": 41,
+      "el": 5.2358
+    },
+    {
+      "az": 42,
+      "el": 5.2782
+    },
+    {
+      "az": 43,
+      "el": 5.4068
+    },
+    {
+      "az": 44,
+      "el": 5.4032
+    },
+    {
+      "az": 45,
+      "el": 5.4011
+    },
+    {
+      "az": 46,
+      "el": 5.4129
+    },
+    {
+      "az": 47,
+      "el": 5.4092
+    },
+    {
+      "az": 48,
+      "el": 5.4713
+    },
+    {
+      "az": 49,
+      "el": 5.4792
+    },
+    {
+      "az": 50,
+      "el": 5.4248
+    },
+    {
+      "az": 51,
+      "el": 5.4389
+    },
+    {
+      "az": 52,
+      "el": 5.3926
+    },
+    {
+      "az": 53,
+      "el": 5.3883
+    },
+    {
+      "az": 54,
+      "el": 5.3953
+    },
+    {
+      "az": 55,
+      "el": 5.3832
+    },
+    {
+      "az": 56,
+      "el": 5.4566
+    },
+    {
+      "az": 57,
+      "el": 5.558
+    },
+    {
+      "az": 58,
+      "el": 5.5984
+    },
+    {
+      "az": 59,
+      "el": 5.6542
+    },
+    {
+      "az": 60,
+      "el": 5.648
+    },
+    {
+      "az": 61,
+      "el": 5.5746
+    },
+    {
+      "az": 62,
+      "el": 5.4982
+    },
+    {
+      "az": 63,
+      "el": 5.4686
+    },
+    {
+      "az": 64,
+      "el": 5.4815
+    },
+    {
+      "az": 65,
+      "el": 5.4621
+    },
+    {
+      "az": 66,
+      "el": 5.4781
+    },
+    {
+      "az": 67,
+      "el": 5.4258
+    },
+    {
+      "az": 68,
+      "el": 5.372
+    },
+    {
+      "az": 69,
+      "el": 5.3474
+    },
+    {
+      "az": 70,
+      "el": 5.3482
+    },
+    {
+      "az": 71,
+      "el": 5.3209
+    },
+    {
+      "az": 72,
+      "el": 5.2666
+    },
+    {
+      "az": 73,
+      "el": 5.2492
+    },
+    {
+      "az": 74,
+      "el": 5.1354
+    },
+    {
+      "az": 75,
+      "el": 5.0404
+    },
+    {
+      "az": 76,
+      "el": 4.9827
+    },
+    {
+      "az": 77,
+      "el": 4.9377
+    },
+    {
+      "az": 78,
+      "el": 4.8849
+    },
+    {
+      "az": 79,
+      "el": 4.8663
+    },
+    {
+      "az": 80,
+      "el": 4.8655
+    },
+    {
+      "az": 81,
+      "el": 4.7742
+    },
+    {
+      "az": 82,
+      "el": 4.6765
+    },
+    {
+      "az": 83,
+      "el": 4.6725
+    },
+    {
+      "az": 84,
+      "el": 4.6512
+    },
+    {
+      "az": 85,
+      "el": 4.6548
+    },
+    {
+      "az": 86,
+      "el": 4.6505
+    },
+    {
+      "az": 87,
+      "el": 4.6572
+    },
+    {
+      "az": 88,
+      "el": 4.6987
+    },
+    {
+      "az": 89,
+      "el": 4.7219
+    },
+    {
+      "az": 90,
+      "el": 4.7245
+    },
+    {
+      "az": 91,
+      "el": 4.7048
+    },
+    {
+      "az": 92,
+      "el": 4.6572
+    },
+    {
+      "az": 93,
+      "el": 4.6065
+    },
+    {
+      "az": 94,
+      "el": 4.5762
+    },
+    {
+      "az": 95,
+      "el": 4.4962
+    },
+    {
+      "az": 96,
+      "el": 4.3837
+    },
+    {
+      "az": 97,
+      "el": 4.2812
+    },
+    {
+      "az": 98,
+      "el": 4.1076
+    },
+    {
+      "az": 99,
+      "el": 3.9624
+    },
+    {
+      "az": 100,
+      "el": 3.8458
+    },
+    {
+      "az": 101,
+      "el": 3.733
+    },
+    {
+      "az": 102,
+      "el": 3.5599
+    },
+    {
+      "az": 103,
+      "el": 3.473
+    },
+    {
+      "az": 104,
+      "el": 3.3682
+    },
+    {
+      "az": 105,
+      "el": 3.2384
+    },
+    {
+      "az": 106,
+      "el": 3.0832
+    },
+    {
+      "az": 107,
+      "el": 2.9013
+    },
+    {
+      "az": 108,
+      "el": 2.7173
+    },
+    {
+      "az": 109,
+      "el": 2.5237
+    },
+    {
+      "az": 110,
+      "el": 2.3026
+    },
+    {
+      "az": 111,
+      "el": 2.0805
+    },
+    {
+      "az": 112,
+      "el": 1.8239
+    },
+    {
+      "az": 113,
+      "el": 1.6037
+    },
+    {
+      "az": 114,
+      "el": 1.3763
+    },
+    {
+      "az": 115,
+      "el": 1.1395
+    },
+    {
+      "az": 116,
+      "el": 0.9154
+    },
+    {
+      "az": 117,
+      "el": 0.6589
+    },
+    {
+      "az": 118,
+      "el": 0.3743
+    },
+    {
+      "az": 119,
+      "el": 0.1205
+    },
+    {
+      "az": 120,
+      "el": -0.1277
+    },
+    {
+      "az": 121,
+      "el": -0.3651
+    },
+    {
+      "az": 122,
+      "el": -0.4939
+    },
+    {
+      "az": 123,
+      "el": -0.5876
+    },
+    {
+      "az": 124,
+      "el": -0.6797
+    },
+    {
+      "az": 125,
+      "el": -0.7789
+    },
+    {
+      "az": 126,
+      "el": -0.9203
+    },
+    {
+      "az": 127,
+      "el": -1.1139
+    },
+    {
+      "az": 128,
+      "el": -1.26
+    },
+    {
+      "az": 129,
+      "el": -1.3847
+    },
+    {
+      "az": 130,
+      "el": -1.4814
+    },
+    {
+      "az": 131,
+      "el": -1.6332
+    },
+    {
+      "az": 132,
+      "el": -1.7041
+    },
+    {
+      "az": 133,
+      "el": -1.7063
+    },
+    {
+      "az": 134,
+      "el": -1.7254
+    },
+    {
+      "az": 135,
+      "el": -1.781
+    },
+    {
+      "az": 136,
+      "el": -1.9136
+    },
+    {
+      "az": 137,
+      "el": -2.0396
+    },
+    {
+      "az": 138,
+      "el": -2.1368
+    },
+    {
+      "az": 139,
+      "el": -2.2499
+    },
+    {
+      "az": 140,
+      "el": -2.3596
+    },
+    {
+      "az": 141,
+      "el": -2.4833
+    },
+    {
+      "az": 142,
+      "el": -2.5947
+    },
+    {
+      "az": 143,
+      "el": -2.6948
+    },
+    {
+      "az": 144,
+      "el": -2.785
+    },
+    {
+      "az": 145,
+      "el": -2.8537
+    },
+    {
+      "az": 146,
+      "el": -2.9183
+    },
+    {
+      "az": 147,
+      "el": -3.0981
+    },
+    {
+      "az": 148,
+      "el": -3.2086
+    },
+    {
+      "az": 149,
+      "el": -3.2763
+    },
+    {
+      "az": 150,
+      "el": -3.349
+    },
+    {
+      "az": 151,
+      "el": -3.4253
+    },
+    {
+      "az": 152,
+      "el": -3.4029
+    },
+    {
+      "az": 153,
+      "el": -3.366
+    },
+    {
+      "az": 154,
+      "el": -3.3168
+    },
+    {
+      "az": 155,
+      "el": -3.3115
+    },
+    {
+      "az": 156,
+      "el": -3.3154
+    },
+    {
+      "az": 157,
+      "el": -3.3004
+    },
+    {
+      "az": 158,
+      "el": -3.2844
+    },
+    {
+      "az": 159,
+      "el": -3.2759
+    },
+    {
+      "az": 160,
+      "el": -3.2702
+    },
+    {
+      "az": 161,
+      "el": -3.2622
+    },
+    {
+      "az": 162,
+      "el": -3.2517
+    },
+    {
+      "az": 163,
+      "el": -3.2499
+    },
+    {
+      "az": 164,
+      "el": -3.2525
+    },
+    {
+      "az": 165,
+      "el": -3.2518
+    },
+    {
+      "az": 166,
+      "el": -3.2386
+    },
+    {
+      "az": 167,
+      "el": -3.2383
+    },
+    {
+      "az": 168,
+      "el": -3.2553
+    },
+    {
+      "az": 169,
+      "el": -3.2255
+    },
+    {
+      "az": 170,
+      "el": -3.1944
+    },
+    {
+      "az": 171,
+      "el": -3.1626
+    },
+    {
+      "az": 172,
+      "el": -3.1297
+    },
+    {
+      "az": 173,
+      "el": -3.0957
+    },
+    {
+      "az": 174,
+      "el": -3.0604
+    },
+    {
+      "az": 175,
+      "el": -3.0239
+    },
+    {
+      "az": 176,
+      "el": -2.988
+    },
+    {
+      "az": 177,
+      "el": -2.951
+    },
+    {
+      "az": 178,
+      "el": -2.9128
+    },
+    {
+      "az": 179,
+      "el": -2.8733
+    },
+    {
+      "az": 180,
+      "el": -2.8327
+    },
+    {
+      "az": 181,
+      "el": -2.7911
+    },
+    {
+      "az": 182,
+      "el": -2.7482
+    },
+    {
+      "az": 183,
+      "el": -2.7039
+    },
+    {
+      "az": 184,
+      "el": -2.6583
+    },
+    {
+      "az": 185,
+      "el": -2.6123
+    },
+    {
+      "az": 186,
+      "el": -2.5665
+    },
+    {
+      "az": 187,
+      "el": -2.5193
+    },
+    {
+      "az": 188,
+      "el": -2.4706
+    },
+    {
+      "az": 189,
+      "el": -2.4205
+    },
+    {
+      "az": 190,
+      "el": -2.3753
+    },
+    {
+      "az": 191,
+      "el": -2.3328
+    },
+    {
+      "az": 192,
+      "el": -2.2881
+    },
+    {
+      "az": 193,
+      "el": -2.2412
+    },
+    {
+      "az": 194,
+      "el": -2.1648
+    },
+    {
+      "az": 195,
+      "el": -2.0499
+    },
+    {
+      "az": 196,
+      "el": -1.9283
+    },
+    {
+      "az": 197,
+      "el": -1.8423
+    },
+    {
+      "az": 198,
+      "el": -1.7895
+    },
+    {
+      "az": 199,
+      "el": -1.7593
+    },
+    {
+      "az": 200,
+      "el": -1.7503
+    },
+    {
+      "az": 201,
+      "el": -1.7489
+    },
+    {
+      "az": 202,
+      "el": -1.6657
+    },
+    {
+      "az": 203,
+      "el": -1.5477
+    },
+    {
+      "az": 204,
+      "el": -1.4265
+    },
+    {
+      "az": 205,
+      "el": -1.3115
+    },
+    {
+      "az": 206,
+      "el": -1.2059
+    },
+    {
+      "az": 207,
+      "el": -1.1031
+    },
+    {
+      "az": 208,
+      "el": -1.0035
+    },
+    {
+      "az": 209,
+      "el": -0.9073
+    },
+    {
+      "az": 210,
+      "el": -0.8136
+    },
+    {
+      "az": 211,
+      "el": -0.7199
+    },
+    {
+      "az": 212,
+      "el": -0.6296
+    },
+    {
+      "az": 213,
+      "el": -0.5432
+    },
+    {
+      "az": 214,
+      "el": -0.4674
+    },
+    {
+      "az": 215,
+      "el": -0.4014
+    },
+    {
+      "az": 216,
+      "el": -0.3265
+    },
+    {
+      "az": 217,
+      "el": -0.241
+    },
+    {
+      "az": 218,
+      "el": -0.1551
+    },
+    {
+      "az": 219,
+      "el": -0.0685
+    },
+    {
+      "az": 220,
+      "el": 0.0185
+    },
+    {
+      "az": 221,
+      "el": 0.106
+    },
+    {
+      "az": 222,
+      "el": 0.1959
+    },
+    {
+      "az": 223,
+      "el": 0.2911
+    },
+    {
+      "az": 224,
+      "el": 0.3882
+    },
+    {
+      "az": 225,
+      "el": 0.4872
+    },
+    {
+      "az": 226,
+      "el": 0.5879
+    },
+    {
+      "az": 227,
+      "el": 0.6905
+    },
+    {
+      "az": 228,
+      "el": 0.7948
+    },
+    {
+      "az": 229,
+      "el": 0.9008
+    },
+    {
+      "az": 230,
+      "el": 1.0017
+    },
+    {
+      "az": 231,
+      "el": 1.1006
+    },
+    {
+      "az": 232,
+      "el": 1.1976
+    },
+    {
+      "az": 233,
+      "el": 1.2926
+    },
+    {
+      "az": 234,
+      "el": 1.3856
+    },
+    {
+      "az": 235,
+      "el": 1.4685
+    },
+    {
+      "az": 236,
+      "el": 1.5504
+    },
+    {
+      "az": 237,
+      "el": 1.6341
+    },
+    {
+      "az": 238,
+      "el": 1.719
+    },
+    {
+      "az": 239,
+      "el": 1.8049
+    },
+    {
+      "az": 240,
+      "el": 1.8912
+    },
+    {
+      "az": 241,
+      "el": 1.9738
+    },
+    {
+      "az": 242,
+      "el": 2.0564
+    },
+    {
+      "az": 243,
+      "el": 2.1392
+    },
+    {
+      "az": 244,
+      "el": 2.222
+    },
+    {
+      "az": 245,
+      "el": 2.3048
+    },
+    {
+      "az": 246,
+      "el": 2.3876
+    },
+    {
+      "az": 247,
+      "el": 2.47
+    },
+    {
+      "az": 248,
+      "el": 2.5521
+    },
+    {
+      "az": 249,
+      "el": 2.6339
+    },
+    {
+      "az": 250,
+      "el": 2.7155
+    },
+    {
+      "az": 251,
+      "el": 2.8011
+    },
+    {
+      "az": 252,
+      "el": 2.89
+    },
+    {
+      "az": 253,
+      "el": 2.9796
+    },
+    {
+      "az": 254,
+      "el": 3.0698
+    },
+    {
+      "az": 255,
+      "el": 3.1605
+    },
+    {
+      "az": 256,
+      "el": 3.2484
+    },
+    {
+      "az": 257,
+      "el": 3.3343
+    },
+    {
+      "az": 258,
+      "el": 3.4199
+    },
+    {
+      "az": 259,
+      "el": 3.5052
+    },
+    {
+      "az": 260,
+      "el": 3.5901
+    },
+    {
+      "az": 261,
+      "el": 3.6798
+    },
+    {
+      "az": 262,
+      "el": 3.7382
+    },
+    {
+      "az": 263,
+      "el": 3.796
+    },
+    {
+      "az": 264,
+      "el": 3.8608
+    },
+    {
+      "az": 265,
+      "el": 3.9244
+    },
+    {
+      "az": 266,
+      "el": 3.9828
+    },
+    {
+      "az": 267,
+      "el": 4.0398
+    },
+    {
+      "az": 268,
+      "el": 4.0955
+    },
+    {
+      "az": 269,
+      "el": 4.1501
+    },
+    {
+      "az": 270,
+      "el": 4.2026
+    },
+    {
+      "az": 271,
+      "el": 4.2488
+    },
+    {
+      "az": 272,
+      "el": 4.294
+    },
+    {
+      "az": 273,
+      "el": 4.3382
+    },
+    {
+      "az": 274,
+      "el": 4.3818
+    },
+    {
+      "az": 275,
+      "el": 4.4205
+    },
+    {
+      "az": 276,
+      "el": 4.4524
+    },
+    {
+      "az": 277,
+      "el": 4.4845
+    },
+    {
+      "az": 278,
+      "el": 4.5186
+    },
+    {
+      "az": 279,
+      "el": 4.63
+    },
+    {
+      "az": 280,
+      "el": 4.734
+    },
+    {
+      "az": 281,
+      "el": 4.7578
+    },
+    {
+      "az": 282,
+      "el": 4.7815
+    },
+    {
+      "az": 283,
+      "el": 4.8053
+    },
+    {
+      "az": 284,
+      "el": 4.8309
+    },
+    {
+      "az": 285,
+      "el": 4.8697
+    },
+    {
+      "az": 286,
+      "el": 4.9149
+    },
+    {
+      "az": 287,
+      "el": 4.9905
+    },
+    {
+      "az": 288,
+      "el": 5.0193
+    },
+    {
+      "az": 289,
+      "el": 5.0203
+    },
+    {
+      "az": 290,
+      "el": 5.021
+    },
+    {
+      "az": 291,
+      "el": 5.0266
+    },
+    {
+      "az": 292,
+      "el": 5.0342
+    },
+    {
+      "az": 293,
+      "el": 5.0453
+    },
+    {
+      "az": 294,
+      "el": 5.0588
+    },
+    {
+      "az": 295,
+      "el": 5.0725
+    },
+    {
+      "az": 296,
+      "el": 5.0865
+    },
+    {
+      "az": 297,
+      "el": 5.1018
+    },
+    {
+      "az": 298,
+      "el": 5.117
+    },
+    {
+      "az": 299,
+      "el": 5.133
+    },
+    {
+      "az": 300,
+      "el": 5.1483
+    },
+    {
+      "az": 301,
+      "el": 5.1555
+    },
+    {
+      "az": 302,
+      "el": 5.161
+    },
+    {
+      "az": 303,
+      "el": 5.165
+    },
+    {
+      "az": 304,
+      "el": 5.1663
+    },
+    {
+      "az": 305,
+      "el": 5.1668
+    },
+    {
+      "az": 306,
+      "el": 5.169
+    },
+    {
+      "az": 307,
+      "el": 5.1727
+    },
+    {
+      "az": 308,
+      "el": 5.178
+    },
+    {
+      "az": 309,
+      "el": 5.1839
+    },
+    {
+      "az": 310,
+      "el": 5.186
+    },
+    {
+      "az": 311,
+      "el": 5.1869
+    },
+    {
+      "az": 312,
+      "el": 5.1954
+    },
+    {
+      "az": 313,
+      "el": 5.203
+    },
+    {
+      "az": 314,
+      "el": 5.203
+    },
+    {
+      "az": 315,
+      "el": 5.2018
+    },
+    {
+      "az": 316,
+      "el": 5.1983
+    },
+    {
+      "az": 317,
+      "el": 5.1925
+    },
+    {
+      "az": 318,
+      "el": 5.1726
+    },
+    {
+      "az": 319,
+      "el": 5.1006
+    },
+    {
+      "az": 320,
+      "el": 5.0318
+    },
+    {
+      "az": 321,
+      "el": 4.9707
+    },
+    {
+      "az": 322,
+      "el": 4.9054
+    },
+    {
+      "az": 323,
+      "el": 4.8659
+    },
+    {
+      "az": 324,
+      "el": 4.8367
+    },
+    {
+      "az": 325,
+      "el": 4.7283
+    },
+    {
+      "az": 326,
+      "el": 4.7009
+    },
+    {
+      "az": 327,
+      "el": 4.7923
+    },
+    {
+      "az": 328,
+      "el": 4.8259
+    },
+    {
+      "az": 329,
+      "el": 4.789
+    },
+    {
+      "az": 330,
+      "el": 4.8047
+    },
+    {
+      "az": 331,
+      "el": 4.8376
+    },
+    {
+      "az": 332,
+      "el": 4.8535
+    },
+    {
+      "az": 333,
+      "el": 4.8282
+    },
+    {
+      "az": 334,
+      "el": 4.8622
+    },
+    {
+      "az": 335,
+      "el": 4.9912
+    },
+    {
+      "az": 336,
+      "el": 4.9679
+    },
+    {
+      "az": 337,
+      "el": 4.9304
+    },
+    {
+      "az": 338,
+      "el": 4.9579
+    },
+    {
+      "az": 339,
+      "el": 5.0301
+    },
+    {
+      "az": 340,
+      "el": 5.0426
+    },
+    {
+      "az": 341,
+      "el": 5.0273
+    },
+    {
+      "az": 342,
+      "el": 4.982
+    },
+    {
+      "az": 343,
+      "el": 4.9603
+    },
+    {
+      "az": 344,
+      "el": 4.9638
+    },
+    {
+      "az": 345,
+      "el": 5.0078
+    },
+    {
+      "az": 346,
+      "el": 4.9762
+    },
+    {
+      "az": 347,
+      "el": 4.9313
+    },
+    {
+      "az": 348,
+      "el": 4.8932
+    },
+    {
+      "az": 349,
+      "el": 4.8279
+    },
+    {
+      "az": 350,
+      "el": 4.789
+    },
+    {
+      "az": 351,
+      "el": 4.7815
+    },
+    {
+      "az": 352,
+      "el": 4.7656
+    },
+    {
+      "az": 353,
+      "el": 4.7789
+    },
+    {
+      "az": 354,
+      "el": 4.7863
+    },
+    {
+      "az": 355,
+      "el": 4.7994
+    },
+    {
+      "az": 356,
+      "el": 4.8215
+    },
+    {
+      "az": 357,
+      "el": 4.7612
+    },
+    {
+      "az": 358,
+      "el": 4.691
+    },
+    {
+      "az": 359,
+      "el": 4.6758
+    }
+  ],
+  "provenance": {
+    "createdAtUtc": "2026-11-15T07:48:56Z",
+    "sources": [
+      {
+        "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+        "productId": "Site23_final_adj_5mpp_surf",
+        "productVersion": "https://pgda.gsfc.nasa.gov/products/78 file revision Last-Modified 2020-06-12T11:39:15Z, ETag W/\"43511b4-172a853aab8\"",
+        "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif",
+        "sourceSha256": "12d280a59cd7580415f6bada638d0abe025ce6727541fddf68d5dc371a6c94cf",
+        "retrievedAtUtc": "2026-11-15T07:48:35Z",
+        "resolutionM": 5.0,
+        "crs": "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",1737400,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]"
+      },
+      {
+        "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+        "productId": "LDEM_80S_20MPP_ADJ",
+        "productVersion": "https://pgda.gsfc.nasa.gov/products/90 file revision Last-Modified 2023-07-07T22:28:19Z, ETag W/\"a0b2f283-189327867b8\" (header checked at export; size matches the hashed download)",
+        "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF",
+        "sourceSha256": "09b7ca80f9e6a146f970225d18af72fc02787669b3ef51b888e347d2b6845649",
+        "retrievedAtUtc": "2026-11-14T10:31:20Z",
+        "resolutionM": 20.0,
+        "crs": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]"
+      },
+      {
+        "provider": "NASA GSFC Planetary Geology, Geophysics and Geochemistry Laboratory (PGDA), LOLA team",
+        "productId": "LDEM_60S_120MPP_ADJ",
+        "productVersion": "https://pgda.gsfc.nasa.gov/products/90 file revision Last-Modified 2023-07-07T22:03:50Z, ETag W/\"30f72b7f-1893261fd70\" (header checked at export; size matches the hashed download)",
+        "sourceUrl": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_60S_120MPP_ADJ.TIF",
+        "sourceSha256": "894f30e2a57e02a00871d5f6f45b4fef07f6a2efa68f8bfd21a246edf944e094",
+        "retrievedAtUtc": "2026-11-14T10:02:08Z",
+        "resolutionM": 120.0,
+        "crs": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]"
+      }
+    ],
+    "algorithm": {
+      "name": "LunarWindow terrain ray caster (lunarwindow.terrain.horizon.compute_horizon, scripts/export_terrain_mask.py): exact spherical line-of-sight along 3600 great-circle rays, whole-degree value = max of rays within ±0.5°, samples from 60 m, 5 m tile then 20 m (≤25 km) then 120 m DEM, bilinear heights",
+      "version": "lunarwindow.horizon-raycast.1; git 9fc9e0f7592d9e248a18fbd0b2337a2517994f4a",
+      "curvatureModel": "spherical",
+      "rayStepM": 5.0,
+      "maxDistanceM": 200000.0,
+      "noDataPolicy": "reject"
+    }
+  }
+}

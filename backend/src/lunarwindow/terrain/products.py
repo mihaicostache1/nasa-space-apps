@@ -49,6 +49,28 @@ PRODUCTS: dict[str, Product] = {
             "reference point and its archived ephemeris altitude",
         ),
         Product(
+            "Site04_final_adj_5mpp_surf",
+            "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site04/Site04_final_adj_5mpp_surf.tif",
+            LOLA_5MPP_PAGE,
+            "site-tile",
+            5.0,
+            8_000.0,
+            40_980_806,
+            "LOLA 5 m/px Site04 (Shackleton inner wall) tile, 16 x 16 km; source of the Site04 "
+            "reference point and its archived ephemeris altitude",
+        ),
+        Product(
+            "Site23_final_adj_5mpp_surf",
+            "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site23/Site23_final_adj_5mpp_surf.tif",
+            LOLA_5MPP_PAGE,
+            "site-tile",
+            5.0,
+            10_500.0,
+            70_586_804,
+            "LOLA 5 m/px Site23 (Malapert massif) tile, 21 x 21 km; source of the Site23 "
+            "reference point and its archived ephemeris altitude",
+        ),
+        Product(
             "LDEM_80S_20MPP_ADJ",
             "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF",
             LOLA_20MPP_PAGE,
