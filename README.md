@@ -11,6 +11,7 @@ LunarWindow compares lunar south-pole sites and dates. For each one it shows whe
 | Run it       | `docker compose up --build -d --wait`, then open [localhost:3000](http://localhost:3000) |
 | Deploy       | Render (API) + Vercel (web): [docs/deploy.md](docs/deploy.md)                            |
 | Demo         | [docs/demo-script.md](docs/demo-script.md), [screenshots](docs/screenshots/)             |
+| Slides       | [7-slide project demo (PDF)](docs/presentation/LunarWindow-Demo-gedegeutecene.pdf)       |
 | Data sources | [docs/attribution.md](docs/attribution.md)                                               |
 | License      | [MIT](LICENSE) for code; data keeps its providers' terms                                 |
 
