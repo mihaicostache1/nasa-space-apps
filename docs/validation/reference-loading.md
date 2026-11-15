@@ -74,3 +74,55 @@ Deploy the backend optimization and the frontend request-planning change to appl
 both improvements. First access to a sleeping Render Free service can still take
 about a minute; this code does not remove the platform's idle spin-down behavior.
 See [Render Free documentation](https://render.com/docs/free).
+
+## Startup from the verified release
+
+The home page now includes the initial geometric Site01 (A) and Site23 (B)
+evaluations directly from `lunarwindow-demo-v1`. Next.js renders them at build time
+and passes them as serialized page data. Loading the reference explorer and playing
+its period require no catalog GET or evaluation POST. The page still needs to load
+from the frontend host; this does not remove a frontend service's cold start.
+Custom capabilities and custom evaluations continue to use the API independently.
+
+These are the original release response objects, with 720 hourly samples each,
+metrics, windows, observer data and NASA/JPL Horizons provenance intact. No synthetic
+samples, interpolated visibility flags or replacement calculations are introduced.
+Only the two initial geometric responses are included. Terrain, changed inputs and
+explicit refreshes use the existing API evaluation path and its integrity checks.
+
+The visible snapshot note identifies A/B and the release ID. The provenance panel
+also records the original output SHA-256 for each snapshot. A successful API update
+removes that slot's snapshot attribution; an unchanged partner keeps its own label.
+Errors retain previous results with an explicit failure status. Inputs that differ
+from retained data still mark those results stale. A failed refresh never presents
+the startup snapshot as a new successful API response.
+
+`data/frontend/reference-bootstrap.json` contains the release manifest checksum,
+output identities and a snapshot of the verified reference catalog. Discovery is
+therefore tied to this frontend build, rather than reflecting changes to a running
+backend immediately. Regenerate it when publishing a new supported catalog/release:
+
+```sh
+python scripts/build_reference_bootstrap.py
+python scripts/build_reference_bootstrap.py --check
+```
+
+Use the backend environment with its dependencies installed. Generation first
+verifies the entire release, current archived evidence and reviewed terrain
+registrations. It selects exactly the jobs matching the UI's default requests and
+does not rewrite any evaluation output. Commit the generated metadata with the
+frontend. Ordinary Node-only frontend builds need neither Python nor a running API.
+Changing the release also requires updating the two server imports; tests verify
+those imports against the metadata's original output hashes and full response data.
+
+CI checks metadata reproducibility against the current source evidence. Frontend
+tests check hashes, unchanged data/provenance and exact default input matching.
+The Chromium rehearsal blocks all API traffic for an initial-load/playback check,
+then checks explicit refresh failure and normal live refresh, terrain and mobile
+flows. One local production rehearsal prepared the explorer in 129 ms with the API
+blocked and zero reference requests; this is a local observation, not a hosted
+latency guarantee.
+
+Deploy the frontend changes to enable this startup path. The backend does not need
+an additional deployment for startup snapshots; it remains necessary for updates
+and custom evaluations.
