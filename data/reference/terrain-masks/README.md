@@ -2,6 +2,8 @@
 
 `lola-site01-reference-mast-0m.json` is a static terrain horizon for the `lola-site01-reference` point (connecting ridge, LOLA Site01 tile centre). It is the single validated topographic demo point for LunarWindow: the other curated sites have only preliminary horizons.
 
+Masks for the Site04 and Site23 reference points are in [`preliminary/`](preliminary/README.md). They are reviewed, but not validated: open findings against the PGDA maps remain.
+
 | | |
 | --- | --- |
 | SHA-256 | `4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d` (also in `.json.sha256`) |

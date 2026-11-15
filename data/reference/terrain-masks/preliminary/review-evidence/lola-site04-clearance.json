@@ -1,0 +1,175 @@
+{
+ "committed": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.509,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 12.6,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.631,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  }
+ },
+ "20m+120m (no 5 m tier)": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.514,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 12.7,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.617,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  }
+ },
+ "120m only, from 120 m": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.535,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 12.8,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.596,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  },
+  "surfaceM": 768.701
+ },
+ "shift dx=60 dy=0 m": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.389,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 11.6,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.966,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  },
+  "surfaceM": 731.8
+ },
+ "shift dx=-60 dy=0 m": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.659,
+   "atAz": 241.9,
+   "bodyEl": 1.441,
+   "pctVisible": 13.6,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.276,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  },
+  "surfaceM": 805.7
+ },
+ "shift dx=0 dy=60 m": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.526,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 12.8,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.622,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  },
+  "surfaceM": 773.5
+ },
+ "shift dx=0 dy=-60 m": {
+  "sun": {
+   "bestUpperLimbMarginDeg": 1.505,
+   "atAz": 238.8,
+   "bodyEl": 1.43,
+   "pctVisible": 12.3,
+   "azRange": [
+    0.2,
+    358.9
+   ],
+   "elMax": 1.76
+  },
+  "earth": {
+   "bestUpperLimbMarginDeg": -0.598,
+   "atAz": 171.1,
+   "bodyEl": 5.582,
+   "pctVisible": 0.0,
+   "azRange": [
+    164.0,
+    179.6
+   ],
+   "elMax": 6.35
+  },
+  "surfaceM": 765.5
+ }
+}
