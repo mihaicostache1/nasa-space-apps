@@ -10,6 +10,7 @@ between integer azimuths and visibility errs toward "blocked".
 """
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
@@ -109,10 +110,13 @@ def compute_horizon(
     fine: Grid | None = None,
     fine_field_m: float = 0.0,
     require_complete: bool = False,
+    check_callback: Callable[[], None] | None = None,
 ) -> HorizonProfile:
     """Ray-cast a horizon. Grids are tried finest first at each sample: `fine` within
     `fine_field_m` (e.g. a 5 m site tile), `near` within nearFieldKm, then `far`. With
     `require_complete`, any sample without data from any grid raises IncompleteTerrain."""
+    if check_callback is not None:
+        check_callback()
     params = parameters or default_parameters()
     surface, surface_grid = surface_height(site.lat, site.lon, fine, near, far)
     observer = surface + params.mastHeightM
@@ -131,6 +135,8 @@ def compute_horizon(
     missing = 0
 
     for start in range(0, count, ray_chunk):
+        if check_callback is not None:
+            check_callback()
         chunk = azimuths[start : start + ray_chunk]
         x, y = stereographic_from_vectors(
             ray_unit_vectors(site.lat, site.lon, chunk, distances, radius), radius
@@ -158,6 +164,8 @@ def compute_horizon(
         last_valid = np.where(valid.any(axis=1), valid.shape[1] - 1 - valid[:, ::-1].argmax(1), -1)
         ray_reach[start:stop] = np.where(last_valid >= 0, distances[last_valid.clip(0)], 0.0)
 
+    if check_callback is not None:
+        check_callback()
     if require_complete and missing:
         raise IncompleteTerrain(
             f"{site.site_id}: {missing} of {count * len(distances)} ray samples have no DEM data."

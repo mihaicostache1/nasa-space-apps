@@ -55,6 +55,8 @@ python -m uvicorn lunarwindow.api.app:app --reload --port 8000
 
 Additional sites use the [reviewed terrain handoff workflow](docs/terrain-coverage.md), including an offline candidate checker and verification of every registered mask in CI and API image builds. Reviewed Site04/Site23 masks are still needed before enabling terrain for those points.
 
+The opt-in [custom-coordinate API](docs/custom-coordinate-evaluation.md) evaluates an explicit observer using live Horizons acquisition, bounded raw archival/reuse, and the existing metrics/windows engine. Geometric mode requires caller-supplied ground elevation; terrain mode derives it from configured LOLA DEMs and labels generated masks preliminary. The reference demo stays offline by default.
+
 Open [localhost:8000/docs](http://localhost:8000/docs). `POST /api/evaluations` serves synthetic scenarios. `GET /api/reference/sites` lists verified reference points and available dates; `POST /api/reference/evaluations` calculates visibility, metrics, windows, and setting brackets from their archived NASA samples with an explicit geometric or reviewed Site01 terrain horizon. Optional `visibilityRule` and `asOfUtc` select the policy and countdown reference. See the [API contract](docs/backend-data.md) and [calculation model](docs/visibility.md) for request examples, source provenance, and precision limits.
 
 ## Native setup: Ephemeris lead

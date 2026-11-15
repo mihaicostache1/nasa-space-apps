@@ -17,6 +17,10 @@ jobs:
         run: docker compose --profile tools --profile test build
       - name: Run offline backend tests in Docker
         run: docker compose run --rm ephemeris-test
+      - name: Build GIS-enabled custom-coordinate test image
+        run: docker build --target custom-test -f backend/Dockerfile -t lunarwindow-custom-test .
+      - name: Exercise custom-coordinate evaluation with GIS dependencies and no network
+        run: docker run --rm --network none --entrypoint python lunarwindow-custom-test -m unittest discover -s /app/tests -p 'test_custom_*.py' -v
       - name: Verify the packaged data release and saved API responses
         run: docker compose run --rm -T --entrypoint python api - < scripts/check_packaged_release.py
       - name: Smoke-test API load paths and resource bounds

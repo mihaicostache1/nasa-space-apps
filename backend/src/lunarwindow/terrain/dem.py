@@ -88,10 +88,17 @@ class DemSource:
     def __init__(self, path: Path, provenance: dict | None = None):
         import rasterio  # Imported here so numpy-only users never need GDAL.
 
-        from .download import read_provenance, sidecar_path
-
         self.path = Path(path)
         self._dataset = rasterio.open(self.path)
+        try:
+            self._configure(provenance)
+        except BaseException:
+            self._dataset.close()
+            raise
+
+    def _configure(self, provenance: dict | None) -> None:
+        from .download import read_provenance, sidecar_path
+
         check_crs(self._dataset.crs, self.path)
         transform = self._dataset.transform
         if transform.b or transform.d or transform.a != -transform.e:

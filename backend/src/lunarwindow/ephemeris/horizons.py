@@ -38,6 +38,10 @@ class HorizonsError(RuntimeError):
     """Provider output cannot be trusted or a request failed."""
 
 
+class HorizonsTimeoutError(HorizonsError):
+    """The provider or a cooperating process exceeded the caller's time budget."""
+
+
 def query_parameters(
     site: Site, target: str, start: datetime, end: datetime, step_minutes: int
 ) -> dict:
@@ -246,12 +250,34 @@ class HorizonsClient:
         refresh: bool = False,
         timeout: float = 40,
         lock_dir: Path | None = None,
+        deadline_monotonic: float | None = None,
+        max_attempts: int = 3,
+        max_response_bytes: int | None = None,
     ):
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("timeout must be positive and finite.")
         self.cache_dir = cache_dir
         self.refresh = refresh
         self.timeout = timeout
+        if deadline_monotonic is not None and (
+            isinstance(deadline_monotonic, bool) or not math.isfinite(deadline_monotonic)
+        ):
+            raise ValueError("deadline_monotonic must be finite.")
+        if (
+            isinstance(max_attempts, bool)
+            or not isinstance(max_attempts, int)
+            or not 1 <= max_attempts <= 3
+        ):
+            raise ValueError("max_attempts must be an integer in [1, 3].")
+        if max_response_bytes is not None and (
+            isinstance(max_response_bytes, bool)
+            or not isinstance(max_response_bytes, int)
+            or max_response_bytes <= 0
+        ):
+            raise ValueError("max_response_bytes must be a positive integer.")
+        self.deadline_monotonic = deadline_monotonic
+        self.max_attempts = max_attempts
+        self.max_response_bytes = max_response_bytes
         self.lock_dir = lock_dir or Path(
             os.environ.get(
                 "LUNARWINDOW_LOCK_DIR", str(Path(tempfile.gettempdir()) / "lunarwindow-locks")
@@ -260,12 +286,60 @@ class HorizonsClient:
 
     def fetch(self, parameters: dict) -> dict:
         # All cooperating processes must use the same lock directory.
-        with file_lock(self.lock_dir / "horizons-request.lock"):
-            if self.cache_dir:
-                key = hashlib.sha256(query_url(parameters).encode()).hexdigest()
-                with file_lock(self.cache_dir / ".locks" / f"{key}.lock"):
-                    return self._fetch_locked(parameters)
-            return self._fetch_locked(parameters)
+        try:
+            with file_lock(self.lock_dir / "horizons-request.lock", timeout=self._lock_timeout()):
+                if self.cache_dir:
+                    key = hashlib.sha256(query_url(parameters).encode()).hexdigest()
+                    with file_lock(
+                        self.cache_dir / ".locks" / f"{key}.lock", timeout=self._lock_timeout()
+                    ):
+                        return self._fetch_locked(parameters)
+                return self._fetch_locked(parameters)
+        except TimeoutError as exc:
+            raise HorizonsTimeoutError("Timed out waiting for the Horizons request lock.") from exc
+
+    def _remaining_timeout(self) -> float:
+        if self.deadline_monotonic is None:
+            return self.timeout
+        remaining = self.deadline_monotonic - time.monotonic()
+        if remaining <= 0:
+            raise HorizonsTimeoutError("Horizons request budget expired.")
+        return min(self.timeout, remaining)
+
+    def _lock_timeout(self) -> float:
+        return 180 if self.deadline_monotonic is None else self._remaining_timeout()
+
+    def _read_response(self, response) -> str:
+        if self.max_response_bytes is None and self.deadline_monotonic is None:
+            content = response.read()
+        else:
+            chunks, count = [], 0
+            while True:
+                remaining = self._remaining_timeout()
+                # urllib's HTTPResponse exposes its socket through its buffered reader.
+                # Refresh the timeout before each read so a slow body does not receive
+                # a new full request budget for each packet.
+                stream = getattr(getattr(response, "fp", None), "raw", None)
+                sock = getattr(stream, "_sock", None)
+                if sock is not None:
+                    sock.settimeout(remaining)
+                size = 65536
+                if self.max_response_bytes is not None:
+                    size = min(size, self.max_response_bytes + 1 - count)
+                read = getattr(response, "read1", response.read)
+                chunk = read(size)
+                self._remaining_timeout()
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                count += len(chunk)
+                if self.max_response_bytes is not None and count > self.max_response_bytes:
+                    raise HorizonsError("Horizons response exceeds the configured byte limit.")
+            content = b"".join(chunks)
+        try:
+            return content.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise HorizonsError("Horizons response is not UTF-8.") from exc
 
     def _validate_archive(self, archive: dict, parameters: dict) -> None:
         if not isinstance(archive, dict) or not all(
@@ -304,15 +378,18 @@ class HorizonsClient:
                 return cached
             except (ValueError, KeyError, TypeError, HorizonsError) as exc:
                 raise HorizonsError(f"Invalid cache entry {path}; rerun with --refresh.") from exc
-        for attempt in range(3):
+        for attempt in range(self.max_attempts):
             try:
                 request = Request(url, headers={"User-Agent": USER_AGENT})
-                with urlopen(request, timeout=self.timeout) as response:
-                    raw = response.read().decode("utf-8")
+                with urlopen(request, timeout=self._remaining_timeout()) as response:
+                    raw = self._read_response(response)
                 break
             except HTTPError as exc:
                 try:
-                    if exc.code not in (429, 500, 502, 503, 504) or attempt == 2:
+                    if (
+                        exc.code not in (429, 500, 502, 503, 504)
+                        or attempt == self.max_attempts - 1
+                    ):
                         raise HorizonsError(f"Horizons HTTP {exc.code}.") from exc
                     delay = retry_delay(
                         exc.headers.get("Retry-After") if exc.headers else None, 2**attempt
@@ -320,9 +397,15 @@ class HorizonsClient:
                 finally:
                     exc.close()
             except (URLError, TimeoutError, ConnectionError, IncompleteRead) as exc:
-                if attempt == 2:
+                if attempt == self.max_attempts - 1:
+                    if isinstance(exc, TimeoutError) or isinstance(
+                        getattr(exc, "reason", None), TimeoutError
+                    ):
+                        raise HorizonsTimeoutError("Horizons request timed out.") from exc
                     raise HorizonsError(f"Horizons request failed: {exc}") from exc
                 delay = 2**attempt
+            if self.deadline_monotonic is not None and delay >= self._remaining_timeout():
+                raise HorizonsTimeoutError("Horizons retry exceeds the remaining request budget.")
             time.sleep(delay)
         archive = {
             "sourceUrl": url,
