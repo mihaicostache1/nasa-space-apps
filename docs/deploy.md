@@ -29,6 +29,7 @@ The demo needs no NASA access at runtime. The API image contains the archived, c
 2. Under **Environment Variables**, add `NEXT_PUBLIC_API_BASE_URL` = `https://<your-api>.onrender.com`, with no trailing slash.
    - Next.js inlines it into the browser bundle at build time.
    - Changing it later requires a **Redeploy**.
+   - If it is omitted in a production build, the web image defaults to `https://lunarwindow-api.onrender.com`; local development still defaults to `http://localhost:8000`.
 3. Deploy, then open the production URL. The page should load the reference sites and show both scenarios.
 
 If the Vercel production domain differs from what you entered in step 1.2, update `LUNARWINDOW_CORS_ORIGINS` on Render to match. Preview deployments get their own URLs, which CORS does not allow unless you add them.
