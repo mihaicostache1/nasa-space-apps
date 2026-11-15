@@ -74,6 +74,9 @@ ENV LUNARWINDOW_REFERENCE_DIR=/app/data/reference \
     LUNARWINDOW_PRECOMPUTED_DIR=/app/data/releases/lunarwindow-demo-v1/bundle \
     UVICORN_LIMIT_CONCURRENCY=16 \
     UVICORN_TIMEOUT_KEEP_ALIVE=5
+RUN lunarwindow-terrain-handoff registered \
+    --reference-dir /app/data/reference/validation-30d \
+    --terrain-dir /app/data/reference/terrain-masks --allow-mean-earth-approximation
 RUN lunarwindow-data-release verify /app/data/releases/lunarwindow-demo-v1 \
     --reference-dir /app/data/reference/validation-30d
 EXPOSE 8000
