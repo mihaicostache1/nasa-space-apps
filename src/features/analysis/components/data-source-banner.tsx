@@ -52,7 +52,7 @@ export function DataSourceBanner({ catalog, results }: Props) {
           <dt>Result delivery</dt>
           <dd>
             {results.map(({ slot, snapshot }) => (
-              <span className="model-line" key={slot}>
+              <span className="model-line provenance-hash" key={slot}>
                 Scenario {slot} ·{' '}
                 {snapshot
                   ? `Precomputed reference snapshot · ${snapshot.releaseId} · SHA-256 ${snapshot.artifactSha256}`

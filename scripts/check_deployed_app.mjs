@@ -9,6 +9,84 @@ const webOrigin = new URL(web).origin;
 const apiOrigin = new URL(api).origin;
 const browser = await chromium.launch({ headless: true });
 try {
+  // A sleeping/unreachable API must not block the bundled reference explorer.
+  const offline = await browser.newPage();
+  offline.setDefaultTimeout(30_000);
+  const offlineErrors = [];
+  const offlineReferenceRequests = [];
+  offline.on('pageerror', (error) => offlineErrors.push(error.message));
+  offline.on('request', (request) => {
+    if (new URL(request.url()).pathname.startsWith('/api/reference/'))
+      offlineReferenceRequests.push(request);
+  });
+  await offline.route(`${apiOrigin}/**`, (route) => route.abort('failed'));
+  const offlineStart = performance.now();
+  const offlineOpened = await offline.goto(web, {
+    waitUntil: 'domcontentloaded',
+  });
+  assert.equal(offlineOpened.status(), 200);
+  await offline
+    .getByText('Results match the inputs above.', { exact: true })
+    .waitFor();
+  await offline.getByText(/Precomputed reference snapshots · A, B/).waitFor();
+  await offline.waitForFunction(
+    () => document.querySelector('.lander-canvas canvas')?.width > 0,
+  );
+  const offlineStartupMs = Math.round(performance.now() - offlineStart);
+  await offline
+    .getByRole('button', { name: 'Play the period', exact: true })
+    .click();
+  await offline.waitForFunction(
+    () => Number(document.querySelector('.cursor-control input').value) > 0,
+  );
+  await offline.getByRole('button', { name: 'Pause', exact: true }).click();
+  assert.equal(
+    offlineReferenceRequests.length,
+    0,
+    'Startup and playback must not need the API.',
+  );
+  await offline.getByRole('button', { name: /Update comparison/ }).click();
+  await offline
+    .getByText(
+      'Update failed. Previous results are retained; see the errors above.',
+      { exact: true },
+    )
+    .waitFor();
+  assert.equal(
+    offlineReferenceRequests.length,
+    2,
+    'An explicit update must still use the API.',
+  );
+  await offline.getByText(/Precomputed reference snapshots · A, B/).waitFor();
+  assert.equal(
+    await offline
+      .getByText('Results match the inputs above.', { exact: true })
+      .count(),
+    0,
+  );
+  // A fresh page restores snapshots; a changed A replaces only its own source label.
+  await offline.reload({ waitUntil: 'domcontentloaded' });
+  await offline.unroute(`${apiOrigin}/**`);
+  const snapshotScenario = offline.getByRole('group', { name: 'Scenario A' });
+  await snapshotScenario.locator('.scenario-advanced summary').click();
+  await snapshotScenario.getByLabel('Visible when').selectOption('full-disc');
+  const beforeSnapshotUpdate = offlineReferenceRequests.length;
+  await offline.getByRole('button', { name: /Update comparison/ }).click();
+  await offline
+    .getByText('Results match the inputs above.', { exact: true })
+    .waitFor();
+  assert.equal(offlineReferenceRequests.length, beforeSnapshotUpdate + 1);
+  await offline.getByText(/Precomputed reference snapshots · B ·/).waitFor();
+  await offline.locator('.provenance-details > summary').click();
+  await offline
+    .getByText('Scenario A · API evaluation', { exact: true })
+    .waitFor();
+  await offline
+    .getByText(/Scenario B · Precomputed reference snapshot/)
+    .waitFor();
+  assert.deepEqual(offlineErrors, []);
+  await offline.close();
+
   const page = await browser.newPage();
   const pageErrors = [];
   const evaluations = [];
@@ -88,8 +166,21 @@ try {
   await page
     .getByRole('heading', { name: 'Compare two scenarios', exact: true })
     .waitFor();
+  assert.equal(
+    evaluations.length,
+    0,
+    'Initial reference results come from the verified release.',
+  );
+  await page.getByText(/Precomputed reference snapshots · A, B/).waitFor();
+  await page.getByRole('button', { name: /Update comparison/ }).click();
+  await matched.waitFor({ state: 'visible', timeout: 45_000 });
   const initial = await Promise.all(evaluations);
-  assert.ok(initial.length >= 2, 'Both default scenarios must call the API.');
+  assert.equal(
+    initial.length,
+    2,
+    'Explicitly refreshing both unchanged scenarios must call the API.',
+  );
+  assert.equal(await page.locator('.snapshot-note').count(), 0);
   for (const response of initial) {
     assert.equal(response.status, 200);
     assert.equal(response.origin, apiOrigin);
@@ -220,7 +311,7 @@ try {
   await matched.waitFor({ state: 'visible', timeout: 45_000 });
   await page.locator('.provenance-details summary').click();
   assert.ok(
-    (await page.locator('.provenance-hash').innerText()).includes(
+    (await page.locator('p.provenance-hash').innerText()).includes(
       terrainData.provenance.terrain.artifactSha256,
     ),
   );
@@ -603,6 +694,9 @@ try {
       web: webOrigin,
       api: apiOrigin,
       initialEvaluations: initial.length,
+      startupReferenceRequests: 0,
+      startupWorksWithoutApi: true,
+      offlineStartupMs,
       updatedVisibilityRule: 'full-disc',
       terrain: 'verified with explicit frame acceptance',
       mapSelection: 'ok',
