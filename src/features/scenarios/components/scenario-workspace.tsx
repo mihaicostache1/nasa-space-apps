@@ -29,6 +29,7 @@ import {
   type ReferenceScenarioForm,
 } from '../lib/reference-scenario';
 import { ReferenceScenarioCard } from './reference-scenario-card';
+import { planReferenceRequests } from '../lib/evaluation-plan';
 
 type CatalogState =
   | { status: 'loading' }
@@ -78,6 +79,10 @@ export function ScenarioWorkspace() {
   >(null);
   const [shiftKeys, setShiftKeys] = useState<string[] | null>(null);
   const inFlight = useRef<AbortController | null>(null);
+  const committedSlots = useRef(slots);
+  useEffect(() => {
+    committedSlots.current = slots;
+  }, [slots]);
 
   const evaluate = useCallback(
     async (
@@ -94,6 +99,10 @@ export function ScenarioWorkspace() {
           sites.find((site) => site.id === form.siteId),
         ),
       );
+      const shouldFetch = planReferenceRequests(
+        current.map(requestKey),
+        committedSlots.current,
+      );
       setSlots((previous) =>
         current.map((_, index) =>
           issues[index].length
@@ -102,12 +111,14 @@ export function ScenarioWorkspace() {
                 status: 'error',
                 message: issues[index].join(' '),
               }
-            : { ...previous[index], status: 'loading', message: undefined },
+            : shouldFetch[index]
+              ? { ...previous[index], status: 'loading', message: undefined }
+              : previous[index],
         ),
       );
       await Promise.all(
         current.map(async (form, index) => {
-          if (issues[index].length) return;
+          if (issues[index].length || !shouldFetch[index]) return;
           try {
             const data = await evaluateReference(
               toRequest(form),

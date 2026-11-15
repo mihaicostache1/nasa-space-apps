@@ -325,3 +325,7 @@ docker compose run --build --rm ephemeris-test
 ```
 
 The tests cover analytical visibility/metrics cases, the catalog, response contract, time grid, repeatability, calculation options, bounds, malformed inputs, errors, CORS, and OpenAPI. `get_provider` in `lunarwindow.api.app` is the dependency boundary for later real-data integration; the demo generator is never a fallback for failed NASA requests.
+
+## Operation-local validation reuse
+
+Repeated validation of identical plain-JSON ephemerides is reused within a single catalog, evaluation, readiness or bundle-verification operation. File reads, hashes, manifest/CSV checks, output/source identities and terrain policy checks remain active. No validation fingerprints survive the operation. Large API responses support gzip without changing decoded values. See [loading measurements and limits](validation/reference-loading.md).

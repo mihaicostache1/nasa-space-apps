@@ -181,11 +181,17 @@ try {
       response.request().method() === 'POST' &&
       response.request().postDataJSON()?.visibilityRule === 'full-disc',
   );
+  const beforeSingleUpdate = evaluations.length;
   await page.getByRole('button', { name: /Update comparison/ }).click();
   const updated = await updatedResponse;
   assert.equal(updated.status(), 200);
   assert.equal((await updated.json()).calculation.visibilityRule, 'full-disc');
   await matched.waitFor({ state: 'visible', timeout: 45_000 });
+  assert.equal(
+    evaluations.length,
+    beforeSingleUpdate + 1,
+    'Editing A must not resubmit the unchanged ready B scenario.',
+  );
 
   // Terrain requires a deliberate opt-in; the UI retains the returned evidence.
   await scenario.getByLabel('Horizon model').selectOption('terrain');

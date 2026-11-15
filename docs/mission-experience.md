@@ -29,3 +29,5 @@ Mission-shift results now show the original and revised sunlight, Earth visibili
 An interactive horizon lesson lets the reader raise a chosen horizon against a fixed 2° Sun with a 0.27° illustrative radius. It is explicitly labeled a concept diagram, submits no API requests, and does not alter mission results. Its visibility labels are educational, separate from the selected site's observations.
 
 Validation includes TypeScript, ESLint, production build, domain tests for projection conventions, explicit terrain acceptance and date shifts, and the browser rehearsal in `scripts/check_deployed_app.mjs`. The browser check exercises geometric and terrain requests, provenance, playhead synchronization, map selection, playback, supported shifts, unavailable six-week shifts, and mobile overflow.
+
+Updating one scenario retains its unchanged ready partner instead of resubmitting both. Explicitly updating unchanged inputs still refreshes both; failed or interrupted slots are retried. This avoids redundant reference work without introducing a persistent browser result cache. See [loading measurements](validation/reference-loading.md).

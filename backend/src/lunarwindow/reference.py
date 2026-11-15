@@ -6,7 +6,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
-from lunarwindow.ephemeris.contract import validate_dataset, verify_run
+from lunarwindow.ephemeris.contract import validate_dataset, validation_session, verify_run
 from lunarwindow.ephemeris.models import TimeRange, iso_utc
 
 
@@ -45,6 +45,7 @@ def load_reference_dataset(directory: str | Path, site_id: str) -> dict:
     return load_verified_reference_dataset(directory, site_id).dataset
 
 
+@validation_session()
 def load_verified_reference_dataset(
     directory: str | Path, site_id: str
 ) -> VerifiedReferenceDataset:
