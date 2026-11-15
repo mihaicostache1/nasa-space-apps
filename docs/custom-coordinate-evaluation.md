@@ -2,7 +2,7 @@
 
 `POST /api/custom/evaluations` evaluates an exact lunar observer using the existing Horizons request builder, parser, and visibility engine. It returns the same metrics, operating windows, disc rules, and setting brackets used for reference evaluations, under the new `lunarwindow.custom-evaluation.v1` response schema.
 
-Custom acquisition is **disabled by default**. Enable it explicitly when the API has outbound HTTPS access to NASA/JPL Horizons and writable archive storage. Existing reference and synthetic endpoints retain their contracts; reference evaluations continue using the shipped offline data. The frontend is unchanged: use the endpoint or FastAPI `/docs` to submit custom coordinates.
+Custom acquisition is **disabled by default**. Enable it explicitly when the API has outbound HTTPS access to NASA/JPL Horizons and writable archive storage. Existing reference and synthetic endpoints retain their contracts; reference evaluations continue using the shipped offline data. The frontend includes a custom-coordinate form; FastAPI `/docs` also supports submitting custom coordinates.
 
 ## Coordinates and observer height
 
@@ -183,3 +183,33 @@ Seven focused agents handled contracts, Horizons acquisition/archival, cache/lim
 - New tests under `backend/tests/`: `test_custom_contract.py`, `test_custom_ephemeris.py`, `test_custom_evaluation.py`, `test_custom_gis.py`, `test_custom_integration.py`, `test_custom_runtime.py`, and `test_custom_terrain.py`.
 - Deployment/configuration: `backend/Dockerfile`, `compose.yaml`, new `compose.custom.yaml`, `.env.example`, and `.github/workflows/ci.yml`. GIS targets install the required `libexpat1` system library and verify Rasterio imports during the build.
 - Documentation: this guide and the README entry linking it.
+
+## Feature discovery
+
+`GET /api/capabilities` reports the active process configuration:
+
+```json
+{
+  "schemaVersion": "lunarwindow.capabilities.v1",
+  "customEvaluation": { "enabled": true, "terrainEnabled": false }
+}
+```
+
+Both flags default to false. They come from the same startup settings used by
+custom evaluation, not from environment variables reread per request. The response
+has `Cache-Control: no-store`, exposes no local paths, and performs no source reads,
+Horizons calls, archive writes, or calculations. `terrainEnabled` describes custom
+terrain only; reviewed reference-site terrain is advertised by `/api/reference/sites`.
+
+These flags indicate deployment opt-ins, not data readiness or guaranteed success.
+An enabled mode still checks admission, source integrity, coverage, and upstream
+availability when evaluating. Existing POST error behavior is unchanged.
+
+The custom form checks capabilities on mount and disables unavailable modes and
+submission until a valid response arrives. Unknown, malformed, timed-out, or old
+API responses leave submission blocked and offer a retry and reference-site link.
+Rechecking availability does not submit an evaluation or change the selected mode.
+
+## Load testing
+
+See [custom load tests](custom-load-test.md) for isolated acquisition, archive reuse, terrain generation/reuse, memory and disk retention limits, admission saturation, and deadline recovery measurements.

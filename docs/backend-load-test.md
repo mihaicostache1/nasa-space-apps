@@ -63,3 +63,5 @@ python scripts/load_test_api.py --image lunarwindow-api:load-test \
 ```
 
 Recorded full-run measurements and their interpretation are in [the load-test report](validation/backend-load-test.md).
+
+Custom acquisition and generated terrain have a separate [custom load-test harness](custom-load-test.md), with local Horizons fixtures, actual GIS computation, admission and deadline recovery checks.

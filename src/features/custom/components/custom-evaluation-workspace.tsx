@@ -8,7 +8,8 @@ import {
   type PointerEvent,
 } from 'react';
 import type { CustomEvaluation } from '@/domain/custom-evaluation';
-import { ApiError, evaluateCustom } from '@/lib/api-client';
+import { ApiError, evaluateCustom, fetchCapabilities } from '@/lib/api-client';
+import { customModeEnabled, type CapabilityState } from '@/domain/capabilities';
 import {
   domainOf,
   formatHours,
@@ -28,6 +29,10 @@ import {
 } from '../lib/form';
 
 export function CustomEvaluationWorkspace() {
+  const [capabilities, setCapabilities] = useState<CapabilityState>({
+    status: 'loading',
+  });
+  const [availabilityAttempt, setAvailabilityAttempt] = useState(0);
   const [form, setForm] = useState<CustomForm>(defaultCustomForm);
   const [issues, setIssues] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
@@ -40,6 +45,41 @@ export function CustomEvaluationWorkspace() {
   const [cursor, setCursor] = useState(0);
   const inFlight = useRef<AbortController | null>(null);
   useEffect(() => () => inFlight.current?.abort(), []);
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+      setCapabilities({
+        status: 'error',
+        message: 'Checking feature availability timed out. Please retry.',
+      });
+    }, 30_000);
+    void fetchCapabilities(controller.signal)
+      .then(
+        (data) => {
+          if (!controller.signal.aborted)
+            setCapabilities({ status: 'ready', data });
+        },
+        (cause: unknown) => {
+          if (!controller.signal.aborted)
+            setCapabilities({
+              status: 'error',
+              message:
+                cause instanceof ApiError && cause.status === 404
+                  ? 'This API does not expose feature availability. Update the backend before using custom evaluation.'
+                  : cause instanceof Error
+                    ? cause.message
+                    : 'Feature availability could not be checked.',
+            });
+        },
+      )
+      .finally(() => clearTimeout(timeout));
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [availabilityAttempt]);
+  const modeEnabled = customModeEnabled(capabilities, form.mode);
   const key = JSON.stringify(customRequest(form).request ?? form);
   const stale = Boolean(completed && completed.key !== key);
 
@@ -57,6 +97,7 @@ export function CustomEvaluationWorkspace() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (!modeEnabled || pending) return;
     const selected = customRequest(form);
     setIssues(selected.issues);
     if (!selected.request) return;
@@ -149,6 +190,8 @@ export function CustomEvaluationWorkspace() {
           >
             <button
               type="button"
+              disabled={!customModeEnabled(capabilities, 'geometric')}
+              aria-describedby="custom-availability"
               aria-pressed={form.mode === 'geometric'}
               onClick={() => change({ mode: 'geometric', accepted: false })}
             >
@@ -156,11 +199,41 @@ export function CustomEvaluationWorkspace() {
             </button>
             <button
               type="button"
+              disabled={!customModeEnabled(capabilities, 'terrain')}
+              aria-describedby="custom-availability"
               aria-pressed={form.mode === 'terrain'}
               onClick={() => change({ mode: 'terrain', accepted: false })}
             >
               Terrain-aware
             </button>
+          </div>
+          <div className="custom-availability" id="custom-availability">
+            <p role="status">
+              {capabilities.status === 'loading'
+                ? 'Checking custom evaluation availability…'
+                : capabilities.status === 'error'
+                  ? capabilities.message
+                  : !capabilities.data.customEvaluation.enabled
+                    ? 'Custom evaluation is disabled on this deployment.'
+                    : !capabilities.data.customEvaluation.terrainEnabled
+                      ? 'Geometric custom evaluation is enabled. Custom terrain is disabled on this deployment.'
+                      : 'Geometric and terrain custom evaluations are enabled. Terrain coverage is checked when you evaluate.'}
+            </p>
+            {capabilities.status !== 'loading' && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  setCapabilities({ status: 'loading' });
+                  setAvailabilityAttempt((attempt) => attempt + 1);
+                }}
+              >
+                Check availability again
+              </button>
+            )}
+            {!modeEnabled && (
+              <a href="#explore">Explore reference locations →</a>
+            )}
           </div>
           <p id="custom-form-description" className="hint">
             {form.mode === 'geometric'
@@ -272,7 +345,11 @@ export function CustomEvaluationWorkspace() {
             )}
           </div>
           <div className="custom-submit-row">
-            <button type="submit" disabled={pending}>
+            <button
+              type="submit"
+              disabled={pending || !modeEnabled}
+              aria-describedby="custom-availability"
+            >
               {pending ? 'Evaluating observer…' : 'Evaluate coordinates'}
               <span aria-hidden="true"> →</span>
             </button>
@@ -291,8 +368,9 @@ export function CustomEvaluationWorkspace() {
             )}
           </div>
           <p className="custom-service-note">
-            Custom acquisition may be disabled on this deployment. The verified
-            reference explorer remains available.
+            Availability reflects server configuration. Evaluations can still
+            fail if source data or upstream services are unavailable. The
+            verified reference explorer remains available.
           </p>
         </form>
         <div className="custom-result-area" aria-busy={pending}>

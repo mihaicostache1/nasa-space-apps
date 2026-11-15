@@ -1,0 +1,425 @@
+{
+  "schemaVersion": "lunarwindow.surface-science-report.v1",
+  "status": "partial-pending-terrain-evidence",
+  "independentTerrainValidationComplete": false,
+  "referenceSha256": "d3261d0157d47331ddbdf8b0348b80718158a152f09cc798f9850abd540c3948",
+  "inputsSha256": "d0ee27f32d5523638474d6ebe837c34d8e7a06582f84b83335decb72560e56ea",
+  "criteria": {
+    "pointingToleranceDeg": 0.001,
+    "angularRadiusToleranceDeg": 1e-5,
+    "basis": "Predeclared engineering cross-tool screening envelopes, not physical uncertainty bounds; no tuning to observed residuals."
+  },
+  "surfacePointing": [
+    {
+      "siteId": "lola-site01-reference",
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "altitudeKm": 1.94476708984375,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0
+      },
+      "status": "pass-cross-tool-consistency",
+      "samples": 720,
+      "angleComparisons": 4320,
+      "failedComparisons": 0,
+      "quantities": {
+        "sunAz": {
+          "maxAbsDifferenceDeg": 1.8486105091142235e-8,
+          "differenceDeg": 1.8486105091142235e-8,
+          "timestampUtc": "2026-11-24T07:00:00Z",
+          "horizonsDeg": 139.013134986,
+          "spiceDeg": 139.0131349675139,
+          "toleranceDeg": 0.001
+        },
+        "sunEl": {
+          "maxAbsDifferenceDeg": 3.42574504319515e-8,
+          "differenceDeg": -3.42574504319515e-8,
+          "timestampUtc": "2026-11-24T15:00:00Z",
+          "horizonsDeg": 1.140739845,
+          "spiceDeg": 1.1407398792574504,
+          "toleranceDeg": 0.001
+        },
+        "earthAz": {
+          "maxAbsDifferenceDeg": 5.248653280887083e-7,
+          "differenceDeg": 5.248653280887083e-7,
+          "timestampUtc": "2026-11-21T20:00:00Z",
+          "horizonsDeg": 131.011582607,
+          "spiceDeg": 131.01158208213468,
+          "toleranceDeg": 0.001
+        },
+        "earthEl": {
+          "maxAbsDifferenceDeg": 5.101024980191937e-8,
+          "differenceDeg": -5.101024980191937e-8,
+          "timestampUtc": "2026-12-02T01:00:00Z",
+          "horizonsDeg": -3.569205924,
+          "spiceDeg": -3.56920587298975,
+          "toleranceDeg": 0.001
+        },
+        "sunAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 6.93458117595469e-8,
+          "differenceDeg": 6.93458117595469e-8,
+          "timestampUtc": "2026-12-05T18:00:00Z",
+          "horizonsDeg": 0.27096027777777776,
+          "spiceDeg": 0.270960208431966,
+          "toleranceDeg": 1e-5
+        },
+        "earthAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 1.330868157900511e-7,
+          "differenceDeg": -1.330868157900511e-7,
+          "timestampUtc": "2026-11-25T04:00:00Z",
+          "horizonsDeg": 1.0162097222222222,
+          "spiceDeg": 1.016209855309038,
+          "toleranceDeg": 1e-5
+        }
+      }
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "observer": {
+        "lat": -89.76674147712977,
+        "lon": -171.89280908299654,
+        "altitudeKm": 0.7679786376953125,
+        "surfaceElevationM": 767.9786376953125,
+        "mastHeightM": 0
+      },
+      "status": "pass-cross-tool-consistency",
+      "samples": 720,
+      "angleComparisons": 4320,
+      "failedComparisons": 0,
+      "quantities": {
+        "sunAz": {
+          "maxAbsDifferenceDeg": 1.839561036831583e-8,
+          "differenceDeg": 1.839561036831583e-8,
+          "timestampUtc": "2026-11-24T08:00:00Z",
+          "horizonsDeg": 172.891101819,
+          "spiceDeg": 172.8911018006044,
+          "toleranceDeg": 0.001
+        },
+        "sunEl": {
+          "maxAbsDifferenceDeg": 3.439761142587372e-8,
+          "differenceDeg": -3.439761142587372e-8,
+          "timestampUtc": "2026-11-24T15:00:00Z",
+          "horizonsDeg": 1.290877792,
+          "spiceDeg": 1.2908778263976115,
+          "toleranceDeg": 0.001
+        },
+        "earthAz": {
+          "maxAbsDifferenceDeg": 5.24557322023611e-7,
+          "differenceDeg": 5.24557322023611e-7,
+          "timestampUtc": "2026-11-21T19:00:00Z",
+          "horizonsDeg": 165.335217846,
+          "spiceDeg": 165.33521732144268,
+          "toleranceDeg": 0.001
+        },
+        "earthEl": {
+          "maxAbsDifferenceDeg": 4.901305672433409e-8,
+          "differenceDeg": -4.901305672433409e-8,
+          "timestampUtc": "2026-12-02T03:00:00Z",
+          "horizonsDeg": -3.479794479,
+          "spiceDeg": -3.4797944299869434,
+          "toleranceDeg": 0.001
+        },
+        "sunAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 6.893644111105601e-8,
+          "differenceDeg": -6.893644111105601e-8,
+          "timestampUtc": "2026-11-14T06:00:00Z",
+          "horizonsDeg": 0.2697111111111111,
+          "spiceDeg": 0.26971118004755223,
+          "toleranceDeg": 1e-5
+        },
+        "earthAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 1.3083388972212617e-7,
+          "differenceDeg": -1.3083388972212617e-7,
+          "timestampUtc": "2026-11-29T15:00:00Z",
+          "horizonsDeg": 0.9884511111111111,
+          "spiceDeg": 0.9884512419450008,
+          "toleranceDeg": 1e-5
+        }
+      }
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "observer": {
+        "lat": -85.99486736492491,
+        "lon": -0.23460969154338968,
+        "altitudeKm": 4.78362939453125,
+        "surfaceElevationM": 4783.62939453125,
+        "mastHeightM": 0
+      },
+      "status": "pass-cross-tool-consistency",
+      "samples": 720,
+      "angleComparisons": 4320,
+      "failedComparisons": 0,
+      "quantities": {
+        "sunAz": {
+          "maxAbsDifferenceDeg": 1.8132908508050605e-8,
+          "differenceDeg": 1.8132908508050605e-8,
+          "timestampUtc": "2026-11-24T07:00:00Z",
+          "horizonsDeg": 1.745142067,
+          "spiceDeg": 1.7451420488670804,
+          "toleranceDeg": 0.001
+        },
+        "sunEl": {
+          "maxAbsDifferenceDeg": 3.440711537905372e-8,
+          "differenceDeg": -3.440711537905372e-8,
+          "timestampUtc": "2026-11-24T16:00:00Z",
+          "horizonsDeg": 5.520106078,
+          "spiceDeg": 5.520106112407116,
+          "toleranceDeg": 0.001
+        },
+        "earthAz": {
+          "maxAbsDifferenceDeg": 5.290760327625321e-7,
+          "differenceDeg": 5.290760327625321e-7,
+          "timestampUtc": "2026-11-21T18:00:00Z",
+          "horizonsDeg": 353.579462062,
+          "spiceDeg": 353.579461532924,
+          "toleranceDeg": 0.001
+        },
+        "earthEl": {
+          "maxAbsDifferenceDeg": 5.25366233850022e-8,
+          "differenceDeg": -5.25366233850022e-8,
+          "timestampUtc": "2026-12-02T08:00:00Z",
+          "horizonsDeg": 0.447390046,
+          "spiceDeg": 0.44739009853662337,
+          "toleranceDeg": 0.001
+        },
+        "sunAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 6.936107876942543e-8,
+          "differenceDeg": -6.936107876942543e-8,
+          "timestampUtc": "2026-11-21T20:00:00Z",
+          "horizonsDeg": 0.2692009722222222,
+          "spiceDeg": 0.269201041583301,
+          "toleranceDeg": 1e-5
+        },
+        "earthAngularRadiusDeg": {
+          "maxAbsDifferenceDeg": 1.324600229501982e-7,
+          "differenceDeg": -1.324600229501982e-7,
+          "timestampUtc": "2026-11-28T00:00:00Z",
+          "horizonsDeg": 1.0071211111111111,
+          "spiceDeg": 1.007121243571134,
+          "toleranceDeg": 1e-5
+        }
+      }
+    }
+  ],
+  "modelConsistency": [
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "any-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 312.0,
+        "bothHrs": 312.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.003236981969915176,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "body-center",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 283.0,
+        "bothHrs": 283.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.007425115600216846,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "full-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 252.0,
+        "bothHrs": 252.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.01849006331848324,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "terrain",
+      "status": "pass-model-consistency",
+      "visibilityRule": "any-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 442.0,
+        "earthVisibleHrs": 232.0,
+        "bothHrs": 81.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.008955541787441845,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "terrain",
+      "status": "pass-model-consistency",
+      "visibilityRule": "body-center",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 427.0,
+        "earthVisibleHrs": 199.0,
+        "bothHrs": 60.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.0017627330639113925,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site01-reference",
+      "horizonMode": "terrain",
+      "status": "pass-model-consistency",
+      "visibilityRule": "full-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 394.0,
+        "earthVisibleHrs": 162.0,
+        "bothHrs": 27.0
+      },
+      "nearScreeningEnvelopeCount": 3,
+      "minimumAbsoluteClearanceDeg": 0.000534614059573224,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "any-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 318.0,
+        "bothHrs": 318.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.01221030367021081,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "body-center",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 288.0,
+        "bothHrs": 288.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.0038048934328998693,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "full-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 720.0,
+        "earthVisibleHrs": 257.0,
+        "bothHrs": 257.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.01521352123644304,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "any-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 459.0,
+        "earthVisibleHrs": 545.0,
+        "bothHrs": 449.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.0016620339666499895,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "body-center",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 443.0,
+        "earthVisibleHrs": 489.0,
+        "bothHrs": 421.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.012603217755116289,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "horizonMode": "geometric",
+      "status": "pass-model-consistency",
+      "visibilityRule": "full-disc",
+      "sampleBodyComparisons": 1440,
+      "flagMismatches": 0,
+      "totalsMatch": true,
+      "referenceTotalsHrs": {
+        "sunlitHrs": 427.0,
+        "earthVisibleHrs": 434.0,
+        "bothHrs": 395.0
+      },
+      "nearScreeningEnvelopeCount": 0,
+      "minimumAbsoluteClearanceDeg": 0.0026043543612895848,
+      "scope": "SPICE pointing plus a shared fixed horizon and disc model; this does not independently establish that terrain horizon or physical visibility."
+    }
+  ],
+  "externalTerrainEvidence": {
+    "status": "pending-independent-evidence",
+    "coverageComplete": false,
+    "comparisons": [],
+    "reason": "No reviewed same-observer, same-UTC terrain visibility evidence is supplied. Elevated QuickMap camera geometry and mismatched-period PGDA averages cannot fill this gap."
+  },
+  "limitations": [
+    "CSPICE and Horizons share JPL ephemeris foundations; agreement is cross-tool consistency, not independent observational truth.",
+    "SPICE uses DE440s and CN+S without relativistic light deflection; Horizons archives use DE441 source positions and apparent airless angles. Screening tolerances are engineering envelopes, not accuracy estimates.",
+    "Surface cases retain DEM ground plus 0 m mast; these checks do not validate a different antenna height or custom-coordinate coverage.",
+    "Model checks use the same reviewed terrain mask and do not independently validate its skyline. The production frame-approximation acceptance policy is unchanged.",
+    "Hourly samples and sample-and-hold metrics do not validate sub-hour sunrise, shadow or Earthset times. Near-threshold states remain sensitive to model differences."
+  ]
+}

@@ -1,0 +1,785 @@
+{
+  "schemaVersion": "lunarwindow.custom-load-test.v1",
+  "startedAtUtc": "2026-11-15T09:17:11.119831+00:00",
+  "harnessSha256": "22610eafe0503aba423d49ca5fc97806de50abe9529268252a7cedb6bdf8683c",
+  "upstreamFixtureSha256": {
+    "sun": "eaa34855d6ce2a1ff9ec38a23d1bafe26356910804fa979ad5493a48cfd266d8",
+    "earth": "cb41098cb02a1f099d292bcbe901812c965d7f9b6b777a09c78408a7ef6ff617"
+  },
+  "status": "passed",
+  "settings": {
+    "image": "lunarwindow-custom-load:check",
+    "profile": "full",
+    "requests": 4,
+    "slots": 1,
+    "concurrency": [1],
+    "budget": 120,
+    "memory": "1g",
+    "cpus": 2
+  },
+  "limitations": [
+    "Local synthetic observer headers and archived angles, not live NASA timing or scientific validation.",
+    "Synthetic 20/120 m GeoTIFFs: byte sizes and geographic extent differ from original LOLA products.",
+    "Smoke profile reduces ray range and count; full profile uses production ray parameters.",
+    "20 ms sampled memory peaks are lower bounds; cgroup lifetime peak is also reported.",
+    "Test-only wrappers add overhead; disk/page caches are warm and health probes disabled."
+  ],
+  "phases": [
+    {
+      "path": "horizons-acquisition",
+      "concurrency": 1,
+      "http": {
+        "requests": 4,
+        "elapsedSeconds": 0.347,
+        "successfulRequestsPerSecond": 11.523,
+        "statusCounts": {
+          "200": 4
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 81.947,
+            "p95": 89.282,
+            "p99": 89.282,
+            "max": 89.282
+          }
+        },
+        "responseBytes": 60252,
+        "errors": []
+      },
+      "server": {
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "numpy": "2.5.4",
+            "rasterio": "1.5.2",
+            "fastapi": "0.163.0",
+            "pydantic": "2.14.3",
+            "uvicorn": "0.54.0"
+          }
+        },
+        "counters": {
+          "acquisitions": 4,
+          "upstreamCalls": 8,
+          "memoryMisses": 4,
+          "calculations": 4,
+          "cachePuts": 4
+        },
+        "stageLatencyMs": {
+          "acquisitions": {
+            "p50": 77.123,
+            "p95": 83.602,
+            "p99": 83.602,
+            "max": 83.602
+          },
+          "calculations": {
+            "p50": 0.33,
+            "p95": 1.228,
+            "p99": 1.228,
+            "max": 1.228
+          }
+        },
+        "cache": {
+          "entry_count": 2,
+          "stored_bytes": 30126,
+          "max_entries": 2,
+          "max_bytes": 1048576
+        },
+        "archive": {
+          "entries": 4,
+          "bytes": 92608
+        },
+        "terrainCache": {
+          "entries": 0,
+          "bytes": 0
+        },
+        "active": 0,
+        "peakActive": 1,
+        "memory": {
+          "baseline": {
+            "rssBytes": 113520640,
+            "cgroupCurrentBytes": 175226880,
+            "cgroupLifetimePeakBytes": 302403584,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "after": {
+            "rssBytes": 117612544,
+            "cgroupCurrentBytes": 179126272,
+            "cgroupLifetimePeakBytes": 302403584,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 117612544,
+            "cgroupCurrentBytes": 179138560
+          },
+          "samples": 29,
+          "cacheBoundViolations": 0,
+          "monitorErrors": []
+        },
+        "fixture": {
+          "profile": "full",
+          "demSha256": {
+            "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+            "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+          },
+          "parameters": {
+            "mastHeightM": 2.0,
+            "maxRangeKm": 200.0,
+            "nearFieldKm": 25.0,
+            "minDistanceM": 60.0,
+            "raysPerDegree": 10,
+            "stepGrowth": 0.001,
+            "binning": "max-per-degree"
+          },
+          "syntheticObserverHeaders": true,
+          "liveNasaRequests": false
+        }
+      }
+    },
+    {
+      "path": "archive-reuse",
+      "concurrency": 1,
+      "http": {
+        "requests": 4,
+        "elapsedSeconds": 0.021,
+        "successfulRequestsPerSecond": 188.152,
+        "statusCounts": {
+          "200": 4
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 3.952,
+            "p95": 4.937,
+            "p99": 4.937,
+            "max": 4.937
+          }
+        },
+        "responseBytes": 60252,
+        "errors": []
+      },
+      "server": {
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "numpy": "2.5.4",
+            "rasterio": "1.5.2",
+            "fastapi": "0.163.0",
+            "pydantic": "2.14.3",
+            "uvicorn": "0.54.0"
+          }
+        },
+        "counters": {
+          "acquisitions": 4,
+          "memoryHits": 4
+        },
+        "stageLatencyMs": {
+          "acquisitions": {
+            "p50": 1.271,
+            "p95": 1.386,
+            "p99": 1.386,
+            "max": 1.386
+          }
+        },
+        "cache": {
+          "entry_count": 2,
+          "stored_bytes": 30126,
+          "max_entries": 2,
+          "max_bytes": 1048576
+        },
+        "archive": {
+          "entries": 4,
+          "bytes": 92608
+        },
+        "terrainCache": {
+          "entries": 0,
+          "bytes": 0
+        },
+        "active": 0,
+        "peakActive": 1,
+        "memory": {
+          "baseline": {
+            "rssBytes": 118108160,
+            "cgroupCurrentBytes": 179544064,
+            "cgroupLifetimePeakBytes": 302403584,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "after": {
+            "rssBytes": 118112256,
+            "cgroupCurrentBytes": 179544064,
+            "cgroupLifetimePeakBytes": 302403584,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 118112256,
+            "cgroupCurrentBytes": 179544064
+          },
+          "samples": 6,
+          "cacheBoundViolations": 0,
+          "monitorErrors": []
+        },
+        "fixture": {
+          "profile": "full",
+          "demSha256": {
+            "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+            "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+          },
+          "parameters": {
+            "mastHeightM": 2.0,
+            "maxRangeKm": 200.0,
+            "nearFieldKm": 25.0,
+            "minDistanceM": 60.0,
+            "raysPerDegree": 10,
+            "stepGrowth": 0.001,
+            "binning": "max-per-degree"
+          },
+          "syntheticObserverHeaders": true,
+          "liveNasaRequests": false
+        }
+      }
+    },
+    {
+      "path": "terrain-generation",
+      "concurrency": 1,
+      "http": {
+        "requests": 4,
+        "elapsedSeconds": 2.414,
+        "successfulRequestsPerSecond": 1.657,
+        "statusCounts": {
+          "200": 4
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 587.82,
+            "p95": 626.505,
+            "p99": 626.505,
+            "max": 626.505
+          }
+        },
+        "responseBytes": 428168,
+        "errors": []
+      },
+      "server": {
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "numpy": "2.5.4",
+            "rasterio": "1.5.2",
+            "fastapi": "0.163.0",
+            "pydantic": "2.14.3",
+            "uvicorn": "0.54.0"
+          }
+        },
+        "counters": {
+          "terrainPreparations": 4,
+          "sourceHashes": 8,
+          "raycasts": 4,
+          "acquisitions": 4,
+          "memoryMisses": 4,
+          "calculations": 4,
+          "cachePuts": 4
+        },
+        "stageLatencyMs": {
+          "sourceHashes": {
+            "p50": 17.556,
+            "p95": 22.362,
+            "p99": 22.362,
+            "max": 22.362
+          },
+          "raycasts": {
+            "p50": 513.982,
+            "p95": 533.158,
+            "p99": 533.158,
+            "max": 533.158
+          },
+          "terrainPreparations": {
+            "p50": 577.249,
+            "p95": 615.983,
+            "p99": 615.983,
+            "max": 615.983
+          },
+          "acquisitions": {
+            "p50": 1.25,
+            "p95": 1.292,
+            "p99": 1.292,
+            "max": 1.292
+          },
+          "calculations": {
+            "p50": 0.24,
+            "p95": 0.294,
+            "p99": 0.294,
+            "max": 0.294
+          }
+        },
+        "cache": {
+          "entry_count": 2,
+          "stored_bytes": 212284,
+          "max_entries": 2,
+          "max_bytes": 1048576
+        },
+        "archive": {
+          "entries": 4,
+          "bytes": 92696
+        },
+        "terrainCache": {
+          "entries": 4,
+          "bytes": 361608
+        },
+        "active": 0,
+        "peakActive": 1,
+        "memory": {
+          "baseline": {
+            "rssBytes": 122892288,
+            "cgroupCurrentBytes": 184553472,
+            "cgroupLifetimePeakBytes": 302403584,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "after": {
+            "rssBytes": 320180224,
+            "cgroupCurrentBytes": 380948480,
+            "cgroupLifetimePeakBytes": 683126784,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 621604864,
+            "cgroupCurrentBytes": 683126784
+          },
+          "samples": 131,
+          "cacheBoundViolations": 0,
+          "monitorErrors": []
+        },
+        "fixture": {
+          "profile": "full",
+          "demSha256": {
+            "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+            "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+          },
+          "parameters": {
+            "mastHeightM": 2.0,
+            "maxRangeKm": 200.0,
+            "nearFieldKm": 25.0,
+            "minDistanceM": 60.0,
+            "raysPerDegree": 10,
+            "stepGrowth": 0.001,
+            "binning": "max-per-degree"
+          },
+          "syntheticObserverHeaders": true,
+          "liveNasaRequests": false
+        }
+      }
+    },
+    {
+      "path": "terrain-reuse",
+      "concurrency": 1,
+      "http": {
+        "requests": 4,
+        "elapsedSeconds": 0.238,
+        "successfulRequestsPerSecond": 16.807,
+        "statusCounts": {
+          "200": 4
+        },
+        "latencyMsByStatus": {
+          "200": {
+            "p50": 53.822,
+            "p95": 55.337,
+            "p99": 55.337,
+            "max": 55.337
+          }
+        },
+        "responseBytes": 417480,
+        "errors": []
+      },
+      "server": {
+        "runtime": {
+          "python": "3.14.10",
+          "machine": "aarch64",
+          "packages": {
+            "numpy": "2.5.4",
+            "rasterio": "1.5.2",
+            "fastapi": "0.163.0",
+            "pydantic": "2.14.3",
+            "uvicorn": "0.54.0"
+          }
+        },
+        "counters": {
+          "terrainPreparations": 4,
+          "sourceHashes": 8,
+          "acquisitions": 4,
+          "memoryHits": 4
+        },
+        "stageLatencyMs": {
+          "sourceHashes": {
+            "p50": 14.597,
+            "p95": 20.93,
+            "p99": 20.93,
+            "max": 20.93
+          },
+          "terrainPreparations": {
+            "p50": 43.571,
+            "p95": 44.912,
+            "p99": 44.912,
+            "max": 44.912
+          },
+          "acquisitions": {
+            "p50": 1.179,
+            "p95": 1.235,
+            "p99": 1.235,
+            "max": 1.235
+          }
+        },
+        "cache": {
+          "entry_count": 2,
+          "stored_bytes": 208712,
+          "max_entries": 2,
+          "max_bytes": 1048576
+        },
+        "archive": {
+          "entries": 4,
+          "bytes": 92684
+        },
+        "terrainCache": {
+          "entries": 4,
+          "bytes": 358001
+        },
+        "active": 0,
+        "peakActive": 1,
+        "memory": {
+          "baseline": {
+            "rssBytes": 335253504,
+            "cgroupCurrentBytes": 396034048,
+            "cgroupLifetimePeakBytes": 683126784,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "after": {
+            "rssBytes": 336162816,
+            "cgroupCurrentBytes": 397058048,
+            "cgroupLifetimePeakBytes": 683126784,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0,
+              "sock_throttled": 0
+            }
+          },
+          "sampledPeak": {
+            "rssBytes": 336162816,
+            "cgroupCurrentBytes": 397058048
+          },
+          "samples": 27,
+          "cacheBoundViolations": 0,
+          "monitorErrors": []
+        },
+        "fixture": {
+          "profile": "full",
+          "demSha256": {
+            "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+            "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+          },
+          "parameters": {
+            "mastHeightM": 2.0,
+            "maxRangeKm": 200.0,
+            "nearFieldKm": 25.0,
+            "minDistanceM": 60.0,
+            "raysPerDegree": 10,
+            "stepGrowth": 0.001,
+            "binning": "max-per-degree"
+          },
+          "syntheticObserverHeaders": true,
+          "liveNasaRequests": false
+        }
+      }
+    }
+  ],
+  "imageId": "sha256:9386f01f1086c08ac81da88dbd08e6dacee054e306755ee870c5e52eb3ca6bcb",
+  "resources": {
+    "Memory": 1073741824,
+    "MemorySwap": 1073741824,
+    "NanoCpus": 2000000000
+  },
+  "busy": {
+    "requests": 8,
+    "elapsedSeconds": 0.016,
+    "successfulRequestsPerSecond": 0.0,
+    "statusCounts": {
+      "503": 8
+    },
+    "latencyMsByStatus": {
+      "503": {
+        "p50": 2.305,
+        "p95": 2.87,
+        "p99": 2.87,
+        "max": 2.87
+      }
+    },
+    "responseBytes": 864,
+    "errors": []
+  },
+  "deadline": {
+    "status": 504,
+    "latencyMs": 1019.028249999792,
+    "bytes": 116,
+    "code": "custom_upstream_timeout"
+  },
+  "deadlineState": {
+    "runtime": {
+      "python": "3.14.10",
+      "machine": "aarch64",
+      "packages": {
+        "numpy": "2.5.4",
+        "rasterio": "1.5.2",
+        "fastapi": "0.163.0",
+        "pydantic": "2.14.3",
+        "uvicorn": "0.54.0"
+      }
+    },
+    "counters": {
+      "acquisitions": 1,
+      "upstreamCalls": 1
+    },
+    "stageLatencyMs": {
+      "acquisitions": {
+        "p50": 1017.103,
+        "p95": 1017.103,
+        "p99": 1017.103,
+        "max": 1017.103
+      }
+    },
+    "cache": {
+      "entry_count": 2,
+      "stored_bytes": 119414,
+      "max_entries": 2,
+      "max_bytes": 1048576
+    },
+    "archive": {
+      "entries": 4,
+      "bytes": 92614
+    },
+    "terrainCache": {
+      "entries": 4,
+      "bytes": 358001
+    },
+    "active": 0,
+    "peakActive": 1,
+    "memory": {
+      "baseline": {
+        "rssBytes": 337281024,
+        "cgroupCurrentBytes": 398540800,
+        "cgroupLifetimePeakBytes": 683126784,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        }
+      },
+      "after": {
+        "rssBytes": 337285120,
+        "cgroupCurrentBytes": 398532608,
+        "cgroupLifetimePeakBytes": 683126784,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        }
+      },
+      "sampledPeak": {
+        "rssBytes": 337285120,
+        "cgroupCurrentBytes": 398540800
+      },
+      "samples": 46,
+      "cacheBoundViolations": 0,
+      "monitorErrors": []
+    },
+    "fixture": {
+      "profile": "full",
+      "demSha256": {
+        "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+        "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+      },
+      "parameters": {
+        "mastHeightM": 2.0,
+        "maxRangeKm": 200.0,
+        "nearFieldKm": 25.0,
+        "minDistanceM": 60.0,
+        "raysPerDegree": 10,
+        "stepGrowth": 0.001,
+        "binning": "max-per-degree"
+      },
+      "syntheticObserverHeaders": true,
+      "liveNasaRequests": false
+    }
+  },
+  "finalState": {
+    "runtime": {
+      "python": "3.14.10",
+      "machine": "aarch64",
+      "packages": {
+        "numpy": "2.5.4",
+        "rasterio": "1.5.2",
+        "fastapi": "0.163.0",
+        "pydantic": "2.14.3",
+        "uvicorn": "0.54.0"
+      }
+    },
+    "counters": {
+      "acquisitions": 1,
+      "upstreamCalls": 2,
+      "memoryMisses": 1,
+      "calculations": 1,
+      "cachePuts": 1
+    },
+    "stageLatencyMs": {
+      "acquisitions": {
+        "p50": 85.411,
+        "p95": 85.411,
+        "p99": 85.411,
+        "max": 85.411
+      },
+      "calculations": {
+        "p50": 1.938,
+        "p95": 1.938,
+        "p99": 1.938,
+        "max": 1.938
+      }
+    },
+    "cache": {
+      "entry_count": 2,
+      "stored_bytes": 30098,
+      "max_entries": 2,
+      "max_bytes": 1048576
+    },
+    "archive": {
+      "entries": 4,
+      "bytes": 92568
+    },
+    "terrainCache": {
+      "entries": 4,
+      "bytes": 358001
+    },
+    "active": 0,
+    "peakActive": 1,
+    "memory": {
+      "baseline": {
+        "rssBytes": 337285120,
+        "cgroupCurrentBytes": 398532608,
+        "cgroupLifetimePeakBytes": 683126784,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        }
+      },
+      "after": {
+        "rssBytes": 337354752,
+        "cgroupCurrentBytes": 398503936,
+        "cgroupLifetimePeakBytes": 683126784,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        }
+      },
+      "sampledPeak": {
+        "rssBytes": 337358848,
+        "cgroupCurrentBytes": 398532608
+      },
+      "samples": 8,
+      "cacheBoundViolations": 0,
+      "monitorErrors": []
+    },
+    "fixture": {
+      "profile": "full",
+      "demSha256": {
+        "LDEM_80S_20MPP_ADJ": "6ff9b0fcfb809bb2f0e02afd53efb6ab9e020076f3576df13e2f26b5a9e80aae",
+        "LDEM_60S_120MPP_ADJ": "a34d664dcaa18d6aec0ddd987189f051474087d41d6b40d60f610bec434bc56f"
+      },
+      "parameters": {
+        "mastHeightM": 2.0,
+        "maxRangeKm": 200.0,
+        "nearFieldKm": 25.0,
+        "minDistanceM": 60.0,
+        "raysPerDegree": 10,
+        "stepGrowth": 0.001,
+        "binning": "max-per-degree"
+      },
+      "syntheticObserverHeaders": true,
+      "liveNasaRequests": false
+    }
+  },
+  "containerLogs": "INFO:     Started server process [1]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)\nWARNING:  custom_evaluation_unavailable operation=horizons-timeout reason=Custom Horizons acquisition timed out."
+}

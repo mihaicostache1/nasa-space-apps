@@ -21,6 +21,14 @@ jobs:
         run: docker build --target custom-test -f backend/Dockerfile -t lunarwindow-custom-test .
       - name: Exercise custom-coordinate evaluation with GIS dependencies and no network
         run: docker run --rm --network none --entrypoint python lunarwindow-custom-test -m unittest discover -s /app/tests -p 'test_custom_*.py' -v
+      - name: Measure custom acquisition, terrain generation, and admission recovery
+        run: python3 scripts/load_test_custom.py --image lunarwindow-custom-test --profile smoke --requests 2 --output /tmp/lunarwindow-custom-load-smoke.json
+      - name: Upload custom API load-test measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: custom-api-load-smoke
+          path: /tmp/lunarwindow-custom-load-smoke.json
       - name: Verify the packaged data release and saved API responses
         run: docker compose run --rm -T --entrypoint python api - < scripts/check_packaged_release.py
       - name: Smoke-test API load paths and resource bounds
@@ -90,6 +98,14 @@ jobs:
       - name: Verify every reviewed terrain registration against the archive
         run: python -m lunarwindow.terrain.handoff registered --reference-dir data/reference/validation-30d --terrain-dir data/reference/terrain-masks --allow-mean-earth-approximation
       - run: python scripts/validate_quickmap.py
+      - name: Replay surface SPICE evidence and shared-horizon model comparisons
+        run: python scripts/validate_surface_science.py --output data/processed/surface-science-ci.json
+      - name: Upload surface scientific comparison report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surface-science-${{ matrix.os }}-${{ matrix.python-version }}
+          path: data/processed/surface-science-ci.json
       - name: Rebuild and compare the pinned demo data release
         run: python -m lunarwindow.precompute.release check data/releases/lunarwindow-demo-v1 --reference-dir data/reference/validation-30d
   check:

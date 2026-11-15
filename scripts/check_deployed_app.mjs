@@ -378,59 +378,90 @@ try {
     );
   }
   const custom = page.locator('#evaluate');
-  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('91');
-  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
-  await custom.locator('.custom-issues').waitFor();
-  assert.equal(customRequests.length, 0);
-  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('-89');
   await custom
-    .getByLabel('Ground elevation above reference sphere (m)', { exact: true })
-    .fill('0');
-  await custom
-    .getByLabel('End (UTC, excluded)', { exact: true })
-    .fill('2026-11-14T03:00');
-  const customResponse = page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname === '/api/custom/evaluations',
-  );
-  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
-  const response = await customResponse;
-  if (response.status() === 200) {
-    const value = await response.json();
-    assert.equal(value.dataMode, 'custom');
-    assert.equal(value.series.length, 3);
-    await custom.locator('.custom-completed').waitFor();
-    assert.equal(await custom.locator('.custom-primary-metrics dt').count(), 4);
+    .getByRole('button', { name: 'Check availability again' })
+    .waitFor();
+  const customSubmit = custom.getByRole('button', {
+    name: 'Evaluate coordinates',
+  });
+  const customTerrain = custom.getByRole('button', {
+    name: 'Terrain-aware',
+    exact: true,
+  });
+  if (await customSubmit.isEnabled()) {
+    await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('91');
+    await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
+    await custom.locator('.custom-issues').waitFor();
+    assert.equal(customRequests.length, 0);
+    await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('-89');
     await custom
-      .getByLabel('Observer height above ground (m)', { exact: true })
-      .fill('3');
-    await custom.locator('.custom-stale').waitFor();
-  } else {
-    assert.ok(
-      [404, 502, 503, 504].includes(response.status()),
-      'Custom service state must be represented honestly.',
+      .getByLabel('Ground elevation above reference sphere (m)', {
+        exact: true,
+      })
+      .fill('0');
+    await custom
+      .getByLabel('End (UTC, excluded)', { exact: true })
+      .fill('2026-11-14T03:00');
+    const customResponse = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === '/api/custom/evaluations',
     );
-    await custom.getByRole('alert').waitFor();
+    await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
+    const response = await customResponse;
+    if (response.status() === 200) {
+      const value = await response.json();
+      assert.equal(value.dataMode, 'custom');
+      assert.equal(value.series.length, 3);
+      await custom.locator('.custom-completed').waitFor();
+      assert.equal(
+        await custom.locator('.custom-primary-metrics dt').count(),
+        4,
+      );
+      await custom
+        .getByLabel('Observer height above ground (m)', { exact: true })
+        .fill('3');
+      await custom.locator('.custom-stale').waitFor();
+    } else {
+      assert.ok(
+        [404, 502, 503, 504].includes(response.status()),
+        'Custom service state must be represented honestly.',
+      );
+      await custom.getByRole('alert').waitFor();
+    }
+    if (await customTerrain.isEnabled()) {
+      const calls = customRequests.length;
+      await custom
+        .getByRole('button', { name: 'Terrain-aware', exact: true })
+        .click();
+      await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('0');
+      await custom.getByRole('checkbox').check();
+      await custom
+        .getByRole('button', { name: 'Evaluate coordinates' })
+        .click();
+      await custom.locator('.custom-issues').waitFor();
+      assert.equal(
+        customRequests.length,
+        calls,
+        'Unsupported terrain coordinates must not trigger a geometric fallback.',
+      );
+      assert.equal(
+        await custom
+          .getByRole('button', { name: 'Terrain-aware', exact: true })
+          .getAttribute('aria-pressed'),
+        'true',
+      );
+    }
+  } else {
+    assert.equal(
+      customRequests.length,
+      0,
+      'Disabled or unknown custom availability must prevent acquisition.',
+    );
+    assert.equal(await customTerrain.isDisabled(), true);
+    assert.ok(
+      (await custom.locator('#custom-availability').innerText()).length > 0,
+    );
   }
-  const calls = customRequests.length;
-  await custom
-    .getByRole('button', { name: 'Terrain-aware', exact: true })
-    .click();
-  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('0');
-  await custom.getByRole('checkbox').check();
-  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
-  await custom.locator('.custom-issues').waitFor();
-  assert.equal(
-    customRequests.length,
-    calls,
-    'Unsupported terrain coordinates must not trigger a geometric fallback.',
-  );
-  assert.equal(
-    await custom
-      .getByRole('button', { name: 'Terrain-aware', exact: true })
-      .getAttribute('aria-pressed'),
-    'true',
-  );
   const probe = await page.evaluate(async (origin) => {
     const ready = await fetch(`${origin}/api/ready`);
     const readiness = await ready.json();

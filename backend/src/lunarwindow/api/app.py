@@ -22,6 +22,7 @@ from lunarwindow.terrain.compatibility import TerrainCompatibilityError
 from lunarwindow.terrain.registry import UnknownTerrainMaskError
 from lunarwindow.visibility.models import VisibilityRule
 
+from .capabilities import router as capabilities_router
 from .custom_routes import router as custom_router
 from .custom_runtime import CustomRuntime
 from .demo import DemoProvider
@@ -115,6 +116,7 @@ def create_app() -> FastAPI:
     app.state.reference_evaluation_cache = configured_reference_cache()
     app.state.custom_runtime = CustomRuntime()
     app.include_router(custom_router)
+    app.include_router(capabilities_router)
     origins = os.environ.get(
         "LUNARWINDOW_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
     )

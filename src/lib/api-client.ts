@@ -4,6 +4,7 @@ import type {
   ReferenceEvaluationRequestContract,
 } from '@/domain/terrain-evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import { capabilitiesSchema } from '@/domain/capabilities';
 import {
   parseCustomEvaluation,
   type CustomEvaluationRequest,
@@ -73,6 +74,22 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     );
   }
   return body as T;
+}
+
+export async function fetchCapabilities(signal?: AbortSignal) {
+  const body = await request<unknown>('/api/capabilities', {
+    signal,
+    cache: 'no-store',
+  });
+  const result = capabilitiesSchema.safeParse(body);
+  if (!result.success) {
+    throw new ApiError(
+      'The API returned invalid feature availability. Custom evaluation remains unavailable until availability can be verified.',
+      502,
+      'invalid_capabilities',
+    );
+  }
+  return result.data;
 }
 
 export async function evaluateCustom(

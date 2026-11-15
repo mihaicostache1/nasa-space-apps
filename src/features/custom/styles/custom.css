@@ -64,6 +64,30 @@
   background: #23313b;
   color: var(--text);
 }
+.custom-availability {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.custom-availability button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  border-radius: 7px;
+}
+.custom-availability a {
+  text-underline-offset: 4px;
+}
+.custom-mode button:disabled,
+.custom-submit-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .custom-evaluation .custom-input-note,
 .custom-service-note {
   margin-top: -8px;
