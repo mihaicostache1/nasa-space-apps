@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from lunarwindow.ephemeris.contract import validation_session
 from lunarwindow.reference import load_reference_catalog, load_reference_dataset
 from lunarwindow.terrain.compatibility import check_terrain_compatibility
 from lunarwindow.terrain.registry import load_reviewed_mask, reviewed_mask_ids
@@ -9,6 +10,7 @@ from lunarwindow.terrain.registry import load_reviewed_mask, reviewed_mask_ids
 from .models import ReferenceSiteCatalog, ReferenceTerrainMask
 
 
+@validation_session()
 def build_reference_catalog(directory: Path, terrain_directory: Path) -> ReferenceSiteCatalog:
     """Fail closed if a registered mask cannot be verified against its site's archive.
 

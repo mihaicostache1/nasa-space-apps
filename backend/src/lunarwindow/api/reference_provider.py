@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import TypeAdapter, ValidationError
 
+from lunarwindow.ephemeris.contract import validation_session
 from lunarwindow.reference import load_verified_reference_dataset, select_reference_dataset
 from lunarwindow.terrain.compatibility import check_terrain_compatibility
 from lunarwindow.terrain.registry import load_reviewed_mask
@@ -30,6 +31,7 @@ from .terrain_models import (
 _RESPONSE = TypeAdapter(ReferenceEvaluationContract)
 
 
+@validation_session()
 def evaluate_reference(
     request: ReferenceEvaluationRequestContract,
     directory: Path,

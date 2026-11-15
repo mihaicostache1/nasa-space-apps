@@ -2,11 +2,14 @@
 
 from pathlib import Path
 
+from lunarwindow.ephemeris.contract import validation_session
+
 from .models import Readiness
 from .reference_cache import ReferenceEvaluationCache
 from .reference_catalog import build_reference_catalog
 
 
+@validation_session()
 def check_readiness(
     reference_directory: Path,
     terrain_directory: Path,

@@ -6,6 +6,8 @@ import hashlib
 import json
 import math
 import sys
+from contextlib import contextmanager
+from contextvars import ContextVar
 from importlib.resources import files
 from pathlib import Path
 
@@ -13,6 +15,38 @@ from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 from .horizons import HorizonsError, validate_observer
 from .models import Site, TimeRange, iso_utc
+
+_VALIDATED: ContextVar[set[bytes] | None] = ContextVar("ephemeris_validation_session", default=None)
+
+
+@contextmanager
+def validation_session():
+    """Reuse successful validation of identical JSON within one operation only.
+
+    No datasets or file snapshots are retained. Callers still read/hash sources
+    and check manifests on every lookup. Nested calls share the current operation;
+    the fingerprints are discarded on return or failure, including HTTP errors.
+    """
+    if _VALIDATED.get() is not None:
+        yield
+        return
+    token = _VALIDATED.set(set())
+    try:
+        yield
+    finally:
+        _VALIDATED.reset(token)
+
+
+def _plain_json(value) -> bool:
+    # JSON encoders coerce tuples to lists and non-string dict keys to strings.
+    # Those values have different schema semantics and must never share a cache hit.
+    if type(value) in (str, int, float, bool, type(None)):
+        return True
+    if type(value) is list:
+        return all(_plain_json(item) for item in value)
+    if type(value) is dict:
+        return all(type(key) is str and _plain_json(item) for key, item in value.items())
+    return False
 
 
 def dataset_schema() -> dict:
@@ -22,6 +56,17 @@ def dataset_schema() -> dict:
 
 
 def validate_dataset(dataset: dict) -> dict:
+    validated = _VALIDATED.get()
+    fingerprint = None
+    if validated is not None and _plain_json(dataset):
+        try:
+            fingerprint = hashlib.sha256(
+                json.dumps(dataset, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+            ).digest()
+        except ValueError:
+            pass  # Non-finite values still go through the existing validation path.
+        if fingerprint is not None and fingerprint in validated:
+            return dataset
     try:
         Draft202012Validator(dataset_schema(), format_checker=FormatChecker()).validate(dataset)
     except ValidationError as exc:
@@ -58,6 +103,8 @@ def validate_dataset(dataset: dict) -> dict:
     }
     if len(models) != 1:
         raise ValueError("Inconsistent observer reference models in provenance.")
+    if validated is not None and fingerprint is not None and len(validated) < 64:
+        validated.add(fingerprint)
     return dataset
 
 

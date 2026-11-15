@@ -8,6 +8,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
@@ -117,6 +118,7 @@ def create_app() -> FastAPI:
     app.state.custom_runtime = CustomRuntime()
     app.include_router(custom_router)
     app.include_router(capabilities_router)
+    app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=3)
     origins = os.environ.get(
         "LUNARWINDOW_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
     )

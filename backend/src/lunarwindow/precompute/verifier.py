@@ -16,6 +16,7 @@ from lunarwindow.api.terrain_models import (
     TerrainCompatibilityProvenance,
     TerrainReferenceEvaluation,
 )
+from lunarwindow.ephemeris.contract import validation_session
 from lunarwindow.reference import load_verified_reference_dataset, select_reference_dataset
 from lunarwindow.terrain.compatibility import check_terrain_compatibility
 from lunarwindow.terrain.registry import load_reviewed_mask
@@ -98,6 +99,7 @@ def _check_sources(
         raise ValueError("Output ephemeris samples differ from the verified source selection.")
 
 
+@validation_session()
 def _verify_bundle(
     directory: Path,
     *,

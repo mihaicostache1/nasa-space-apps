@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "lunarwindow.reference-loading-benchmark.v1",
+  "environment": {
+    "python": "3.12.16",
+    "machine": "arm64"
+  },
+  "method": "Five alternating local saved-result evaluations; baseline disables only operation-local validation reuse to reproduce the former repeated-validation path. Both use fresh response caches and the same verified files. All decoded response bytes are identical. No network or cold-start time is measured.",
+  "request": {
+    "startUtc": "2026-11-14T00:00:00Z",
+    "endUtc": "2026-12-14T00:00:00Z",
+    "stepMinutes": 60,
+    "visibilityRule": "any-disc",
+    "asOfUtc": null,
+    "siteId": "lola-site01-reference",
+    "horizonMode": "geometric"
+  },
+  "latencyMs": {
+    "baseline": [
+      598.645416999716, 606.6847500005679, 623.6868329997378, 624.2227919992729,
+      599.2267080000602
+    ],
+    "optimized": [
+      153.2666249986505, 152.97458299937716, 155.0076250005077,
+      158.44754200043099, 158.3388750004815
+    ]
+  },
+  "medianMs": {
+    "baseline": 606.6847500005679,
+    "optimized": 155.0076250005077
+  },
+  "schemaValidationsPerRequest": {
+    "baseline": 36,
+    "optimized": 3
+  },
+  "responseBytes": 244884,
+  "gzipLevel3Bytes": 41187,
+  "responseSha256": "adb43a03fd754959304a2a878fc0fd97a1bc8c4c5724f67cd1d51bbb365a3253",
+  "medianSpeedup": 3.913902622523123
+}
