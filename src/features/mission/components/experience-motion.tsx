@@ -39,7 +39,7 @@ export function ExperienceMotion({ children }: { children: ReactNode }) {
       discover();
     };
     const finishIntro = (event: AnimationEvent) => {
-      if (event.animationName === 'panel-enter')
+      if (event.animationName === 'lunar-enter')
         element.dataset.introComplete = 'true';
     };
     const progress = () => {

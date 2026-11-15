@@ -44,11 +44,11 @@ const RULER_H = 24;
 const REPORT_MS = 80;
 
 const COLORS = {
-  sun: '#fc734d',
-  earth: '#0297de',
+  sun: '#ff704f',
+  earth: '#18b8f2',
   muted: '#8da5b2',
-  accent: '#0297de',
-  danger: '#fc734d',
+  accent: '#cbd6dd',
+  danger: '#d5dce1',
 };
 
 type Props = {
@@ -462,7 +462,7 @@ function drawScene(
 ) {
   const { width: w, height: h, pxPerDeg: ppd } = camera;
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#02070a';
+  ctx.fillStyle = '#050a0e';
   ctx.fillRect(0, 0, w, h);
   if (!state) {
     ctx.fillStyle = COLORS.muted;

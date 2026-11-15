@@ -27,9 +27,11 @@ _MASKS = {
 }
 
 
-def reviewed_mask_ids(site_id: str) -> tuple[str, ...]:
-    """List registrations for a site; artifact availability still needs verification."""
-    return tuple(mask_id for mask_id, (site, _, _) in _MASKS.items() if site == site_id)
+def reviewed_mask_ids(site_id: str | None = None) -> tuple[str, ...]:
+    """List registrations, optionally by site; availability still needs verification."""
+    return tuple(
+        mask_id for mask_id, (site, _, _) in _MASKS.items() if site_id is None or site == site_id
+    )
 
 
 def load_reviewed_mask(directory: str | Path, mask_id: str) -> ReviewedTerrainMask:

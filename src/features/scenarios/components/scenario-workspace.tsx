@@ -248,8 +248,12 @@ export function ScenarioWorkspace() {
     <section className="workspace" aria-labelledby="workspace-heading">
       <div className="section-heading workspace-heading" data-reveal>
         <div>
-          <p className="eyebrow">01 / MISSION CONTROL</p>
-          <h2 id="workspace-heading">The view from your landing site.</h2>
+          <p className="eyebrow">Explore / Mission control</p>
+          <h2 id="workspace-heading">Explore the Moon.</h2>
+          <p className="section-copy">
+            Choose a location. Follow its sky. Find time with Sun and Earth in
+            view.
+          </p>
         </div>
         <span className="badge">
           <i className="earth-dot" /> VERIFIED DATA ·{' '}
@@ -276,9 +280,9 @@ export function ScenarioWorkspace() {
         <a href="#compare">Compare scenarios ↗</a>
       </div>
       <div className="mission-grid" data-reveal>
-        <div className="mission-controls">
+        <div className="mission-controls" id="scenario-controls">
           <div className="control-heading">
-            <span className="micro-label">MISSION PARAMETERS</span>
+            <span className="micro-label">Choose your observer</span>
             <div className="toggle" role="group" aria-label="Edit scenario">
               {(['A', 'B'] as const).map((slot) => (
                 <button
@@ -307,7 +311,8 @@ export function ScenarioWorkspace() {
             </div>
           ))}
           <p className="hint custom-note">
-            Custom coordinates are not available in the verified reference API.
+            Have a specific location?{' '}
+            <a href="#evaluate">Evaluate your coordinates →</a>
           </p>
           <div className="actions">
             <button
@@ -425,8 +430,11 @@ export function ScenarioWorkspace() {
           <section id="compare" className="comparison-section" data-reveal>
             <div className="section-heading">
               <div>
-                <p className="eyebrow">02 / OPERATIONS ANALYSIS</p>
+                <p className="eyebrow">Compare / Mission opportunities</p>
                 <h2>Compare two scenarios</h2>
+                <p className="section-copy">
+                  Which lunar location better supports your mission?
+                </p>
               </div>
               <PlaybackControl
                 playing={playbackOwner === 'samples'}
@@ -439,6 +447,33 @@ export function ScenarioWorkspace() {
                 disabled={loading || anyStale}
                 onChange={setCursorHours}
               />
+            </div>
+            <div
+              className="comparison-edit-actions"
+              role="group"
+              aria-label="Change comparison scenarios"
+            >
+              {(['A', 'B'] as const).map((slot) => (
+                <button
+                  type="button"
+                  key={slot}
+                  onClick={() => {
+                    selectSlot(slot);
+                    document
+                      .getElementById('scenario-controls')
+                      ?.scrollIntoView({
+                        behavior: window.matchMedia(
+                          '(prefers-reduced-motion: reduce)',
+                        ).matches
+                          ? 'instant'
+                          : 'smooth',
+                        block: 'center',
+                      });
+                  }}
+                >
+                  Edit scenario {slot} <span aria-hidden="true">↗</span>
+                </button>
+              ))}
             </div>
             <ComparisonTimeline
               results={results}
@@ -455,19 +490,24 @@ export function ScenarioWorkspace() {
                 ?.scrollIntoView({ behavior: 'smooth' });
             }}
           />
-          <MissionShift
-            form={forms[0]}
-            site={sites.find((site) => site.id === forms[0].siteId)!}
-            disabled={loading}
-            comparisonState={shiftState}
-            results={shiftReady ? results : []}
-            onApply={(next) => {
-              setShiftKeys(next.map(requestKey));
-              setForms(next);
-              setCursorHours(0);
-              void evaluate(next, sites);
-            }}
-          />
+          <details className="elevation-details mission-planning-details">
+            <summary>
+              Compare a shifted mission period <span>Advanced planning</span>
+            </summary>
+            <MissionShift
+              form={forms[0]}
+              site={sites.find((site) => site.id === forms[0].siteId)!}
+              disabled={loading}
+              comparisonState={shiftState}
+              results={shiftReady ? results : []}
+              onApply={(next) => {
+                setShiftKeys(next.map(requestKey));
+                setForms(next);
+                setCursorHours(0);
+                void evaluate(next, sites);
+              }}
+            />
+          </details>
           <details className="elevation-details">
             <summary>
               Inspect azimuth / elevation detail <span>Cartesian view ↗</span>

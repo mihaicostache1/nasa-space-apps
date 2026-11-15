@@ -1,0 +1,26 @@
+# Opt-in live Horizons + LOLA terrain. See docs/custom-coordinate-evaluation.md.
+# Start with: docker compose -f compose.yaml -f compose.custom.yaml up --build -d --wait api
+services:
+  api:
+    image: lunarwindow-api:custom-local
+    build:
+      target: custom-api
+    environment:
+      LUNARWINDOW_CUSTOM_ENABLED: 'true'
+      LUNARWINDOW_CUSTOM_TERRAIN_ENABLED: 'true'
+      LUNARWINDOW_CUSTOM_ARCHIVE_DIR: /app/data/processed/custom/ephemeris
+      LUNARWINDOW_CUSTOM_TERRAIN_CACHE_DIR: /app/data/processed/custom/terrain
+      LUNARWINDOW_CUSTOM_DEM_DIR: /app/data/raw/lola
+      LUNARWINDOW_CUSTOM_MAX_CONCURRENCY: '${LUNARWINDOW_CUSTOM_MAX_CONCURRENCY:-1}'
+      LUNARWINDOW_CUSTOM_TIMEOUT_SECONDS: '${LUNARWINDOW_CUSTOM_TIMEOUT_SECONDS:-30}'
+      LUNARWINDOW_CUSTOM_MAX_SAMPLES: '${LUNARWINDOW_CUSTOM_MAX_SAMPLES:-744}'
+      LUNARWINDOW_CUSTOM_ARCHIVE_MAX_ENTRIES: '${LUNARWINDOW_CUSTOM_ARCHIVE_MAX_ENTRIES:-64}'
+      LUNARWINDOW_CUSTOM_ARCHIVE_MAX_BYTES: '${LUNARWINDOW_CUSTOM_ARCHIVE_MAX_BYTES:-67108864}'
+      LUNARWINDOW_CUSTOM_CACHE_MAX_ENTRIES: '${LUNARWINDOW_CUSTOM_CACHE_MAX_ENTRIES:-16}'
+      LUNARWINDOW_CUSTOM_CACHE_MAX_BYTES: '${LUNARWINDOW_CUSTOM_CACHE_MAX_BYTES:-16777216}'
+    volumes:
+      - custom-data:/app/data/processed
+      - ./data/raw/lola:/app/data/raw/lola:ro
+
+volumes:
+  custom-data:

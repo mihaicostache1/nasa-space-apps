@@ -145,41 +145,44 @@ export function ReferenceScenarioCard({
           />
         </label>
       </div>
-      <div className="fields fields-1-2">
-        <label>
-          Sample interval
-          <select
-            value={form.stepMinutes}
-            onChange={(event) =>
-              onChange({ ...form, stepMinutes: Number(event.target.value) })
-            }
-          >
-            {stepOptions(site).map((minutes) => (
-              <option key={minutes} value={minutes}>
-                {minutes / 60} h
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Visible when
-          <select
-            value={form.visibilityRule}
-            onChange={(event) =>
-              onChange({
-                ...form,
-                visibilityRule: event.target.value as VisibilityRule,
-              })
-            }
-          >
-            {VISIBILITY_RULES.map((rule) => (
-              <option key={rule.value} value={rule.value}>
-                {rule.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <details className="scenario-advanced">
+        <summary>Sampling & visibility rule</summary>
+        <div className="fields fields-1-2">
+          <label>
+            Sample interval
+            <select
+              value={form.stepMinutes}
+              onChange={(event) =>
+                onChange({ ...form, stepMinutes: Number(event.target.value) })
+              }
+            >
+              {stepOptions(site).map((minutes) => (
+                <option key={minutes} value={minutes}>
+                  {minutes / 60} h
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Visible when
+            <select
+              value={form.visibilityRule}
+              onChange={(event) =>
+                onChange({
+                  ...form,
+                  visibilityRule: event.target.value as VisibilityRule,
+                })
+              }
+            >
+              {VISIBILITY_RULES.map((rule) => (
+                <option key={rule.value} value={rule.value}>
+                  {rule.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </details>
       <div id={`${id}-issues`} aria-live="polite">
         {issues.map((issue) => (
           <p className="issue" key={issue}>

@@ -4,6 +4,8 @@
 
 The contract, offline loader, observer/frame compatibility checks, and [terrain-aware evaluation endpoint](backend-data.md#terrain-aware-evaluation-contract) are implemented. The reviewed artifact is `data/reference/terrain-masks/lola-site01-reference-mast-0m.json` (see the README beside it). Live reference evaluations support `horizonMode: "geometric"` or `"terrain"`; terrain mode requires the registered mask ID and explicit acceptance of the frame approximation.
 
+For further sites, use the [reviewed terrain handoff workflow](terrain-coverage.md). Its offline checker validates candidate checksums and observer/frame compatibility before registration; CI and API image builds check every trusted registration. Site04 and Site23 remain geometric-only pending reviewed GIS artifacts.
+
 ## Required fields
 
 All fields below are required. Extra fields, numeric strings, booleans used as numbers, and nonfinite numbers are rejected. Human-readable text must be nonblank. There are no implicit heights, frames, or angular conventions.

@@ -7,19 +7,23 @@
 }
 :root {
   color-scheme: dark;
-  --background: #02070a;
-  --panel: #071016;
-  --line: rgba(154, 194, 214, 0.13);
-  --muted: #8da5b2;
-  --accent: #fc734d;
-  --interactive: #0297de;
+  --background: #050a0e;
+  --panel: #0c151d;
+  --surface-secondary: #111e28;
+  --line: #233540;
+  --text: #f5f7fa;
+  --muted: #9aadb9;
+  --accent: #ff704f;
+  --interactive: #f5f7fa;
   --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --nav-offset: 85px;
-  --sun: #fc734d;
-  --earth: #0297de;
-  --both: #a7c7d6;
-  --track: #12242e;
-  --danger: #fc734d;
+  --sun: #ff704f;
+  --earth: #18b8f2;
+  --both: #e0e8ed;
+  --track: #15232e;
+  --danger: #f5f7fa;
+  --radius: 12px;
+  --radius-small: 8px;
   --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 html {

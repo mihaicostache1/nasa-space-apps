@@ -3,6 +3,7 @@ import { LunarPortrait } from '@/features/mission/components/lunar-portrait';
 import { MissionNavigation } from '@/features/mission/components/mission-navigation';
 import { ExperienceMotion } from '@/features/mission/components/experience-motion';
 import { HorizonLesson } from '@/features/mission/components/horizon-lesson';
+import { CustomEvaluationWorkspace } from '@/features/custom/components/custom-evaluation-workspace';
 
 export default function Home() {
   return (
@@ -12,12 +13,13 @@ export default function Home() {
       </a>
       <MissionNavigation />
       <main>
-        <section className="hero" id="overview" aria-labelledby="hero-heading">
+        <section
+          className="hero editorial-hero"
+          id="overview"
+          aria-labelledby="hero-heading"
+        >
           <div className="hero-copy">
-            <p className="eyebrow">
-              <span className="eyebrow-line" />
-              LUNAR EXPLORATION / MISSION INTELLIGENCE
-            </p>
+            <p className="eyebrow">Lunar mission intelligence</p>
             <h1 id="hero-heading">
               <span className="headline-line">Every landing</span>
               <span className="headline-line">has a window.</span>
@@ -26,68 +28,104 @@ export default function Home() {
               </span>
             </h1>
             <p className="hero-description">
-              See the Moon from your landing site. Explore sunlight, Earth
-              visibility, and the moments when they align.
+              Explore sunlight, Earth visibility, and operational windows across
+              the lunar surface.
             </p>
             <div className="hero-actions">
               <a className="primary-link" href="#explore">
                 Explore the Moon <span aria-hidden="true">↗</span>
               </a>
-              <a className="text-link" href="#learn">
-                Discover the science <span aria-hidden="true">→</span>
+              <a className="text-link" href="#compare">
+                Compare locations <span aria-hidden="true">→</span>
               </a>
             </div>
             <p className="hero-provenance">
-              <i className="earth-dot" /> NASA/JPL HORIZONS <span>×</span> NASA
-              LOLA
-              <br />
-              <small>
-                Real archived observations. Clearly stated assumptions.
-              </small>
+              Two lines of sight. A clearer mission decision.
             </p>
           </div>
           <LunarPortrait />
           <a href="#explore" className="hero-scroll">
-            <span aria-hidden="true">↓</span> SCROLL TO MISSION CONTROL
+            <span aria-hidden="true">↓</span> Start exploring
           </a>
         </section>
-        <div className="mission-intro" data-reveal>
-          <p>
-            Where you land changes
-            <br />
-            <strong>what becomes possible.</strong>
-          </p>
-          <span>
-            EXPLORE THE SITE.
-            <br />
-            UNDERSTAND THE SKY.
-            <br />
-            FIND THE WINDOW.
-          </span>
-        </div>
+        <aside className="credibility-strip" aria-label="Scientific foundation">
+          <p>Evidence behind every window.</p>
+          <ul>
+            <li>NASA/JPL Horizons</li>
+            <li>NASA LOLA terrain</li>
+            <li>Verified archives</li>
+            <li>Transparent assumptions</li>
+          </ul>
+        </aside>
+        <section
+          className="product-pathways"
+          aria-label="Choose your starting point"
+          data-reveal
+        >
+          <article>
+            <div className="pathway-visual pathway-explore" aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <h2>Explore the Moon</h2>
+            <p>
+              Discover how sunlight and Earth visibility change across lunar
+              locations.
+            </p>
+            <a href="#explore">
+              Explore a reference site <span aria-hidden="true">↗</span>
+            </a>
+          </article>
+          <article>
+            <div className="pathway-visual pathway-compare" aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <h2>Compare mission scenarios</h2>
+            <p>
+              Understand which locations provide better operational
+              opportunities.
+            </p>
+            <a href="#compare">
+              Compare two scenarios <span aria-hidden="true">↗</span>
+            </a>
+          </article>
+          <article>
+            <div className="pathway-visual pathway-evaluate" aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <h2>Evaluate your coordinates</h2>
+            <p>
+              Analyze a specific lunar observer using geographic coordinates.
+            </p>
+            <a href="#evaluate">
+              Configure an observer <span aria-hidden="true">↗</span>
+            </a>
+          </article>
+        </section>
         <div id="explore" className="explorer-anchor">
           <ScenarioWorkspace />
         </div>
+        <CustomEvaluationWorkspace />
         <section
-          className="learn-section"
+          className="learn-section editorial-learn"
           id="learn"
           aria-labelledby="learn-heading"
           data-reveal
         >
           <div className="section-heading">
             <div>
-              <p className="eyebrow">03 / A LITTLE LUNAR PERSPECTIVE</p>
+              <p className="eyebrow">Learn the science</p>
               <h2 id="learn-heading">The horizon changes everything.</h2>
             </div>
             <p className="section-copy">
-              Two lines of sight.
-              <br />
-              One operational decision.
+              Understand the geometry before you interpret the numbers.
             </p>
           </div>
           <div className="learn-grid">
             <article data-reveal>
-              <span className="lesson-number">01 / LIGHT</span>
+              <span className="lesson-number">Sunlight</span>
               <div className="lesson-graphic solar-lesson" aria-hidden="true">
                 <span />
                 <i />
@@ -101,7 +139,7 @@ export default function Home() {
               <a href="#explore">Inspect the Sun&apos;s path ↗</a>
             </article>
             <article data-reveal>
-              <span className="lesson-number">02 / CONNECTION</span>
+              <span className="lesson-number">Earth visibility</span>
               <div className="lesson-graphic earth-lesson" aria-hidden="true">
                 <span />
                 <i />
@@ -115,7 +153,7 @@ export default function Home() {
               <a href="#compare">Explore visibility windows ↗</a>
             </article>
             <article data-reveal>
-              <span className="lesson-number">03 / POSSIBILITY</span>
+              <span className="lesson-number">Operational windows</span>
               <div className="lesson-graphic joint-lesson" aria-hidden="true">
                 <span />
                 <i />
@@ -129,25 +167,27 @@ export default function Home() {
               <a href="#finder-heading">Find a window ↗</a>
             </article>
           </div>
+          <p className="editorial-diagram-note">
+            Conceptual diagrams illustrate the geometry; mission results come
+            from the evaluated samples.
+          </p>
         </section>
         <HorizonLesson />
         <section
-          className="methodology-section"
+          className="methodology-section editorial-methodology"
           id="methodology"
           aria-labelledby="methodology-heading"
           data-reveal
         >
           <div>
-            <p className="eyebrow">04 / THE SCIENCE BEHIND THE VIEW</p>
+            <p className="eyebrow">Methodology</p>
             <h2 id="methodology-heading">
-              Designed for discovery.
-              <br />
-              Grounded in evidence.
+              Every result.
+              <br />A traceable foundation.
             </h2>
             <p className="section-copy">
-              Every result has a source.
-              <br />
-              Every model has a limit.
+              Inspect the observations, the observer, and the assumptions behind
+              the analysis.
             </p>
             <a
               className="text-link"
@@ -161,41 +201,71 @@ export default function Home() {
           <div className="methodology-rows">
             <details open>
               <summary>
-                <span>01</span> The observations
+                <span>01</span> Data provenance &amp; observations
               </summary>
               <p>
                 Sun and Earth directions come from archived NASA/JPL Horizons
                 ephemerides. The catalog reports each site&apos;s available
-                dates and sampling intervals. Changing the selection never
-                downloads or invents missing observations.
+                dates and sampling intervals. Reference evaluations stay within
+                that archive. Custom evaluation, when enabled by the server,
+                fetches and archives observations for the requested observer.
+                Missing samples are rejected rather than filled in.
               </p>
             </details>
             <details>
               <summary>
-                <span>02</span> The local horizon
+                <span>02</span> The observer &amp; coordinate system
               </summary>
               <p>
-                Geometric mode uses a flat 0° horizon. Reviewed terrain mode is
-                available only at Site01, using checksummed LOLA DEMs and the 0
-                m reference mast. These are DEM reference points, not approved
-                landing targets.
+                Latitude and east-positive longitude identify a point on the
+                Moon. Observer altitude combines ground elevation above the
+                1737.4 km reference sphere and height above the ground. The
+                reference archives use their recorded observer heights; changing
+                a height requires matching observations and terrain.
               </p>
             </details>
             <details>
               <summary>
-                <span>03</span> The assumptions
+                <span>03</span> Geometric &amp; terrain horizons
               </summary>
               <p>
-                The DE421 MOON_ME terrain frame and DE441 MEAN_ME ephemerides
-                have different realizations. Terrain requires explicit
-                acceptance of an approximation; no transformation is applied. A
-                2 m mast can shift the current horizon by up to 1.9°, requiring
-                matching observer data.
+                Geometric mode compares directions with a flat 0° local horizon.
+                Terrain mode compares them with a DEM-derived skyline. The
+                reference catalog advertises reviewed masks; Site01 currently
+                has a reviewed 0 m mask. Custom terrain is preliminary, needs
+                configured DEMs and complete ray coverage, and never silently
+                falls back to geometric mode.
               </p>
             </details>
             <details>
               <summary>
-                <span>04</span> The limits
+                <span>04</span> Visibility, windows &amp; time
+              </summary>
+              <p>
+                The selected any-disc, body-center, or full-disc rule determines
+                visibility relative to the horizon. The engine holds each
+                sampled state until the next sample and groups consecutive
+                states into windows. Setting times are bracketed by the sample
+                cadence. Windows clipped by the evaluation period are lower
+                bounds, not measured complete events.
+              </p>
+            </details>
+            <details>
+              <summary>
+                <span>05</span> Frames, resolution &amp; height sensitivity
+              </summary>
+              <p>
+                DE421 MOON_ME terrain and the Horizons Mean Earth orientation
+                are paired only with explicit acceptance of the documented
+                approximation. No frame transformation is applied. DEM
+                resolution and observer height affect the skyline: a 2 m mast
+                changed the Site01 reference horizon by up to 1.9°. That
+                sensitivity is specific to Site01, not a rule for every site.
+              </p>
+            </details>
+            <details>
+              <summary>
+                <span>06</span> Scientific &amp; operational limits
               </summary>
               <p>
                 Visibility is sample-based geometric line of sight. The model
@@ -213,7 +283,7 @@ export default function Home() {
           LUNAR<span>WINDOW</span>
         </a>
         <div>
-          <p>See the Moon from your landing site.</p>
+          <p>A clearer view of your mission window.</p>
           <p>NASA Space Apps 2026 · Independent challenge project</p>
         </div>
         <p className="footer-attribution">
