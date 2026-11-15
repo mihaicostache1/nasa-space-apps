@@ -388,6 +388,7 @@ try {
     name: 'Terrain-aware',
     exact: true,
   });
+  let customEvaluationStatus = null;
   if (await customSubmit.isEnabled()) {
     await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('91');
     await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
@@ -408,6 +409,7 @@ try {
     );
     await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
     const response = await customResponse;
+    customEvaluationStatus = response.status();
     if (response.status() === 200) {
       const value = await response.json();
       assert.equal(value.dataMode, 'custom');
@@ -604,7 +606,7 @@ try {
       palette: 'aerospace dark / sunlight orange / Earth visibility blue',
       customCoordinates:
         'explicit submission, validation, real service state, no terrain fallback',
-      customEvaluationStatus: response.status(),
+      customEvaluationStatus,
       motionAndReducedMotion: 'ok',
       shiftPercentagePointDifferences: 'verified against API responses',
       illustrativeHorizonLesson: 'isolated from mission results',
