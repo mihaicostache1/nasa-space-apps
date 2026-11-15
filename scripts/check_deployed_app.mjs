@@ -12,6 +12,11 @@ try {
   const page = await browser.newPage();
   const pageErrors = [];
   const evaluations = [];
+  const customRequests = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/api/custom/evaluations')
+      customRequests.push(request);
+  });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('response', (response) => {
     const url = new URL(response.url());
@@ -34,6 +39,31 @@ try {
   });
   const opened = await page.goto(web, { waitUntil: 'domcontentloaded' });
   assert.equal(opened.status(), 200);
+  const portraitImage = page.locator('.moon-object img');
+  assert.equal(
+    await portraitImage.evaluate(
+      (element) => getComputedStyle(element).animationName,
+    ),
+    'portrait-moon-rotation',
+  );
+  await page
+    .getByRole('button', { name: 'Pause Moon rotation', exact: true })
+    .click();
+  assert.equal(
+    await portraitImage.evaluate(
+      (element) => getComputedStyle(element).animationPlayState,
+    ),
+    'paused',
+  );
+  await page
+    .getByRole('button', { name: 'Resume Moon rotation', exact: true })
+    .click();
+  assert.equal(
+    await portraitImage.evaluate(
+      (element) => getComputedStyle(element).animationPlayState,
+    ),
+    'running',
+  );
   const matched = page.getByText('Results match the inputs above.', {
     exact: true,
   });
@@ -47,9 +77,9 @@ try {
     };
   });
   assert.deepEqual(palette, {
-    background: 'rgb(2, 7, 10)',
-    earth: '#0297de',
-    solar: '#fc734d',
+    background: 'rgb(5, 10, 14)',
+    earth: '#18b8f2',
+    solar: '#ff704f',
   });
   await page.locator('.mission-grid').scrollIntoViewIfNeeded();
   await page.waitForFunction(
@@ -127,16 +157,17 @@ try {
   );
   assert.equal(evaluations.length, evaluationCountBeforePlayback);
   assert.ok(
-    (await page.locator('.timeline .stats dt').allTextContents()).includes(
-      'Next sunset',
-    ),
+    (
+      await page.locator('.comparison-secondary-metrics dt').allTextContents()
+    ).includes('Next sunset'),
   );
   assert.ok(
-    (await page.locator('.timeline .stats dt').allTextContents()).includes(
-      'Next Earthset',
-    ),
+    (
+      await page.locator('.comparison-secondary-metrics dt').allTextContents()
+    ).includes('Next Earthset'),
   );
   await page.getByRole('button', { name: 'Sky dome', exact: true }).click();
+  await scenario.locator('.scenario-advanced summary').click();
   await scenario.getByLabel('Visible when').selectOption('full-disc');
   await page
     .getByText(
@@ -252,6 +283,7 @@ try {
   assert.equal(await mapSvg.getAttribute('viewBox'), beforeZoom);
 
   // Archive coverage is a hard boundary, including the headline six-week shift.
+  await page.locator('.mission-planning-details > summary').click();
   assert.equal(
     await page
       .getByRole('button', { name: '+6 WEEKS', exact: true })
@@ -333,6 +365,72 @@ try {
     requestCount,
     'The illustrative lesson must not submit evaluations.',
   );
+  assert.equal(
+    customRequests.length,
+    0,
+    'Custom acquisition must run only on explicit submission.',
+  );
+  assert.equal(await page.locator('.comparison-summary').count(), 2);
+  for (const summary of await page.locator('.comparison-summary').all()) {
+    assert.equal(
+      await summary.locator('.comparison-primary-metrics dt').count(),
+      4,
+    );
+  }
+  const custom = page.locator('#evaluate');
+  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('91');
+  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
+  await custom.locator('.custom-issues').waitFor();
+  assert.equal(customRequests.length, 0);
+  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('-89');
+  await custom
+    .getByLabel('Ground elevation above reference sphere (m)', { exact: true })
+    .fill('0');
+  await custom
+    .getByLabel('End (UTC, excluded)', { exact: true })
+    .fill('2026-11-14T03:00');
+  const customResponse = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/api/custom/evaluations',
+  );
+  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
+  const response = await customResponse;
+  if (response.status() === 200) {
+    const value = await response.json();
+    assert.equal(value.dataMode, 'custom');
+    assert.equal(value.series.length, 3);
+    await custom.locator('.custom-completed').waitFor();
+    assert.equal(await custom.locator('.custom-primary-metrics dt').count(), 4);
+    await custom
+      .getByLabel('Observer height above ground (m)', { exact: true })
+      .fill('3');
+    await custom.locator('.custom-stale').waitFor();
+  } else {
+    assert.ok(
+      [404, 502, 503, 504].includes(response.status()),
+      'Custom service state must be represented honestly.',
+    );
+    await custom.getByRole('alert').waitFor();
+  }
+  const calls = customRequests.length;
+  await custom
+    .getByRole('button', { name: 'Terrain-aware', exact: true })
+    .click();
+  await custom.getByLabel('Lunar latitude (°)', { exact: true }).fill('0');
+  await custom.getByRole('checkbox').check();
+  await custom.getByRole('button', { name: 'Evaluate coordinates' }).click();
+  await custom.locator('.custom-issues').waitFor();
+  assert.equal(
+    customRequests.length,
+    calls,
+    'Unsupported terrain coordinates must not trigger a geometric fallback.',
+  );
+  assert.equal(
+    await custom
+      .getByRole('button', { name: 'Terrain-aware', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
   const probe = await page.evaluate(async (origin) => {
     const ready = await fetch(`${origin}/api/ready`);
     const readiness = await ready.json();
@@ -357,12 +455,30 @@ try {
   assert.equal(probe.readiness.status, 'ready');
   assert.equal(probe.invalidStatus, 422);
   assert.equal(probe.invalid.error.code, 'validation_error');
+  await page.evaluate(() =>
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'instant',
+    }),
+  );
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('nav a[href="#methodology"]')
+        ?.getAttribute('aria-current') === 'location',
+  );
   const mobile = await browser.newPage({
     viewport: { width: 390, height: 844 },
     reducedMotion: 'reduce',
   });
   mobile.on('pageerror', (error) => pageErrors.push(error.message));
   await mobile.goto(web);
+  assert.equal(
+    await mobile
+      .locator('.moon-object img')
+      .evaluate((element) => getComputedStyle(element).animationName),
+    'none',
+  );
   await mobile
     .getByText('Results match the inputs above.', { exact: true })
     .waitFor({ timeout: 45_000 });
@@ -415,6 +531,32 @@ try {
       .evaluate((element) => getComputedStyle(element).animationName),
     'none',
   );
+  await mobile.setViewportSize({ width: 320, height: 844 });
+  assert.equal(
+    await mobile.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    true,
+  );
+  const clippedControls = await mobile
+    .locator('input, select, button')
+    .evaluateAll((elements) =>
+      elements
+        .filter((element) => {
+          const box = element.getBoundingClientRect();
+          return (
+            element.checkVisibility() &&
+            box.width > 0 &&
+            (box.left < -1 || box.right > innerWidth + 1)
+          );
+        })
+        .map((element) => element.id || element.textContent),
+    );
+  assert.deepEqual(
+    clippedControls,
+    [],
+    'Visible controls must fit at 320px, not merely be clipped by a container.',
+  );
   await mobile.close();
   assert.deepEqual(pageErrors, []);
   console.log(
@@ -428,7 +570,10 @@ try {
       sharedCursorAndPlayback: 'ok',
       landerViewAndPlaybackOwnership: 'ok',
       landerKeyboardCamera: 'ok',
-      palette: 'midnight / electric blue / cantaloupe',
+      palette: 'aerospace dark / sunlight orange / Earth visibility blue',
+      customCoordinates:
+        'explicit submission, validation, real service state, no terrain fallback',
+      customEvaluationStatus: response.status(),
       motionAndReducedMotion: 'ok',
       shiftPercentagePointDifferences: 'verified against API responses',
       illustrativeHorizonLesson: 'isolated from mission results',

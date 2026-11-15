@@ -70,12 +70,14 @@ export function longestOf(
   windows: VisibilityWindow[],
   longestHrs: number,
 ): { hours: number; atLeast: boolean } {
-  const match = windows.find(
+  const matches = windows.filter(
     (window) => Math.abs(window.durationHrs - longestHrs) < 1e-6,
   );
   return {
     hours: longestHrs,
-    atLeast: Boolean(match && (match.startTruncated || match.endTruncated)),
+    atLeast: matches.some(
+      (window) => window.startTruncated || window.endTruncated,
+    ),
   };
 }
 

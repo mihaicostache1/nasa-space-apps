@@ -313,18 +313,23 @@ class HorizonsBudgetTests(unittest.TestCase):
             client.fetch(self.params)
 
     def test_slow_response_consumes_total_budget_without_retries(self):
+        # Advance only simulated response time; real filesystem/lock setup varies
+        # across platforms and must not expire this test's budget before HTTP starts.
+        clock = [100.0]
+
         class SlowBody(io.BytesIO):
             def read1(self, size=-1):
-                time.sleep(0.03)
+                clock[0] += 0.03
                 return super().read1(size)
 
         client = HorizonsClient(
             lock_dir=self.root,
-            deadline_monotonic=time.monotonic() + 0.01,
+            deadline_monotonic=clock[0] + 0.01,
             max_attempts=1,
             max_response_bytes=1024,
         )
         with (
+            patch("lunarwindow.ephemeris.horizons.time.monotonic", side_effect=lambda: clock[0]),
             patch(
                 "lunarwindow.ephemeris.horizons.urlopen",
                 return_value=SlowBody(raw_fixture("sun").encode()),
@@ -333,3 +338,4 @@ class HorizonsBudgetTests(unittest.TestCase):
         ):
             client.fetch(self.params)
         self.assertEqual(request.call_count, 1)
+        self.assertAlmostEqual(request.call_args.kwargs["timeout"], 0.01)

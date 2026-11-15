@@ -92,7 +92,18 @@ class MultisiteTerrainTests(unittest.TestCase):
         }
 
     def test_catalog_handoff_readiness_and_evaluation_support_multiple_registered_sites(self):
-        with patch("socket.socket.connect", side_effect=AssertionError("No NASA or DEM requests")):
+        # Block upstream I/O, while allowing the event loop's internal loopback
+        # sockets (required by Windows ProactorEventLoop / TestClient).
+        with (
+            patch(
+                "lunarwindow.ephemeris.horizons.urlopen",
+                side_effect=AssertionError("No NASA requests"),
+            ),
+            patch(
+                "lunarwindow.terrain.download.urlopen",
+                side_effect=AssertionError("No DEM requests"),
+            ),
+        ):
             reports = verify_registered(
                 REFERENCE / "validation-30d", self.terrain, allow_mean_earth_approximation=True
             )

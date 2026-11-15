@@ -11,43 +11,55 @@ const destinations = [
 
 export function MissionNavigation() {
   const [active, setActive] = useState('overview');
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries)
-          if (entry.isIntersecting) setActive(entry.target.id);
-      },
-      { rootMargin: '-15% 0px -65% 0px' },
-    );
     const ids = ['overview', ...destinations.map(([id]) => id)];
-    const observed = new Set<Element>();
-    const observeSections = () => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const header = document.querySelector('.masthead');
+      const threshold = (header?.getBoundingClientRect().height ?? 80) + 72;
+      let current = 'overview';
       for (const id of ids) {
         const element = document.getElementById(id);
-        if (element && !observed.has(element)) {
-          observed.add(element);
-          observer.observe(element);
-        }
+        if (element && element.getBoundingClientRect().top <= threshold)
+          current = id;
       }
-      if (observed.size === ids.length) mutations.disconnect();
+      if (
+        window.scrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - 2
+      ) {
+        current =
+          [...ids].reverse().find((id) => document.getElementById(id)) ??
+          current;
+      }
+      setActive(current);
+      setScrolled(window.scrollY > 16);
     };
-    const mutations = new MutationObserver(observeSections);
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    const mutations = new MutationObserver(schedule);
     mutations.observe(document.body, { childList: true, subtree: true });
-    observeSections();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    schedule();
     return () => {
-      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
       mutations.disconnect();
     };
   }, []);
   return (
-    <header className="masthead">
+    <header className="masthead" data-scrolled={scrolled}>
       <a
         className="wordmark"
         href="#overview"
         aria-label="LunarWindow overview"
       >
         <span className="brand-orbit" aria-hidden="true" />
-        LUNAR<span>WINDOW</span>
+        Lunar<span>Window</span>
       </a>
       <nav aria-label="Main navigation">
         {destinations.map(([id, label]) => (

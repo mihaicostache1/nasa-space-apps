@@ -4,6 +4,10 @@ import type {
   ReferenceEvaluationRequestContract,
 } from '@/domain/terrain-evaluation';
 import type { ReferenceSiteCatalog } from '@/domain/reference';
+import {
+  parseCustomEvaluation,
+  type CustomEvaluationRequest,
+} from '@/domain/custom-evaluation';
 
 /** Browser-visible FastAPI origin; inlined at build time. */
 export const API_BASE_URL = (
@@ -14,6 +18,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -59,9 +64,36 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(
       describeApiError(response.status, body),
       response.status,
+      typeof body === 'object' &&
+        body !== null &&
+        'error' in body &&
+        typeof (body as ApiErrorResponse).error?.code === 'string'
+        ? (body as ApiErrorResponse).error.code
+        : undefined,
     );
   }
   return body as T;
+}
+
+export async function evaluateCustom(
+  body: CustomEvaluationRequest,
+  signal?: AbortSignal,
+) {
+  const result = await request<unknown>('/api/custom/evaluations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  });
+  try {
+    return parseCustomEvaluation(result, body);
+  } catch {
+    throw new ApiError(
+      'The API returned incomplete or inconsistent scientific data. No result has been inferred. Retry or inspect the backend data.',
+      502,
+      'invalid_custom_response',
+    );
+  }
 }
 
 export function fetchReferenceSites(signal?: AbortSignal) {
