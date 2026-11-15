@@ -1,0 +1,222 @@
+{
+  "$defs": {
+    "SurfaceObserver": {
+      "additionalProperties": false,
+      "properties": {
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lon": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lon",
+          "type": "number"
+        },
+        "surfaceElevationM": {
+          "title": "Surfaceelevationm",
+          "type": "number"
+        },
+        "mastHeightM": {
+          "minimum": 0,
+          "title": "Mastheightm",
+          "type": "number"
+        },
+        "altitudeKm": {
+          "title": "Altitudekm",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lon",
+        "surfaceElevationM",
+        "mastHeightM",
+        "altitudeKm"
+      ],
+      "title": "SurfaceObserver",
+      "type": "object"
+    },
+    "TerrainObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "caseId": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Caseid",
+          "type": "string"
+        },
+        "siteId": {
+          "title": "Siteid",
+          "type": "string"
+        },
+        "timestampUtc": {
+          "title": "Timestamputc",
+          "type": "string"
+        },
+        "body": {
+          "enum": ["sun", "earth"],
+          "title": "Body",
+          "type": "string"
+        },
+        "visible": {
+          "title": "Visible",
+          "type": "boolean"
+        },
+        "observerKind": {
+          "const": "surface",
+          "title": "Observerkind",
+          "type": "string"
+        },
+        "observer": {
+          "$ref": "#/$defs/SurfaceObserver"
+        },
+        "quantity": {
+          "const": "terrain-visibility-at-observer",
+          "title": "Quantity",
+          "type": "string"
+        },
+        "visibilityRule": {
+          "const": "any-disc",
+          "title": "Visibilityrule",
+          "type": "string"
+        },
+        "bodyDefinition": {
+          "const": "finite-disc-any-part",
+          "title": "Bodydefinition",
+          "type": "string"
+        },
+        "refractionModel": {
+          "const": "none",
+          "title": "Refractionmodel",
+          "type": "string"
+        },
+        "referenceFrame": {
+          "const": "MOON_ME_DE421",
+          "title": "Referenceframe",
+          "type": "string"
+        },
+        "referenceRadiusKm": {
+          "const": 1737.4,
+          "title": "Referenceradiuskm",
+          "type": "number"
+        },
+        "sourceType": {
+          "enum": ["dated-terrain-simulation", "surface-observation"],
+          "title": "Sourcetype",
+          "type": "string"
+        },
+        "sourceUrl": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Sourceurl",
+          "type": "string"
+        },
+        "sourceVersion": {
+          "minLength": 1,
+          "title": "Sourceversion",
+          "type": "string"
+        },
+        "method": {
+          "minLength": 20,
+          "title": "Method",
+          "type": "string"
+        },
+        "demDescription": {
+          "minLength": 10,
+          "title": "Demdescription",
+          "type": "string"
+        },
+        "frameAssessment": {
+          "minLength": 20,
+          "title": "Frameassessment",
+          "type": "string"
+        },
+        "independenceStatement": {
+          "minLength": 20,
+          "title": "Independencestatement",
+          "type": "string"
+        },
+        "independentOfLunarWindow": {
+          "title": "Independentoflunarwindow",
+          "type": "boolean"
+        },
+        "evidencePath": {
+          "title": "Evidencepath",
+          "type": "string"
+        },
+        "evidenceSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidencesha256",
+          "type": "string"
+        },
+        "reviewer": {
+          "minLength": 2,
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewedAtUtc": {
+          "title": "Reviewedatutc",
+          "type": "string"
+        },
+        "reviewNotes": {
+          "minLength": 20,
+          "title": "Reviewnotes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "caseId",
+        "siteId",
+        "timestampUtc",
+        "body",
+        "visible",
+        "observerKind",
+        "observer",
+        "quantity",
+        "visibilityRule",
+        "bodyDefinition",
+        "refractionModel",
+        "referenceFrame",
+        "referenceRadiusKm",
+        "sourceType",
+        "sourceUrl",
+        "sourceVersion",
+        "method",
+        "demDescription",
+        "frameAssessment",
+        "independenceStatement",
+        "independentOfLunarWindow",
+        "evidencePath",
+        "evidenceSha256",
+        "reviewer",
+        "reviewedAtUtc",
+        "reviewNotes"
+      ],
+      "title": "TerrainObservation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "lunarwindow.terrain-observations.v1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/TerrainObservation"
+      },
+      "minItems": 1,
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  "required": ["schemaVersion", "observations"],
+  "title": "TerrainEvidence",
+  "type": "object"
+}

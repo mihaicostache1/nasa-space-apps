@@ -48,3 +48,7 @@ The default QuickMap replay uses committed evidence and does not contact NASA or
 The checks establish reproducible acquisition, contract consistency, and agreement between two tools at displayed pointing precision for three elevated observers at one timestamp. Both tools may share underlying NASA ephemerides; agreement is not wholly independent verification of those ephemerides. It does not validate the complete 30-day series against QuickMap, terrain shadowing, partial-disc visibility, eclipses, electrical power, a radio link budget, or actual mission coordinates.
 
 The shipped plots use local horizontal planes and body centers. Earth azimuth is unwrapped only in the plot; exported values remain [0, 360). Local Earth pointing angles are not libration longitude/latitude. GIS/backend still need to agree mast height, reference-frame compatibility, horizon masks, disc rules, and event-time refinement. Team-approved landing coordinates and the proposed 2026-2030 batch remain later work.
+
+## Surface scientific comparisons
+
+The [surface SPICE comparison and terrain-evidence audit](surface-science.md) now cover all three archived surface observers and all 720 hourly samples, with a separately generated NAIF reference. Shared-mask model consistency is reported separately; independent dated terrain evidence remains pending.

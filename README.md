@@ -178,3 +178,5 @@ tests/                        Offline contract tests
 ## Next step
 
 The [terrain-aware evaluation endpoint](docs/backend-data.md#terrain-aware-evaluation-contract) connects archived ephemerides and the reviewed Site01 mask to the visibility engine, with checksum verification, observer/frame checks, and complete provenance. Geometric v1 remains available; terrain v2 requires explicit acceptance of the frame approximation. [Dedicated regression tests](docs/validation/terrain-regression.md) cover terrain blocking and independently derived Site01 model baselines. Verified evaluations are cached, and the web app selects the terrain horizon per scenario. Next, review and register masks for further curated sites. See the [backend work package](docs/backend-data.md), [visibility model](docs/visibility.md), and [ephemeris handoff](docs/ephemeris-lead.md). The long 2026-2030 batch is supported by the CLI but has not been run.
+
+Surface pointing is also checked through a separate [SPICE calculation and terrain-evidence audit](docs/validation/surface-science.md). This is cross-tool consistency, with independent surface terrain observations still pending.

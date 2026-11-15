@@ -62,3 +62,7 @@ docker compose run --build --rm ephemeris-test
 ```
 
 Scientific validation against surface imagery or an independent terrain-visibility dataset remains separate work. The existing QuickMap camera comparisons check body pointing at elevated observers; they do not validate this ground-level terrain mask.
+
+## Surface scientific comparisons
+
+The [surface SPICE comparison and terrain-evidence audit](surface-science.md) now cover all three archived surface observers and all 720 hourly samples, with a separately generated NAIF reference. Shared-mask model consistency is reported separately; independent dated terrain evidence remains pending.

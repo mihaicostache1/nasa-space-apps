@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "lunarwindow.surface-science-inputs.v1",
+  "criteria": {
+    "pointingToleranceDeg": 0.001,
+    "angularRadiusToleranceDeg": 1e-5,
+    "basis": "Predeclared engineering cross-tool screening envelopes, not physical uncertainty bounds; no tuning to observed residuals."
+  },
+  "conventions": {
+    "referenceFrame": "MOON_ME_DE440_ME421",
+    "referenceRadiusKm": 1737.4,
+    "flattening": 0,
+    "aberrationCorrection": "CN+S",
+    "azimuthConvention": "clockwise-from-local-north",
+    "elevationReference": "local-horizontal",
+    "refraction": "none",
+    "timeScale": "UTC",
+    "mastHeightM": 0,
+    "targetRadiiKm": {
+      "sun": 695700.0,
+      "earth": 6378.137
+    }
+  },
+  "kernels": [
+    {
+      "filename": "naif0012.tls",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls",
+      "sizeBytes": 5257,
+      "sha256": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b"
+    },
+    {
+      "filename": "pck00011.tpc",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc",
+      "sizeBytes": 131226,
+      "sha256": "3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1"
+    },
+    {
+      "filename": "de440s.bsp",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp",
+      "sizeBytes": 32726016,
+      "sha256": "c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2"
+    },
+    {
+      "filename": "moon_pa_de440_200625.bpc",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de440_200625.bpc",
+      "sizeBytes": 12863488,
+      "sha256": "60cd55aa401ea2ea97360636f567554bfe4e37bb829f901b4460a455dfaf783f"
+    },
+    {
+      "filename": "moon_de440_250416.tf",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf",
+      "sizeBytes": 19478,
+      "sha256": "a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768"
+    }
+  ],
+  "datasets": [
+    {
+      "siteId": "lola-site01-reference",
+      "path": "data/reference/validation-30d/lola-site01-reference.json",
+      "sha256": "519628d7384992cc012039fe9df226a932d6c482de56b0b3277fdff6f30e9b50",
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "altitudeKm": 1.94476708984375,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0
+      }
+    },
+    {
+      "siteId": "lola-site04-reference",
+      "path": "data/reference/validation-30d/lola-site04-reference.json",
+      "sha256": "fa9b4e639709be80d49274895aaff003da8233e2b5644de67d372e43e3cee470",
+      "observer": {
+        "lat": -89.76674147712977,
+        "lon": -171.89280908299654,
+        "altitudeKm": 0.7679786376953125,
+        "surfaceElevationM": 767.9786376953125,
+        "mastHeightM": 0
+      }
+    },
+    {
+      "siteId": "lola-site23-reference",
+      "path": "data/reference/validation-30d/lola-site23-reference.json",
+      "sha256": "d6b6e13763f9ce645d87744f872ab754944c4fa87c2027c52b1bc0c2f28698aa",
+      "observer": {
+        "lat": -85.99486736492491,
+        "lon": -0.23460969154338968,
+        "altitudeKm": 4.78362939453125,
+        "surfaceElevationM": 4783.62939453125,
+        "mastHeightM": 0
+      }
+    }
+  ],
+  "siteProvenance": {
+    "path": "data/reference/site-provenance.json",
+    "sha256": "66216144e04824b807ade58b543f73e5bc73e0325478a6726af3c5843a995db6"
+  }
+}

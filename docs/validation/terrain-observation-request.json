@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "lunarwindow.terrain-observation-request.v1",
+  "maskArtifactSha256": "4554c4dd492b59f57d30e2de8cecb33d84714da5248f98acefdb8abccc446f6d",
+  "warning": "These UTCs and states select candidate checks using the model; they are not external measurements or ground truth. Do not copy model predictions into reference observations.",
+  "cases": [
+    {
+      "caseId": "site01-sun-visible",
+      "siteId": "lola-site01-reference",
+      "timestampUtc": "2026-12-04T07:00:00Z",
+      "body": "sun",
+      "modelPredictedVisible": true,
+      "modelClearanceDeg": 0.05163744512161106,
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0.0,
+        "altitudeKm": 1.94476708984375
+      },
+      "visibilityRule": "any-disc",
+      "referenceFrame": "MOON_ME_DE421",
+      "referenceRadiusKm": 1737.4,
+      "referenceMeasurement": null,
+      "status": "pending-independent-evidence"
+    },
+    {
+      "caseId": "site01-sun-blocked",
+      "siteId": "lola-site01-reference",
+      "timestampUtc": "2026-12-04T03:00:00Z",
+      "body": "sun",
+      "modelPredictedVisible": false,
+      "modelClearanceDeg": -0.05945868179292235,
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0.0,
+        "altitudeKm": 1.94476708984375
+      },
+      "visibilityRule": "any-disc",
+      "referenceFrame": "MOON_ME_DE421",
+      "referenceRadiusKm": 1737.4,
+      "referenceMeasurement": null,
+      "status": "pending-independent-evidence"
+    },
+    {
+      "caseId": "site01-earth-visible",
+      "siteId": "lola-site01-reference",
+      "timestampUtc": "2026-11-19T08:00:00Z",
+      "body": "earth",
+      "modelPredictedVisible": true,
+      "modelClearanceDeg": 0.06826698445733337,
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0.0,
+        "altitudeKm": 1.94476708984375
+      },
+      "visibilityRule": "any-disc",
+      "referenceFrame": "MOON_ME_DE421",
+      "referenceRadiusKm": 1737.4,
+      "referenceMeasurement": null,
+      "status": "pending-independent-evidence"
+    },
+    {
+      "caseId": "site01-earth-blocked",
+      "siteId": "lola-site01-reference",
+      "timestampUtc": "2026-11-29T00:00:00Z",
+      "body": "earth",
+      "modelPredictedVisible": false,
+      "modelClearanceDeg": -0.08669102372507798,
+      "observer": {
+        "lat": -89.46315775697248,
+        "lon": -137.50198490762307,
+        "surfaceElevationM": 1944.76708984375,
+        "mastHeightM": 0.0,
+        "altitudeKm": 1.94476708984375
+      },
+      "visibilityRule": "any-disc",
+      "referenceFrame": "MOON_ME_DE421",
+      "referenceRadiusKm": 1737.4,
+      "referenceMeasurement": null,
+      "status": "pending-independent-evidence"
+    }
+  ]
+}
